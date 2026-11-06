@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
-  <title id="title">Saman architecture</title>
-  <desc id="desc">Employees and editors reach the Saman frontend and CMS, both running in the Saman namespace on the DIS Core AKS cluster in Azure Norway East. The frontend's middleware checks on every request that the visitor is logged in, and the pages read from the CMS with the visitor's Payload session. The CMS runs the sign-in with Microsoft Entra ID through its login endpoint and issues that session. Ansattmottak, on a server in Digdir's server room in Leikanger, posts employees and the organisation structure in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. The CMS stores data in Azure Database for PostgreSQL and files in Azure Blob Storage.</desc>
+  <title id="title">ilag architecture</title>
+  <desc id="desc">Employees and editors reach the ilag frontend and CMS, both running in the ilag namespace on the DIS Core AKS cluster in Azure Norway East. The frontend's middleware checks on every request that the visitor is logged in, and the pages read from the CMS with the visitor's Payload session. The CMS runs the sign-in with Microsoft Entra ID through its login endpoint and issues that session. Ansattmottak, on a server in Digdir's server room in Leikanger, posts employees and the organisation structure in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. The CMS stores data in Azure Database for PostgreSQL and files in Azure Blob Storage.</desc>
 
   <style>
     svg {
@@ -75,7 +75,7 @@
 
   <rect class="bg" width="1200" height="900"/>
 
-  <text class="title" x="40" y="48">Saman architecture</text>
+  <text class="title" x="40" y="48">ilag architecture</text>
   <text class="lede" x="40" y="72">Target setup. Sign-in with Entra ID is built; the Azure hosting is decided but not built yet.</text>
 
   <!-- Zones -->
@@ -86,7 +86,7 @@
   <text class="zone-label" x="92" y="278">AKS · DIS CORE</text>
 
   <rect class="zone-ns" x="100" y="294" width="1000" height="336" rx="12"/>
-  <text class="zone-label" x="122" y="320">SAMAN NAMESPACE</text>
+  <text class="zone-label" x="122" y="320">ilag NAMESPACE</text>
 
   <!-- Actors, Ansattmottak and identity provider -->
   <rect class="actor" x="210" y="104" width="180" height="56" rx="28"/>
@@ -122,7 +122,7 @@
   <text class="s" x="280" y="510" text-anchor="middle">rendered on the server · /logg-inn</text>
 
   <rect class="chip" x="145" y="538" width="270" height="52" rx="8"/>
-  <text class="b" x="280" y="559" text-anchor="middle">@saman/shared</text>
+  <text class="b" x="280" y="559" text-anchor="middle">@ilag/shared</text>
   <text class="s" x="280" y="577" text-anchor="middle">src/shared · REST client + types</text>
 
   <path class="edge" d="M280,454 V470" marker-end="url(#arrow)"/>

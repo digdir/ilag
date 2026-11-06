@@ -12,7 +12,7 @@ who the fallback is for, and that matters.
 
 A password login doesn't go through Entra ID. It therefore doesn't get Entra
 ID's MFA and conditional access, and it keeps working for someone whose Entra ID
-account has been disabled. Every account with a password is a way into Saman
+account has been disabled. Every account with a password is a way into ilag
 that Entra ID doesn't control.
 
 Today any user can have a password: the first user is created with one, and
@@ -34,7 +34,7 @@ configured. Payload's password login has no second factor.
 
 **(b) Everyone who has a password**
 
-- Employees can still use Saman during an Entra ID outage.
+- Employees can still use ilag during an Entra ID outage.
 - Every password is a way around MFA and around disabling the account in Entra
   ID, and people have one more password to look after.
 
@@ -67,9 +67,9 @@ If (a) is accepted:
 
 - The text of NF-12 is sharpened to say the fallback is for named break-glass
   accounts, with an entry in `docs/specification/decisions.md`.
-- Every way into Saman except a handful of accounts goes through Entra ID and
+- Every way into ilag except a handful of accounts goes through Entra ID and
   what it enforces.
-- During an Entra ID outage, Saman is available to administrators only.
+- During an Entra ID outage, ilag is available to administrators only.
 - Break-glass accounts are single-factor. Long random passwords, the vault and
   logging are what protect them, so the routine around them has to be kept up.
 - The end-to-end tests log in with a password, so the users they create must be

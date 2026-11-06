@@ -1,6 +1,6 @@
 # Architecture decision records
 
-Why Saman is built the way it is. Each record describes one technical decision:
+Why ilag is built the way it is. Each record describes one technical decision:
 the situation, the options, what we chose and what follows from it.
 
 The requirements specification has its own log,
