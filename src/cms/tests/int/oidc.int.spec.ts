@@ -63,7 +63,7 @@ describe('Login with Entra ID', () => {
 
     process.env.ENTRA_ISSUER = provider.issuer.url!
     process.env.ENTRA_TENANT_ID = tenant
-    process.env.ENTRA_CLIENT_ID = 'saman-test'
+    process.env.ENTRA_CLIENT_ID = 'ilag-test'
     process.env.ENTRA_CLIENT_SECRET = 'test-secret'
 
     payload = await getPayload({ config: await config })

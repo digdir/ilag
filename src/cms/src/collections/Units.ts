@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 // Divisions, departments and sections, imported from their own file from
 // Digdir's authoritative source (NF-07). The import writes through the Local
 // API, which bypasses access control, so nobody can change units through the
-// admin panel or the REST/GraphQL API. What a unit leader maintains in Saman
+// admin panel or the REST/GraphQL API. What a unit leader maintains in ilag
 // (LO-03) will live elsewhere.
 //
 // The import matches units on externalUnitId. It stores the source's IDs for

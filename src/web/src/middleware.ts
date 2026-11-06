@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { currentUser } from '@saman/shared'
+import { currentUser } from '@ilag/shared'
 
 // Every page needs a logged-in user (NF-11), except the login page itself.
 // Payload owns the session: this only asks it who the cookie belongs to.
@@ -15,7 +15,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     user = await currentUser(context.request.headers.get('cookie'))
   } catch {
     // Without the CMS nobody can be checked, so nobody gets in.
-    return new Response('Saman får ikke kontakt med innloggingen. Prøv igjen om litt.', {
+    return new Response('ilag får ikke kontakt med innloggingen. Prøv igjen om litt.', {
       status: 503,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     })

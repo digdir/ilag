@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",
-    "@saman/shared": "workspace:*",
+    "@ilag/shared": "workspace:*",
     "astro": "^7.4.2"
   },
   "devDependencies": {

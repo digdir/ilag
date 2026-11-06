@@ -41,7 +41,7 @@ function configuration(settings: OidcSettings): Promise<client.Configuration> {
   return config
 }
 
-const stateCookieName = (provider: OidcProvider) => `saman-oauth-${provider.id}`
+const stateCookieName = (provider: OidcProvider) => `ilag-oauth-${provider.id}`
 const callbackURL = (payload: Payload, provider: OidcProvider) =>
   new URL(`/api/${COLLECTION}/oauth/${provider.id}/callback`, payload.config.serverURL)
 
