@@ -1,9 +1,9 @@
 # Architecture overview
 
-Saman replaces baksia.digdir.no as Digdir's internal source for employees, roles
+ilag replaces baksia.digdir.no as Digdir's internal source for employees, roles
 and the organisation structure.
 
-The moving parts of Saman as it is meant to run: in Azure in Norway, with
+The moving parts of ilag as it is meant to run: in Azure in Norway, with
 sign-in through Microsoft Entra ID. Solid arrows are requests. The dotted arrow
 is the sign-in with Entra ID: the browser is sent there and back, and the CMS
 exchanges the result for a token and checks it against Entra ID's signing keys.
@@ -13,7 +13,7 @@ exchanges the result for a token and checks it against Entra ID's signing keys.
 > [Local development](#local-development) for how this maps to a developer machine
 > today.
 
-![Saman architecture: employees and editors reach the frontend and CMS in the Saman namespace on DIS Core in Azure Norway East, with sign-in through Entra ID](architecture.svg)
+![ilag architecture: employees and editors reach the frontend and CMS in the ilag namespace on DIS Core in Azure Norway East, with sign-in through Entra ID](architecture.svg)
 
 ### Diagram source
 
@@ -33,11 +33,11 @@ flowchart TB
 
     subgraph azure["Azure — Norway East"]
         subgraph aks["AKS — DIS Core (Digdir Infrastructure Services)"]
-            subgraph ns["Saman namespace"]
+            subgraph ns["ilag namespace"]
                 subgraph web["Frontend — src/web, Astro 7 SSR"]
                     middleware["Middleware<br/>checks the session on every request"]
                     pages["Pages<br/>(server-rendered)"]
-                    client["@saman/shared (src/shared)<br/>REST client + Payload types"]
+                    client["@ilag/shared (src/shared)<br/>REST client + Payload types"]
                 end
 
                 subgraph cms["CMS — src/cms, Payload 3 on Next.js 16"]
@@ -73,16 +73,16 @@ flowchart TB
 
 | Part | Role |
 | --- | --- |
-| **DIS Core** | Digdir Infrastructure Services' shared AKS cluster. Saman gets its own namespace there, and both apps run in it. |
-| **Frontend** (`src/web`) | The site employees use, running in Saman's namespace on DIS Core. Its middleware checks on every request that the visitor is logged in, and sends everyone else to `/logg-inn`. Astro renders every page on the server and fetches content from the CMS during the request, so the browser never fetches content from the CMS directly. |
+| **DIS Core** | Digdir Infrastructure Services' shared AKS cluster. ilag gets its own namespace there, and both apps run in it. |
+| **Frontend** (`src/web`) | The site employees use, running in ilag's namespace on DIS Core. Its middleware checks on every request that the visitor is logged in, and sends everyone else to `/logg-inn`. Astro renders every page on the server and fetches content from the CMS during the request, so the browser never fetches content from the CMS directly. |
 | **CMS** (`src/cms`) | Runs in the same namespace as the frontend. Owns the content model, access control and data. It runs the sign-in with Entra ID and issues the session both apps use. Editors work in the admin UI; the frontend reads through the REST API, and Ansattmottak posts employees and the org structure to a custom batch endpoint on it. GraphQL is exposed but nothing uses it yet. CORS and CSRF only allow the frontend's URL. |
-| **`@saman/shared`** (`src/shared`) | A pnpm workspace package, not a running service; it is drawn inside the frontend because that is where its code runs. It holds the types generated from the collection configs (`pnpm generate:types`) and a thin REST client, so the frontend is typed against the CMS schema. |
+| **`@ilag/shared`** (`src/shared`) | A pnpm workspace package, not a running service; it is drawn inside the frontend because that is where its code runs. It holds the types generated from the collection configs (`pnpm generate:types`) and a thin REST client, so the frontend is typed against the CMS schema. |
 | **Microsoft Entra ID** | Identity provider for both employees and editors, through OpenID Connect against Digdir's tenant. The CMS's login talks to it; the frontend never does. It says who someone is; what they may see and do is managed in Payload. It is a global Microsoft service, so it sits outside the Norway region in the diagram. |
-| **Ansattmottak** | The source of employee information and the organisation structure (units). It runs on a server in Digdir's own server room in Leikanger, outside Azure, and posts this data in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. Saman does not edit this data; it receives it. |
+| **Ansattmottak** | The source of employee information and the organisation structure (units). It runs on a server in Digdir's own server room in Leikanger, outside Azure, and posts this data in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. ilag does not edit this data; it receives it. |
 | **Azure Database for PostgreSQL** | The only database. In Azure the schema is applied with migrations, not pushed on startup. |
 | **Azure Blob Storage** | Files uploaded to Payload's `media` collection. |
 
-Everything Saman stores — content in PostgreSQL and uploaded files in Blob
+Everything ilag stores — content in PostgreSQL and uploaded files in Blob
 Storage — stays in Norway East.
 
 ## Authentication
@@ -127,7 +127,7 @@ for the Azure services:
 | Azure Blob Storage | Local disk, `src/cms/media` |
 | Entra ID sign-in | The same sign-in, against an app registration with `localhost` redirect URIs (`ENTRA_*` in `src/cms/.env`). Without those settings, only email and password. The tests use a mock provider |
 | Ansattmottak | Not available; employees and units have to be seeded or posted by hand |
-| Saman namespace on DIS Core | `pnpm dev`: Astro on `:4321`, Payload on `:3000` |
+| ilag namespace on DIS Core | `pnpm dev`: Astro on `:4321`, Payload on `:3000` |
 
 The [agentctl Agent](../../agent/README.md) runs this same local stack inside a
 sandbox, with Podman in place of Docker. The [prototype](../../prototype) is a
@@ -146,7 +146,7 @@ one-time import from baksia.digdir.no to get realistic test data.
 
 ## Later: public pages
 
-Saman is internal for now: every visitor is an employee who signs in (NF-11).
+ilag is internal for now: every visitor is an employee who signs in (NF-11).
 Public pages may come later; the requirements for them (NF-03, SF-03) are set
 to «Ikke nå». Those requests carry no employee token, so the frontend
 will need another way to read from the CMS, and the CMS will need access rules

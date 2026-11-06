@@ -1,5 +1,5 @@
 ---
-import { login, loginProviders, providerLoginURL, type LoginProvider } from '@saman/shared'
+import { login, loginProviders, providerLoginURL, type LoginProvider } from '@ilag/shared'
 
 // Only pages on this site, so a crafted link can't send people elsewhere.
 // The target is resolved the way a browser resolves a Location header, which
@@ -45,10 +45,10 @@ try {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Logg inn — Saman</title>
+    <title>Logg inn — ilag</title>
   </head>
   <body>
-    <h1>Logg inn i Saman</h1>
+    <h1>Logg inn i ilag</h1>
     {error && <p role="alert">{error}</p>}
     {
       providers.map(({ id, label }) => (

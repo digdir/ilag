@@ -1,5 +1,5 @@
 ---
-import { cmsFetch } from '@saman/shared'
+import { cmsFetch } from '@ilag/shared'
 
 const cmsURL = import.meta.env.PUBLIC_CMS_URL
 const { user } = Astro.locals
@@ -18,10 +18,10 @@ try {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Saman — utviklingsmiljø</title>
+    <title>ilag — utviklingsmiljø</title>
   </head>
   <body>
-    <h1>Saman</h1>
+    <h1>ilag</h1>
     {
       user && (
         <form method="post" action="/logg-ut">

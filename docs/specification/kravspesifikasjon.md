@@ -1,19 +1,19 @@
-# Saman — Rammeverk for hvordan vi jobber sammen med leveranser
+# ilag — Rammeverk for hvordan vi jobber sammen med leveranser
 
 **Kravspesifikasjon**
 
-> Kravspesifikasjonen eies av Organisasjonslæring (VSU) og forvaltes i denne filen. Den beskriver intensjonen bak Saman og er utgangspunktet for implementeringen, og den oppdateres etter hvert som løsningen utvikles. Begrunnelser for endringer står i `docs/specification/decisions.md`. Ved behov for en Word-versjon lages den fra denne filen.
+> Kravspesifikasjonen eies av Organisasjonslæring (VSU) og forvaltes i denne filen. Den beskriver intensjonen bak ilag og er utgangspunktet for implementeringen, og den oppdateres etter hvert som løsningen utvikles. Begrunnelser for endringer står i `docs/specification/decisions.md`. Ved behov for en Word-versjon lages den fra denne filen.
 
 ## 1. Innledning
 ### 1.1 Bakgrunn
 I dag er det mange ulike strukturer, prosesser og metoder som påvirker hvordan vi jobber med leveransene i Digdir. Dette mangfoldet gir fleksibilitet, ved at team og enheter står fritt til å velge den arbeidsformen som passer best for oppgaven som skal løses. Samtidig skaper mangfoldet noen ulemper: det kan oppleves uklart hvem som har ansvar for hva, hvordan milepæler og fremdrift følges opp, og hvordan ressurser fordeles. Variasjonen kan også bli så stor at det oppstår et "oversettelsesbehov" mellom team og enheter, som gjør det unødvendig krevende å samarbeide og samordne arbeidet på tvers.
 
 ### 1.2 Formål
-Hovedleveransen er et rammeverk i form av et digitalt produkt som gjør det enklere å jobbe sammen på tvers: **Saman** – rammeverk for hvordan vi jobber sammen med leveranser. En annen undertittel til Saman kunne like gjerne vært: slik jobber vi sammen i Digdir.
+Hovedleveransen er et rammeverk i form av et digitalt produkt som gjør det enklere å jobbe sammen på tvers: **ilag** – rammeverk for hvordan vi jobber sammen med leveranser. En annen undertittel til ilag kunne like gjerne vært: slik jobber vi sammen i Digdir.
 
 Arbeidet er en del av Digdirs pågående organisasjonsutvikling (OU). Målet med OU-prosessen er at Digdir skal bruke virkemidlene sine mer helhetlig og samtidig styrke organisasjonens endringsevne. Dette rammeverket skal bidra til å nå det målet ved å gi Digdir et operasjonelt rammeverk som gjør det enklere å levere mer samordnet på samfunnsoppdraget.
 
-Saman definerer hva som skal eller bør gjøres likt på tvers av team og enheter som jobber med leveranser - interne eller eksterne - og hva som fortsatt skal være fleksibelt og opp til det enkelte team eller enhet.
+ilag definerer hva som skal eller bør gjøres likt på tvers av team og enheter som jobber med leveranser - interne eller eksterne - og hva som fortsatt skal være fleksibelt og opp til det enkelte team eller enhet.
 
 ### 1.3 Mål og gevinster
 - gi alle ansatte et felles språk for hvordan vi jobber med leveranser
@@ -31,7 +31,7 @@ Saman definerer hva som skal eller bør gjøres likt på tvers av team og enhete
 - hjelpe nyansatte til å bli kjent med organisasjonen og måten vi jobber på
 
 ### 1.4 Omfang og avgrensning
-**Saman skal dekke:**
+**ilag skal dekke:**
 
 - Beskrivelse av **prinsipper** på ulike nivåer og formål.
 
@@ -49,7 +49,7 @@ Saman definerer hva som skal eller bør gjøres likt på tvers av team og enhete
 
 - En **oversikt over alle ansatte**, deres tilhørighet i linjen, teamene de er med i og hvordan kapasiteten deres er allokert
 
-- En **KI-assistent** som svarer på spørsmål ut fra innholdet i Saman
+- En **KI-assistent** som svarer på spørsmål ut fra innholdet i ilag
 
 - **Mål og nøkkelresultater (OKR)** for team og enheter, med status som kan følges samlet i linjen
 
@@ -57,15 +57,15 @@ Saman definerer hva som skal eller bør gjøres likt på tvers av team og enhete
 
 - Vise, og knytte inn, **Digdirs styringsfundament** (visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller), som en samlet og alltid oppdatert kilde for alle ansatte.
 
-Saman skal være tilgjengelig for alle ansatte i Digdir, uavhengig av om arbeidet er organisert i team eller i linjen.
+ilag skal være tilgjengelig for alle ansatte i Digdir, uavhengig av om arbeidet er organisert i team eller i linjen.
 
-**Saman skal ikke:**
+**ilag skal ikke:**
 
-- Saman skal ikke velge eller pålegge en bestemt arbeidsmetodikk (f.eks. Scrum, Kanban, SAFe) for virksomheten. Rammeverket skal anbefale prinsipper, roller og strukturer som bør være felles, og overlate valg av metodikk til det enkelte team. For å sikre at rammeverket utfordres når det ikke fungerer etter hensikt må det være mulig å velge noe annet. Men da bør læringen gå tilbake i form av oppdaterte beskrivelser og anbefalinger.
+- ilag skal ikke velge eller pålegge en bestemt arbeidsmetodikk (f.eks. Scrum, Kanban, SAFe) for virksomheten. Rammeverket skal anbefale prinsipper, roller og strukturer som bør være felles, og overlate valg av metodikk til det enkelte team. For å sikre at rammeverket utfordres når det ikke fungerer etter hensikt må det være mulig å velge noe annet. Men da bør læringen gå tilbake i form av oppdaterte beskrivelser og anbefalinger.
 
-- Saman skal ikke detaljstyre hvordan det enkelte team organiserer sitt daglige arbeid, utover det som er nødvendig for å sikre samarbeid og samordning på tvers.
+- ilag skal ikke detaljstyre hvordan det enkelte team organiserer sitt daglige arbeid, utover det som er nødvendig for å sikre samarbeid og samordning på tvers.
 
-- Med det store mangfoldet av oppgaver og virksomhetsområder i Digdir skal fleksibilitet beholdes der det er mulig og hensiktsmessig – Saman skal legge til rette for en balanse mellom det som må gjøres likt for alle, og det som fortsatt kan variere.
+- Med det store mangfoldet av oppgaver og virksomhetsområder i Digdir skal fleksibilitet beholdes der det er mulig og hensiktsmessig – ilag skal legge til rette for en balanse mellom det som må gjøres likt for alle, og det som fortsatt kan variere.
 
 ### 1.5 Begreper
 For å sikre en felles forståelse gjennom dokumentet, brukes følgende begreper med disse betydningene:
@@ -73,7 +73,7 @@ For å sikre en felles forståelse gjennom dokumentet, brukes følgende begreper
 **Rammeverk  
 **"Et rammeverk er en overordnet struktur, et sett med regler, retningslinjer eller standarder som brukes som et grunnlag for å bygge eller organisere noe annet."[^1]
 
-Rammeverket, Saman, beskriver hvordan vi i Digdir ønsker å jobbe for best mulig å levere på formålet vårt. Det gir rammer og struktur og er i praksis en verktøykasse for alle i Digdir. Noe MÅ man forholde seg, men i det store handler det om en verktøykasse hvor man velger det verktøyet som passer til formålet.
+Rammeverket, ilag, beskriver hvordan vi i Digdir ønsker å jobbe for best mulig å levere på formålet vårt. Det gir rammer og struktur og er i praksis en verktøykasse for alle i Digdir. Noe MÅ man forholde seg, men i det store handler det om en verktøykasse hvor man velger det verktøyet som passer til formålet.
 
 **Team  
 **En gruppe Digdir-medarbeidere (og eventuelt eksterne) som arbeider sammen om leveranser.
@@ -90,7 +90,7 @@ En gruppe Digdir-medarbeidere (og eventuelt eksterne) som jobber sammen mot leve
 Alt som skapes av eller kommer ut av et team eller prosjekt. Kan være et digitalt produkt, en rapport, et arrangement, en prosess, daglig drift etc.
 
 ### 1.6 Brukergrupper
-Saman henvender seg til alle ansatte og innleide i Digdir, men ulike grupper vil bruke rammeverket til noe ulike formål:
+ilag henvender seg til alle ansatte og innleide i Digdir, men ulike grupper vil bruke rammeverket til noe ulike formål:
 
 - **Alle ansatte** - for å forstå hvordan organisasjonen henger sammen og hvordan vi ønsker å jobbe sammen, hvem som har ansvar for hva, lære hvordan en selv kan bidra inn i leveranser
 
@@ -116,24 +116,24 @@ I tillegg skal deler av rammeverket være tilgjengelig for eksterne brukergruppe
 
 ## 2. Systembeskrivelse
 ### 2.1 Hva er rammeverket
-Saman er et digitalt, nettbasert produkt som samler de sentrale funksjonsområdene beskrevet i kapittel 3 på ett sted: teamklassifisering, prinsipper, rollebeskrivelser, verktøykasse, teamoversikt og begreper. Brukeren møter Saman som en veiledningsportal der man kan orientere seg i hvordan Digdir organiserer og jobber med leveranser, uavhengig av om man selv er organisert i team eller i linjen.
+ilag er et digitalt, nettbasert produkt som samler de sentrale funksjonsområdene beskrevet i kapittel 3 på ett sted: teamklassifisering, prinsipper, rollebeskrivelser, verktøykasse, teamoversikt og begreper. Brukeren møter ilag som en veiledningsportal der man kan orientere seg i hvordan Digdir organiserer og jobber med leveranser, uavhengig av om man selv er organisert i team eller i linjen.
 
 Innhold som er spesifikt for et team, prosjekt eller enhet forvaltes desentralisert: ledere kan oppdatere informasjon for sin enhet, prosjektledere for sitt prosjekt, og teamledere for sitt team. Alle medlemmer av et team, prosjekt eller en enhet skal i utgangspunktet kunne redigere innhold på sitt eget område.
 
 ### 2.2 Systemkontekst og avhengigheter
-Saman inngår i og må sees i sammenheng med følgende:
+ilag inngår i og må sees i sammenheng med følgende:
 
-- **Digdirs styringsfundament** — Saman erstatter ikke styringsfundamentet, men skal integrere dette inn i løsningen og legge til rette for at dette innarbeides.
+- **Digdirs styringsfundament** — ilag erstatter ikke styringsfundamentet, men skal integrere dette inn i løsningen og legge til rette for at dette innarbeides.
 
-- **Digdirs nye organisering** — besluttes gjennom den pågående organisasjonsutviklingen (OU), og Saman skal reflektere og understøtte denne.
+- **Digdirs nye organisering** — besluttes gjennom den pågående organisasjonsutviklingen (OU), og ilag skal reflektere og understøtte denne.
 
-- **Ressursstyring/porteføljestyring** — Saman viser hvordan den enkelte ansatte er allokert på tvers av team og prosjekter (jf. Allokering), men selve prioriteringen og fordelingen av ressurser håndteres i egne prosesser/systemer for porteføljestyring.
+- **Ressursstyring/porteføljestyring** — ilag viser hvordan den enkelte ansatte er allokert på tvers av team og prosjekter (jf. Allokering), men selve prioriteringen og fordelingen av ressurser håndteres i egne prosesser/systemer for porteføljestyring.
 
-- **Ekstern begrepskatalog (data.norge.no)** — begreper i Saman kan kobles mot denne katalogen (jf. BG-04).
+- **Ekstern begrepskatalog (data.norge.no)** — begreper i ilag kan kobles mot denne katalogen (jf. BG-04).
 
-- **Digdirs designsystem** — det visuelle uttrykket i Saman skal følge Digdirs etablerte designsystem.
+- **Digdirs designsystem** — det visuelle uttrykket i ilag skal følge Digdirs etablerte designsystem.
 
-- **Språkmodell** — KI-assistenten (jf. Spør Saman) forutsetter en ekstern språkmodelltjeneste. Valg av leverandør, databehandleravtale og kostnadsmodell er ikke avklart.
+- **Språkmodell** — KI-assistenten (jf. Spør ilag) forutsetter en ekstern språkmodelltjeneste. Valg av leverandør, databehandleravtale og kostnadsmodell er ikke avklart.
 
 - **HR-system eller Entra ID** — ansatte, enhetstilhørighet og ledere hentes automatisk fra Digdirs autoritative kilde. Hvilken kilde som skal brukes, er ikke avklart (jf. åpen avklaring 6).
 
@@ -157,15 +157,15 @@ Saman inngår i og må sees i sammenheng med følgende:
 - **Ekstern bruker** — har lesetilgang til innhold som er gjort tilgjengelig eksternt, uten redigeringsrettigheter. Rollen er ikke med i første versjon (jf. NF-03 og NF-11).
 
 ### 2.4 Overordnede antakelser
-- Digdirs styringsfundament og nye organisering vedtas og gjelder som forutsatt gjennom OU-prosessen, og legger rammene Saman skal understøtte.
+- Digdirs styringsfundament og nye organisering vedtas og gjelder som forutsatt gjennom OU-prosessen, og legger rammene ilag skal understøtte.
 
 - Alle ansatte og innleide har tilgang til systemet via eksisterende pålogging/tilgangsstyring i Digdir.
 
 - Team, prosjekter og enheter registrerer og vedlikeholder innholdet om eget område selv, som mandat, prinsipper og OKR (jf. 2.1) — løsningen forutsetter aktiv bruk og oppdatering fra brukerne. Ansatte, enhetstilhørighet og ledere hentes automatisk (jf. 2.2).
 
-- Ekstern begrepskatalog (data.norge.no) er tilgjengelig og kan kobles til fra Saman.
+- Ekstern begrepskatalog (data.norge.no) er tilgjengelig og kan kobles til fra ilag.
 
-- Organisasjonslæring (VSU) har innholdsmessig eierskap til Saman.
+- Organisasjonslæring (VSU) har innholdsmessig eierskap til ilag.
 
 ## 3. Funksjonelle krav
 > **NB!** De funksjonelle kravene er basert på det innsiktsarbeidet gruppen har gjort gjennom intervjuer, diskusjoner og enkle brukertester. Det er på ingen måte en fasit, og det oppfordres til å starte i det små med en MVP.
@@ -306,7 +306,7 @@ Prinsipper skal gi et samlet sted for prinsipper som skal bidra til å forme kul
 | PR-06 | Systemet skal la brukeren definere hvilke områder prinsipper skal kunne knyttes til (eks. lederprinsipper, arkitekturprinsipper)           | Må        |
 
 ### 3.7 Styringsfundament
-Digdirs styringsfundament er en samlet fremstilling av virksomhetens visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller. Det er én av tre MVP-er fra arbeidspakken "Digdirs styringsfundament" i OU-prosessen — de to andre (styringsstruktur og styringsprinsipper) er hovedsakelig til bruk for andre OU-kjerneteam, og planlegges tatt inn i Saman på et senere tidspunkt.
+Digdirs styringsfundament er en samlet fremstilling av virksomhetens visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller. Det er én av tre MVP-er fra arbeidspakken "Digdirs styringsfundament" i OU-prosessen — de to andre (styringsstruktur og styringsprinsipper) er hovedsakelig til bruk for andre OU-kjerneteam, og planlegges tatt inn i ilag på et senere tidspunkt.
 
 #### Krav
 Styringsfundament skal gi alle ansatte en samlet og alltid oppdatert kilde til Digdirs visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller.
@@ -348,18 +348,18 @@ Allokering skal vise hvordan den enkelte ansattes kapasitet er fordelt på team 
 | AL-03 | Systemet skal markere ansatte med samlet allokering under 80 % eller over 100 %.                                               | Kan       |
 | AL-04 | Systemet skal begrense visning av allokering til den ansatte selv, teamleder, teameier og personalleder.                       | Må        |
 
-### 3.10 Spør Saman (KI-assistent)
+### 3.10 Spør ilag (KI-assistent)
 Rammeverket samler mye innhold på ett sted: roller, teamtyper, prinsipper, verktøy, begreper og organisasjonen. Brukerne kommer ofte med et konkret spørsmål, for eksempel hvem som bør være teameier for et nytt team eller hvilken teamtype som passer en oppgave, og må i dag sette sammen svaret fra flere sider selv.
 
-En KI-assistent kan gi svar i kontekst, basert på innholdet i Saman, og vise hvor svaret kommer fra slik at brukeren kan kontrollere det.
+En KI-assistent kan gi svar i kontekst, basert på innholdet i ilag, og vise hvor svaret kommer fra slik at brukeren kan kontrollere det.
 
 #### Krav
-Spør Saman skal gi brukerne svar på spørsmål om hvordan vi jobber sammen i Digdir, basert på innholdet i Saman og med tydelig kildehenvisning.
+Spør ilag skal gi brukerne svar på spørsmål om hvordan vi jobber sammen i Digdir, basert på innholdet i ilag og med tydelig kildehenvisning.
 
 | ID    | Beskrivelse                                                                                                                      | Prioritet |
 |-------|----------------------------------------------------------------------------------------------------------------------------------|-----------|
-| AI-01 | Systemet skal la brukeren stille spørsmål i naturlig språk om innholdet i Saman og få svar.                                      | Bør       |
-| AI-02 | Svarene skal bygge på innholdet i Saman og vise hvilke sider eller elementer svaret er basert på.                                | Må        |
+| AI-01 | Systemet skal la brukeren stille spørsmål i naturlig språk om innholdet i ilag og få svar.                                       | Bør       |
+| AI-02 | Svarene skal bygge på innholdet i ilag og vise hvilke sider eller elementer svaret er basert på.                                 | Må        |
 | AI-03 | Assistenten skal bare bruke innhold brukeren selv har tilgang til, og skal ikke gi ut allokeringsdata utover det AL-04 tillater. | Må        |
 | AI-04 | Systemet skal tydelig opplyse om at svarene er generert av KI og kan inneholde feil.                                             | Må        |
 | AI-05 | Assistenten skal foreslå relevante spørsmål ut fra siden brukeren står på.                                                       | Kan       |
@@ -368,7 +368,7 @@ Spør Saman skal gi brukerne svar på spørsmål om hvordan vi jobber sammen i D
 ### 3.11 Mål og nøkkelresultater (OKR)
 OKR er et målstyringsverktøy som hjelper team og enheter å holde fokus på effekten de ønsker å oppnå, og hvordan de vet om de lykkes (jf. Vedlegg 5). I dag ligger OKR spredt i ulike dokumenter og verktøy, og det er vanskelig å se hvordan teamenes mål henger sammen med enhetenes mål.
 
-Når OKR registreres og følges opp i Saman, blir målene synlige på tvers, og det blir lettere å holde dem levende gjennom tertialet i stedet for at de havner i skuffen. Confidence på nøkkelresultatene gir et raskt bilde av hvor det går bra og hvor det trengs hjelp.
+Når OKR registreres og følges opp i ilag, blir målene synlige på tvers, og det blir lettere å holde dem levende gjennom tertialet i stedet for at de havner i skuffen. Confidence på nøkkelresultatene gir et raskt bilde av hvor det går bra og hvor det trengs hjelp.
 
 #### Krav
 OKR skal gjøre mål og nøkkelresultater for team og enheter synlige, og gi et samlet bilde av status oppover i linjen.
@@ -421,17 +421,17 @@ Innsatsområder skal gi en oversikt over Digdirs innsatsområder, hvem som leder
 | IO-06 | Systemet skal la administrator opprette, endre og avvikle innsatsområder.                      | Bør       |
 
 ### 3.14 Porteføljestyring
-Toppledergruppen er Digdirs porteføljestyre, og beslutter strategisk retning og prioriteringer. Saman skal ha et eget funksjonsområde for porteføljestyring, men modellen for porteføljestyring i Digdir er fortsatt under utarbeidelse.
+Toppledergruppen er Digdirs porteføljestyre, og beslutter strategisk retning og prioriteringer. ilag skal ha et eget funksjonsområde for porteføljestyring, men modellen for porteføljestyring i Digdir er fortsatt under utarbeidelse.
 
 Detaljerte krav avventes til det er avklart hva funksjonsområdet skal inneholde (jf. åpen avklaring 5).
 
 ### 3.15 Forside
-Forsiden er inngangen til Saman for alle ansatte. Den skal gjøre det enkelt å finne en kollega, et team eller en enhet, og lede nye brukere til det som er mest nyttig å starte med.
+Forsiden er inngangen til ilag for alle ansatte. Den skal gjøre det enkelt å finne en kollega, et team eller en enhet, og lede nye brukere til det som er mest nyttig å starte med.
 
-Forsiden samler også innhold fra resten av Saman, som dagens begrep, status for OKR og det som er nytt, slik at rammeverket oppleves som levende og verdt å komme tilbake til.
+Forsiden samler også innhold fra resten av ilag, som dagens begrep, status for OKR og det som er nytt, slik at rammeverket oppleves som levende og verdt å komme tilbake til.
 
 #### Krav
-Forsiden skal gi en enkel inngang til Saman, med samlet søk og snarveier til det viktigste.
+Forsiden skal gi en enkel inngang til ilag, med samlet søk og snarveier til det viktigste.
 
 | ID    | Beskrivelse                                                                                                      | Prioritet |
 |-------|------------------------------------------------------------------------------------------------------------------|-----------|
@@ -440,7 +440,7 @@ Forsiden skal gi en enkel inngang til Saman, med samlet søk og snarveier til de
 | FS-03 | Systemet skal ha en inngang til veiviseren for dem som skal etablere et team.                                    | Bør       |
 | FS-04 | Systemet skal vise et nytt begrep fra begrepslisten hver dag.                                                    | Kan       |
 | FS-05 | Systemet skal vise verktøy som nylig er lagt til i verktøykassen.                                                | Kan       |
-| FS-06 | Systemet skal vise en oversikt over de siste endringene i innholdet i Saman.                                     | Kan       |
+| FS-06 | Systemet skal vise en oversikt over de siste endringene i innholdet i ilag.                                      | Kan       |
 | FS-07 | Systemet skal minne team og enheter om å oppdatere confidence og sette nye OKR når tertialet nærmer seg slutten. | Kan       |
 
 ### 3.16 Tilbakemeldinger
@@ -545,11 +545,11 @@ Punkter som er identifisert underveis, men som krever avklaring med flere enn kj
 | 1   | Navngiving av person-entitet                        | Avklart 2026-10-31: ansatte og innleide modelleres som én entitet, Person, med et flagg for om personen er ansatt (jf. 4.1). Opprinnelig spørsmål: Bør Medlem, Ansatt og eksterne/innleide modelleres som én generisk entitet (der relasjonsnavnet varierer: «ansatt i» Enhet, «medlem av» Team/Prosjekt), eller som separate entiteter (f.eks. Ansatt + Ekstern ressurs)? Påvirker hvordan eksterne/innleide håndteres i datamodellen. | TBD                                 |
 | 2   | Teknisk forvaltning og videreutvikling              | Hvem har ansvar for drift, oppdateringer og feilretting fra 1.1.27, når det ikke er etablert et dedikert team?                                                                                                                                                                       | TBD                                 |
 | 3   | Personvern ved visning av allokering og bruksmåling | Visning av allokering per ansatt (jf. Allokering) og måling av bruk (jf. NF-08 til NF-10) krever personvernvurdering og avklaring av medvirkning fra tillitsvalgte før funksjonene tas i bruk.                                                                                       | Personvernombud, tillitsvalgte      |
-| 4   | Språkmodell for KI-assistenten                      | Hvilken språkmodelltjeneste skal Spør Saman bruke, og hvordan sikres databehandleravtale, personvern og en akseptabel kostnadsmodell?                                                                                                                                                | TBD                                 |
+| 4   | Språkmodell for KI-assistenten                      | Hvilken språkmodelltjeneste skal Spør ilag bruke, og hvordan sikres databehandleravtale, personvern og en akseptabel kostnadsmodell?                                                                                                                                                 | TBD                                 |
 | 5   | Innhold i Porteføljestyring                         | Hva skal funksjonsområdet Porteføljestyring inneholde: forklaring av porteføljestyringen, oversikt over porteføljen, støtte for prioriteringsprosessen, eller en kombinasjon? Støtte for prioriteringsprosessen vil kreve endring i 2.2.                                             | Arbeidspakken for porteføljestyring |
 | 6   | Kilde for ansatte og enheter                        | Skal ansatte, enhetstilhørighet og ledere hentes fra HR-systemet eller fra Entra ID? Valget påvirker datakvalitet, hvor raskt endringer blir synlige og hvilke opplysninger som er tilgjengelige.                                                                                    | TBD                                 |
 | 7   | Varig ID for personer                               | Personer kobles mot kilden med kildens egen ID. Det er ikke avklart om ID-en er den samme når en innleid blir ansatt. Endres den, blir personen registrert to ganger, og teamhistorikken følger ikke med. | TBD                                 |
-| 8   | Kobling av Ansattporten til brukere                 | Ansattporten (jf. NF-13) identifiserer brukeren med fødselsnummer, mens Entra ID bruker en ID i Digdirs tenant. Det er ikke avklart hvordan en innlogging med Ansattporten kobles til samme bruker, og om Saman kan lagre fødselsnummer for å gjøre det. | Personvernombud                     |
+| 8   | Kobling av Ansattporten til brukere                 | Ansattporten (jf. NF-13) identifiserer brukeren med fødselsnummer, mens Entra ID bruker en ID i Digdirs tenant. Det er ikke avklart hvordan en innlogging med Ansattporten kobles til samme bruker, og om ilag kan lagre fødselsnummer for å gjøre det. | Personvernombud                     |
 
 ## Vedlegg 1: Klassifisering av team (team veiviser)
 ### Egner oppgaven seg for teamarbeid?
@@ -725,7 +725,7 @@ For å gi fagnettverket gode rammer er det viktig å:
 Et tydelig formål gjør det enklere å skape relevant aktivitet og verdi for deltakerne, samtidig som fagnettverket beholder den fleksible formen som skiller det fra et team.
 
 ## Vedlegg 3: Verktøy - Teammandat
-Et teammandat sier hvorfor teamet finnes, hva det skal oppnå og hvilke rammer det har. Saman bruker mandatmalen fra arbeidspakken «Helhetlig prioritering og styringspraksis», slik at team, prosjekter og enheter beskriver oppdraget sitt på samme måte.
+Et teammandat sier hvorfor teamet finnes, hva det skal oppnå og hvilke rammer det har. ilag bruker mandatmalen fra arbeidspakken «Helhetlig prioritering og styringspraksis», slik at team, prosjekter og enheter beskriver oppdraget sitt på samme måte.
 
 Malen består av følgende felter:
 
@@ -777,8 +777,8 @@ Team Agile har gode beskrivelser og maler vi anbefaler å benytte:
 
 - <https://www.teamagile.no/vi-deler/team-agiles-teamkontrakt>
 
-### Teamkontrakten i Saman
-I Saman registreres teamkontrakten i faste felter, gruppert i tre deler. Kontrakten er synlig for alle i Digdir, med unntak av den personlige bruksanvisningen, som bare er synlig for teamets medlemmer.
+### Teamkontrakten i ilag
+I ilag registreres teamkontrakten i faste felter, gruppert i tre deler. Kontrakten er synlig for alle i Digdir, med unntak av den personlige bruksanvisningen, som bare er synlig for teamets medlemmer.
 
 #### Hva skal vi få til sammen?
 **Mål og formål**

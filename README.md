@@ -1,12 +1,12 @@
-# Saman
+# ilag
 
-Prototype of the Saman application.
+Prototype of the ilag application.
 
-- `prototype/` — the original clickable HTML prototype. Reference/spec only; not part of the build. Published to <https://digdir.github.io/saman/> on every change.
+- `prototype/` — the original clickable HTML prototype. Reference/spec only; not part of the build. Published to <https://digdir.github.io/ilag/> on every change.
 - `src/cms/` — Payload 3 (on Next.js 16), admin UI and REST/GraphQL API.
 - `src/web/` — Astro 7 frontend (SSR via `@astrojs/node`).
 - `src/shared/` — generated Payload types + a thin REST client shared by the frontend.
-- `agent/` — an [agentctl](https://github.com/digdir/digdir-agents/tree/main/agentctl) Agent for developing Saman in a sandbox; see [`agent/README.md`](agent/README.md).
+- `agent/` — an [agentctl](https://github.com/digdir/digdir-agents/tree/main/agentctl) Agent for developing ilag in a sandbox; see [`agent/README.md`](agent/README.md).
 
 ## Requirements
 
@@ -110,7 +110,7 @@ the Entra ID flow against a mock provider, so they don't need them.
 
 Pages that read from the CMS pass the visitor's session on, so Payload's access
 control applies: `find('personer', '', { headers: authHeaders(cookie) })` from
-`@saman/shared`. Payload ignores its cookie on server-to-server requests, so
+`@ilag/shared`. Payload ignores its cookie on server-to-server requests, so
 `authHeaders` sends the token in the `Authorization` header instead.
 
 ## Database schema

@@ -1,7 +1,7 @@
-# Saman Agent
+# ilag Agent
 
-You develop Saman in the checkout at `/home/agent/code/saman`. It is cloned at boot; if it is absent, run
-`gh repo clone digdir/saman /home/agent/code/saman`. Never delete, reset or reclone it. Read its `CLAUDE.md` and
+You develop ilag in the checkout at `/home/agent/code/ilag`. It is cloned at boot; if it is absent, run
+`gh repo clone digdir/ilag /home/agent/code/ilag`. Never delete, reset or reclone it. Read its `CLAUDE.md` and
 `README.md` before changing code, and treat `prototype/` as a read-only spec.
 
 Keep the primary checkout clean for synchronizing with `origin`. Do each task in its own Git worktree under

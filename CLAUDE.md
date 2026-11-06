@@ -1,25 +1,25 @@
-# Saman
+# ilag
 
-Prototype of the Saman application. See README.md for the full setup.
+Prototype of the ilag application. See README.md for the full setup.
 
 ## Layout
 
 - `src/cms` — Payload 3 on Next.js, admin panel and REST/GraphQL API
 - `src/web` — Astro frontend, SSR, reads the CMS over REST
-- `src/shared` — generated Payload types + REST client, imported as `@saman/shared`
+- `src/shared` — generated Payload types + REST client, imported as `@ilag/shared`
 - `docs/specification/kravspesifikasjon.md` — the requirements specification
   (Norwegian). The intention and starting point for the implementation, not a
   fixed contract. See «Specification» below before changing it.
 - `docs/specification/decisions.md` — log of why the specification has changed.
-- `docs/adr/` — architecture decision records: why Saman is built the way it is.
-- `docs/integrations/` — contracts for systems that send data to Saman.
+- `docs/adr/` — architecture decision records: why ilag is built the way it is.
+- `docs/integrations/` — contracts for systems that send data to ilag.
 - `prototype/` — the original clickable HTML prototype. Use it for look, flow and
   wording, not as the specification. Never modify it.
-- `agent/` — the agentctl Agent for developing Saman in a sandbox. See `agent/README.md`.
+- `agent/` — the agentctl Agent for developing ilag in a sandbox. See `agent/README.md`.
 
 ## Specification
 
-`docs/specification/kravspesifikasjon.md` describes the intention behind Saman and
+`docs/specification/kravspesifikasjon.md` describes the intention behind ilag and
 is the starting point for the implementation. It is the master copy of the
 specification and is owned by Organisasjonslæring (VSU). It is a good start, but
 requirements will change as we build, test with users and learn. If a Word version
@@ -59,7 +59,7 @@ edit a Word copy and treat it as the source.
   collection access functions. Hiding a field or button in the frontend is not
   access control.
 - **Read as the visitor.** Astro pages fetch from the CMS with the visitor's
-  session (`authHeaders` from `@saman/shared`), never with an API key or a
+  session (`authHeaders` from `@ilag/shared`), never with an API key or a
   service account, so the access functions see who is asking. See «Login» in
   README.md.
 - **Open questions are not ours to decide.** The section «Åpne avklaringer» lists
@@ -81,6 +81,7 @@ Follow the specification here, not the prototype, unless the specification is ch
 | Team data | Imported from Baksia | Baksia is not a data source; the data in the prototype is test data |
 | Employees and units | Built from team members; units mostly missing | Fetched automatically from the HR system or Entra ID (`NF-07`, open question 6) |
 | Porteføljestyring | Explanatory page | Placeholder without requirements (open question 5); do not build yet |
+| Name | Saman | ilag, always lowercase, also at the start of a sentence |
 
 Remove a row when the prototype has been updated.
 

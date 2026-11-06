@@ -36,13 +36,13 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: saman
-          POSTGRES_PASSWORD: saman
-          POSTGRES_DB: saman_dev
+          POSTGRES_USER: ilag
+          POSTGRES_PASSWORD: ilag
+          POSTGRES_DB: ilag_dev
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U saman -d saman_dev"
+          --health-cmd "pg_isready -U ilag -d ilag_dev"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -68,13 +68,13 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: saman
-          POSTGRES_PASSWORD: saman
-          POSTGRES_DB: saman_dev
+          POSTGRES_USER: ilag
+          POSTGRES_PASSWORD: ilag
+          POSTGRES_DB: ilag_dev
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U saman -d saman_dev"
+          --health-cmd "pg_isready -U ilag -d ilag_dev"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10

@@ -111,7 +111,7 @@ importers:
       '@astrojs/node':
         specifier: ^11.1.9
         version: 11.1.9(astro@7.4.2(@types/node@22.19.9)(esbuild@0.28.2)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))(supports-color@7.2.0)
-      '@saman/shared':
+      '@ilag/shared':
         specifier: workspace:*
         version: link:../shared
       astro:

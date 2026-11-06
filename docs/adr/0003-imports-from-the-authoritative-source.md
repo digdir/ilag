@@ -10,15 +10,15 @@
 ## Context
 
 Units, people and locations come from Digdir's authoritative source (NF-07),
-and nobody can change them in Saman. Units come in a file of their own. The
+and nobody can change them in ilag. Units come in a file of their own. The
 collections exist (#30), but nothing fills them yet.
 
 The sending system sets the limits:
 
 - It runs a PowerShell script on a server in Digdir's server room in
-  Leikanger, and can make an HTTP POST to an endpoint Saman provides.
+  Leikanger, and can make an HTTP POST to an endpoint ilag provides.
 - The data is a CSV file.
-- The script should not have to wait while Saman updates the database.
+- The script should not have to wait while ilag updates the database.
 
 Units come first. People and locations will follow the same pattern, so the
 choices here apply to all three.
@@ -40,7 +40,7 @@ choices here apply to all three.
 - **Everything, every time (chosen).** Each file is a full snapshot. The
   import corrects any drift by itself, and a unit missing from the file has
   been closed.
-- **Only changes.** Smaller files, but a lost or failed file leaves Saman
+- **Only changes.** Smaller files, but a lost or failed file leaves ilag
   wrong until someone notices, and closing a unit needs its own signal.
 
 **How the file is sent**
@@ -113,7 +113,7 @@ choices here apply to all three.
 
 ### Still to agree
 
-- [ ] **Column names.** The contract uses Saman's field names for now. The
+- [ ] **Column names.** The contract uses ilag's field names for now. The
   source may end up with its own; the mapping is in one place.
 - [ ] **Protection against a truncated file.** Every row is checked, but a
   file that is cut off or nearly empty is still valid row by row, and as a
@@ -132,10 +132,10 @@ choices here apply to all three.
 - Administrators can see in the admin panel what came in, when, and what it
   changed.
 - A failed or partial import never leaves a half-updated organisation chart.
-- Closed units stay in Saman, marked inactive, with their history.
+- Closed units stay in ilag, marked inactive, with their history.
 - The people and location imports reuse the endpoint pattern, the import runs,
   the integration user and the job setup.
-- The API key is a way into Saman that doesn't go through Entra ID. It is
+- The API key is a way into ilag that doesn't go through Entra ID. It is
   limited to the import endpoints, kept on the sending server, and each use is
   recorded on an import run. Changing `PAYLOAD_SECRET` makes it unreadable, so
   the sender then needs a new key.

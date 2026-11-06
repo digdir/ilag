@@ -1,9 +1,9 @@
-# The Saman development Agent: Claude Code in a Sandbox with a checkout of digdir/saman, Node 24, pnpm and Podman
+# The ilag development Agent: Claude Code in a Sandbox with a checkout of digdir/ilag, Node 24, pnpm and Podman
 # for the repository's PostgreSQL compose file. See README.md beside this file.
 apiVersion: agents.platform/v1alpha1
 kind: Agent
 metadata:
-  name: saman
+  name: ilag
 spec:
   sandbox:
     # Built from the Dockerfile beside this manifest. Paths in a manifest resolve against its directory.
@@ -39,7 +39,7 @@ spec:
     - name: GIT_USER_NAME
     - name: GIT_USER_EMAIL
   secrets:
-    # A fine-grained token on digdir/saman with Contents and Pull requests read and write. It stays on the host; the
+    # A fine-grained token on digdir/ilag with Contents and Pull requests read and write. It stays on the host; the
     # Sandbox sees the placeholder, which carries the fine-grained prefix gh classifies tokens by.
     - environment: GITHUB_TOKEN
       placeholder: github_pat_AGENT_MEDIATED_GITHUB_TOKEN

@@ -1,31 +1,31 @@
 # Unit import
 
 How the authoritative source sends Digdir's units (divisions, departments and
-sections) to Saman. The design behind it is in
+sections) to ilag. The design behind it is in
 [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md).
 
-> **Status:** proposed, not built yet. The column names are Saman's own for now
+> **Status:** proposed, not built yet. The column names are ilag's own for now
 > and may change to match the source.
 
 ## In short
 
 - Send **all** units every time, as one CSV file, in an HTTP POST.
-- Saman checks every row and answers at once: `202` when the file is accepted,
+- ilag checks every row and answers at once: `202` when the file is accepted,
   `400` with every error when it isn't.
-- Saman applies an accepted file shortly after, usually within seconds.
-- A unit missing from the file is marked as closed in Saman. It is not deleted.
+- ilag applies an accepted file shortly after, usually within seconds.
+- A unit missing from the file is marked as closed in ilag. It is not deleted.
 
 ## Request
 
 ```
-POST https://<saman>/api/enheter/import
+POST https://<ilag>/api/enheter/import
 Authorization: brukere API-Key <key>
 Content-Type: text/csv; charset=utf-8
 
 <the CSV file>
 ```
 
-- **The key** belongs to Saman's integration user. Keep it on the sending
+- **The key** belongs to ilag's integration user. Keep it on the sending
   server, for example in Windows Credential Manager, never in the script.
 - **The body** is the file itself, not a form upload.
 - **The file** may be at most 5 MB.
@@ -35,7 +35,7 @@ Content-Type: text/csv; charset=utf-8
 - UTF-8, with or without a byte order mark.
 - The first line is the header. A leading `#TYPE …` line from older versions of
   `Export-Csv` is ignored.
-- Comma or semicolon as separator; Saman detects which from the header.
+- Comma or semicolon as separator; ilag detects which from the header.
 - Values may be quoted, as `Export-Csv` does.
 - One unit per line, all units in every file.
 
@@ -61,7 +61,7 @@ Other columns are ignored.
 "111","Analyse","","Seksjon","110",""
 ```
 
-### What makes Saman refuse a file
+### What makes ilag refuse a file
 
 The whole file is refused, and nothing changes, if any row:
 
@@ -71,7 +71,7 @@ The whole file is refused, and nothing changes, if any row:
 - has an `externalParentId` that isn't the `externalUnitId` of another row
 - is, through its parents, its own ancestor
 
-A leader ID Saman doesn't know is **not** an error, because the people file may
+A leader ID ilag doesn't know is **not** an error, because the people file may
 come later. It is listed in the import's result.
 
 ## Responses
@@ -82,7 +82,7 @@ come later. It is listed in the import's result.
 {
   "importRunId": 42,
   "rows": 46,
-  "statusUrl": "https://<saman>/api/enheter/import/42"
+  "statusUrl": "https://<ilag>/api/enheter/import/42"
 }
 ```
 
@@ -106,7 +106,7 @@ come later. It is listed in the import's result.
 
 ### Status of an import
 
-`GET https://<saman>/api/enheter/import/<importRunId>`, with the same
+`GET https://<ilag>/api/enheter/import/<importRunId>`, with the same
 `Authorization` header, returns the run's status: `queued`, `running`,
 `succeeded`, `failed` or `superseded` (a newer file arrived before this one
 started). A finished run also has its result:
@@ -123,7 +123,7 @@ started). A finished run also has its result:
 }
 ```
 
-Polling is optional. Administrators see the same in Saman's admin panel.
+Polling is optional. Administrators see the same in ilag's admin panel.
 
 ## Example script
 
@@ -132,9 +132,9 @@ Works in Windows PowerShell 5.1 and PowerShell 7.
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-$uri  = 'https://<saman>/api/enheter/import'
+$uri  = 'https://<ilag>/api/enheter/import'
 $file = 'C:\eksport\enheter.csv'
-$key  = $env:SAMAN_API_KEY   # or read it from Windows Credential Manager
+$key  = $env:ILAG_API_KEY   # or read it from Windows Credential Manager
 
 # Write the file as UTF-8. Windows PowerShell 5.1 otherwise writes ASCII,
 # and æ, ø and å turn into question marks.
@@ -151,7 +151,7 @@ try {
 }
 catch {
     # A 400 response lists every error in the file.
-    Write-Error "Saman refused the file: $($_.ErrorDetails.Message)"
+    Write-Error "ilag refused the file: $($_.ErrorDetails.Message)"
     exit 1
 }
 ```
