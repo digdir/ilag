@@ -1,20 +1,20 @@
-name: saman
+name: ilag
 
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: saman-postgres
+    container_name: ilag-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: saman
-      POSTGRES_PASSWORD: saman
-      POSTGRES_DB: saman_dev
+      POSTGRES_USER: ilag
+      POSTGRES_PASSWORD: ilag
+      POSTGRES_DB: ilag_dev
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U saman -d saman_dev"]
+      test: ["CMD-SHELL", "pg_isready -U ilag -d ilag_dev"]
       interval: 5s
       timeout: 5s
       retries: 10

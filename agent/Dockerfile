@@ -1,4 +1,4 @@
-# The Saman Agent's image: the agentctl base image (Ubuntu 26.04, systemd, Node 24, Claude Code, gh) plus what the
+# The ilag Agent's image: the agentctl base image (Ubuntu 26.04, systemd, Node 24, Claude Code, gh) plus what the
 # repository's own scripts need. Renovate keeps the digest current; it must be a base with the containers feature
 # (digdir/digdir-agents#266) and /tmp on the Sandbox disk (#329), as agentctl v0.1.0-preview.13 expects.
 FROM ghcr.io/digdir/agentctl-base:ubuntu-26.04@sha256:2ee51d4619a9e13b1d1e6037b48c76fcc6bbed46ef6203aadde1270c1a2fb790
@@ -26,7 +26,7 @@ RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
 RUN ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 
 # The repositories agent-workspace-init clones into /home/agent/code at boot.
-COPY workspace.list /etc/agent-workspace.d/saman.list
+COPY workspace.list /etc/agent-workspace.d/ilag.list
 
 RUN agent-image-check
 

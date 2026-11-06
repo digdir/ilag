@@ -1,4 +1,4 @@
-# Publishes prototype/ to GitHub Pages at https://digdir.github.io/saman/.
+# Publishes prototype/ to GitHub Pages at https://digdir.github.io/ilag/.
 # Requires Settings → Pages → Source to be "GitHub Actions".
 name: Deploy prototype
 
@@ -45,10 +45,10 @@ jobs:
           cat > _site/index.html <<'EOF'
           <!doctype html>
           <meta charset="utf-8">
-          <title>Saman</title>
+          <title>ilag</title>
           <script>location.replace('Saman.dc.html' + location.hash)</script>
           <meta http-equiv="refresh" content="0; url=Saman.dc.html">
-          <a href="Saman.dc.html">Saman</a>
+          <a href="Saman.dc.html">ilag</a>
           EOF
 
           # Pages used to publish the whole repository, with the prototype
@@ -57,10 +57,10 @@ jobs:
           cat > _site/prototype/Saman.dc.html <<'EOF'
           <!doctype html>
           <meta charset="utf-8">
-          <title>Saman</title>
+          <title>ilag</title>
           <script>location.replace('../Saman.dc.html' + location.hash)</script>
           <meta http-equiv="refresh" content="0; url=../Saman.dc.html">
-          <a href="../Saman.dc.html">Saman</a>
+          <a href="../Saman.dc.html">ilag</a>
           EOF
 
       - uses: actions/upload-pages-artifact@v5
