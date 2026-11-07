@@ -11,5 +11,8 @@ export default defineConfig({
   }),
   server: {
     port: 4321,
+    // Listen on every interface. By default Astro binds localhost, which can
+    // resolve to ::1 only, and `agentctl port-forward` connects to 127.0.0.1.
+    host: true,
   },
 });
