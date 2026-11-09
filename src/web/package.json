@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",
+    "@digdir/designsystemet-css": "^1.23.0",
+    "@digdir/designsystemet-web": "^1.23.0",
     "@ilag/shared": "workspace:*",
     "astro": "^7.4.2"
   },

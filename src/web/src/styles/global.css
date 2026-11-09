@@ -1,0 +1,15 @@
+/* Designsystemet: components first, so its layer order (@layer ds) is set before the theme. */
+@import '@digdir/designsystemet-css/index.css';
+@import '@digdir/designsystemet-css/theme.css';
+
+body {
+  font-family: var(--ds-font-family), sans-serif;
+  font-feature-settings: 'cv05' 1; /* Lowercase l with a tail, easier to tell from uppercase I */
+  margin: 0;
+}
+
+main {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--ds-size-8) var(--ds-size-4);
+}

@@ -111,6 +111,12 @@ importers:
       '@astrojs/node':
         specifier: ^11.1.9
         version: 11.1.9(astro@7.4.2(@types/node@22.19.9)(esbuild@0.28.2)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))(supports-color@7.2.0)
+      '@digdir/designsystemet-css':
+        specifier: ^1.23.0
+        version: 1.23.0
+      '@digdir/designsystemet-web':
+        specifier: ^1.23.0
+        version: 1.23.0
       '@ilag/shared':
         specifier: workspace:*
         version: link:../shared
@@ -419,6 +425,15 @@ packages:
 
   '@date-fns/tz@1.2.0':
     resolution: {integrity: sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg==}
+
+  '@digdir/designsystemet-css@1.23.0':
+    resolution: {integrity: sha512-OuqjDBxKl81K+X/5bDj2RydTq2+97kgImanjJOTB6uKe19mmEmnE22uLYuP6QWTjzU9LuBF5nTApM9zTtkRvSw==}
+
+  '@digdir/designsystemet-types@1.23.0':
+    resolution: {integrity: sha512-fUDl1bMAWlV2pyo1GlWaN5heuVZNdNMW3/hEgzmYxQcCtaq0g8lNKsUt2GZEeWR5vKE1dfxahsOdKW1E9Udpyg==}
+
+  '@digdir/designsystemet-web@1.23.0':
+    resolution: {integrity: sha512-XaCVAw7W84PXjSt2RqJVTWIpl9/5zeazTqL3nsIwud3+bfH1mvyo5UeE8GVTFsC23LXmprjjDZG1ySD2Xuo4yw==}
 
   '@dnd-kit/accessibility@3.1.1':
     resolution: {integrity: sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw==}
@@ -2091,6 +2106,18 @@ packages:
   '@typescript-eslint/visitor-keys@8.72.0':
     resolution: {integrity: sha512-E2mroviasaWecDzTGiGMtuEguuLVOeRggnrIn93CJuxYJzQBHbyymlT08aVQydbBal5538o+JkBKXh2sRuCyIA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@u-elements/u-combobox@2.1.5':
+    resolution: {integrity: sha512-SnuSbE0OSSSut41tZYtLClXifWXO29n3Y+D2EBNRlbVUuSfcgG46yrOjiwbwxkfAX6WpJ6UciMwSHGW3xcegMA==}
+
+  '@u-elements/u-datalist@2.0.3':
+    resolution: {integrity: sha512-1/N53P9CtmpTQQN/S8fQG0JEQqQmpAmAVhuPTskycrn74DJUdi2lKYdyGW7X4tg6ANsi4iGLn5Bv3NLHoCrzIg==}
+
+  '@u-elements/u-details@1.0.0':
+    resolution: {integrity: sha512-CA0w0VTH/vWWouFWEw7XIws3RUCBm2dh7ity+sbDXgpc6yz5NkoMpeDTdB/DHpI+/YInULz0XLOTrw8b7KX3Qg==}
+
+  '@u-elements/u-tabs@1.0.4':
+    resolution: {integrity: sha512-F0CoSaiFnUInfTSiftufZARi6bvC0Ucb+aVaVfO65a0GWeIsTjTZupXh313POqN7SkvH4lQ+4+X33uhwBMAiww==}
 
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
@@ -5492,6 +5519,20 @@ snapshots:
 
   '@date-fns/tz@1.2.0': {}
 
+  '@digdir/designsystemet-css@1.23.0':
+    dependencies:
+      '@digdir/designsystemet-types': 1.23.0
+
+  '@digdir/designsystemet-types@1.23.0': {}
+
+  '@digdir/designsystemet-web@1.23.0':
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      '@u-elements/u-combobox': 2.1.5
+      '@u-elements/u-datalist': 2.0.3
+      '@u-elements/u-details': 1.0.0
+      '@u-elements/u-tabs': 1.0.4
+
   '@dnd-kit/accessibility@3.1.1(react@19.2.6)':
     dependencies:
       react: 19.2.6
@@ -7059,6 +7100,14 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.72.0
       eslint-visitor-keys: 5.0.1
+
+  '@u-elements/u-combobox@2.1.5': {}
+
+  '@u-elements/u-datalist@2.0.3': {}
+
+  '@u-elements/u-details@1.0.0': {}
+
+  '@u-elements/u-tabs@1.0.4': {}
 
   '@ungap/structured-clone@1.4.0': {}
 
