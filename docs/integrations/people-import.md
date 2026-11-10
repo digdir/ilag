@@ -55,7 +55,7 @@ Content-Type: text/csv; charset=utf-8
 | `0002NACHN` | Last name (Etternavn) | yes | `lastName` |
 | `01050010USRID_LONG` | Email (Epost) | yes | `email`, the same address the person signs in with through Entra ID |
 | `9999PLANS_TEKST` | Job title (Stillingstittel) | no | `title` |
-| `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `externalUnitId` in the unit file |
+| `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `orgEnhet` in the [unit file](unit-import.md) |
 | `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code`. See «Locations» |
 | `9999LEDER_PERNR` | The manager's employee number (LederAnsattNr) | no | `managerEmployeeNumber`, then `manager`: the person with that `employeeNumber` |
 | `0001PERSG` | Employee group (AnsattType) | yes | `isEmployee`: `1` or `4` is an employee, `8` or `9` a contractor |
@@ -83,9 +83,9 @@ The people are made up.
 
 ```csv
 0000PERNR;0001BTRTL;0001ORGEH;0001PERSG;0001STELL;0002NACHN;0002VORNA;01050001USRID;01050010USRID_LONG;01059003USRID;01059004USRID;9999BEGDA;9999LEDER_PERNR;9999PLANS_TEKST
-4711;LEI;100;1;50001234;Nordmann;Kari;KNORDMANN;kari.nordmann@digdir.no;+4791234567;;01.03.2019;;Divisjonsdirektør
-4712;OSL;110;1;50001240;Hansen;Ola;OHANSEN;ola.hansen@digdir.no;;+4799887766;15.08.2021;4711;Avdelingsdirektør
-4720;OSL;111;8;50001301;Ødegård;Åse;AODEGARD;ase.odegard@digdir.no;+4790011223;;02.01.2024;4712;Seniorrådgiver
+4711;LEI;10008925;1;50001234;Nordmann;Kari;KNORDMANN;kari.nordmann@digdir.no;+4791234567;;01.03.2019;;Divisjonsdirektør
+4712;OSL;10002031;1;50001240;Hansen;Ola;OHANSEN;ola.hansen@digdir.no;;+4799887766;15.08.2021;4711;Avdelingsdirektør
+4720;OSL;10014302;8;50001301;Ødegård;Åse;AODEGARD;ase.odegard@digdir.no;+4790011223;;02.01.2024;4712;Seniorrådgiver
 ```
 
 ### A person in more than one unit
@@ -133,7 +133,9 @@ The whole file is refused, and nothing changes, if any row:
 These are **not** errors, because the other files may come later or the
 person may be outside the file. They are listed in the import's result:
 
-- a `0001ORGEH` that isn't a unit in ilag
+- a `0001ORGEH` that isn't a unit in ilag. A unit the unit import skips,
+  such as `10013301` (BOD-ekstern), is not listed: the person just gets no
+  unit
 - a `0001BTRTL` that isn't the code of a location registered in ilag
 - a `9999LEDER_PERNR` that isn't the `0000PERNR` of a person in the file
 
@@ -159,7 +161,7 @@ no manager in ilag.
 {
   "errors": [
     { "line": 3, "column": "01050010USRID_LONG", "message": "«kari.nordmann» is not a valid email" },
-    { "line": 9, "column": "0001ORGEH", "message": "«4712» is already in unit «110» on line 2" }
+    { "line": 9, "column": "0001ORGEH", "message": "«4712» is already in unit «10002031» on line 2" }
   ]
 }
 ```
@@ -185,7 +187,7 @@ started). A finished run also has its result:
     "created": 3,
     "updated": 407,
     "deactivated": 2,
-    "unknownUnits": ["199"],
+    "unknownUnits": ["10099999"],
     "unknownLocations": [],
     "unknownManagers": ["4799"],
     "differingLines": ["4720"]
@@ -197,9 +199,6 @@ Polling is optional. Administrators see the same in ilag's admin panel.
 
 ## Still to confirm
 
-- [ ] **Unit file columns.** If the unit file also comes from SAP, it should
-  use SAP's names too, and the [unit contract](unit-import.md) changes to
-  match.
 - [ ] **The email of a contractor who becomes an employee.** Do they keep
   the same address? ilag allows each email only once, also for people who
   have left, so the new employee would collide with the old contractor.

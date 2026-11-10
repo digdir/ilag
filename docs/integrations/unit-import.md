@@ -1,11 +1,12 @@
 # Unit import
 
-How the authoritative source sends Digdir's units (divisions, departments and
-sections) to ilag. The design behind it is in
+How Ansattmottak sends Digdir's units (the directorate, divisions,
+departments and sections) to ilag. The file is an export from SAP, with SAP's
+field names in the header. The design behind it is in
 [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md).
 
-> **Status:** proposed, not built yet. The column names are ilag's own for now
-> and may change to match the source.
+> **Status:** proposed, not built yet. The columns are the ones in
+> Ansattmottak's example file.
 
 ## In short
 
@@ -33,46 +34,90 @@ Content-Type: text/csv; charset=utf-8
 ## The file
 
 - UTF-8, with or without a byte order mark.
-- The first line is the header. A leading `#TYPE …` line from older versions of
-  `Export-Csv` is ignored.
-- Comma or semicolon as separator; ilag detects which from the header.
+- The first line is the header, with SAP's field names. ilag matches them
+  without regard to case or surrounding spaces, in any order. A leading
+  `#TYPE …` line from older versions of `Export-Csv` is ignored.
+- Comma or semicolon as separator; ilag detects which from the header. A
+  value that contains the separator must be quoted. Semicolon, as in the
+  [people file](people-import.md), avoids that for names with a comma.
 - Values may be quoted, as `Export-Csv` does.
 - One unit per line, all units in every file.
 
 ### Columns
 
-| Column | Required | Content |
-| --- | --- | --- |
-| `externalUnitId` | yes | The source's ID for the unit. Unique in the file |
-| `name` | yes | The unit's name |
-| `code` | no | A short code, such as `SSR` |
-| `level` | yes | `Divisjon`, `Avdeling` or `Seksjon` |
-| `externalParentId` | no | The `externalUnitId` of the unit above. Empty for divisions |
-| `managerEmployeeNumber` | no | The leader's employee number, `0000PERNR` in the [people file](people-import.md) |
+| Column | Required | Content | Field in ilag |
+| --- | --- | --- | --- |
+| `orgEnhet` | yes | The unit's ID in SAP. Unique in the file. The same ID as `0001ORGEH` in the people file | `externalUnitId` |
+| `Betegnelse på organisasjonsenh` | yes | The unit's name | `name` |
+| `Avdeling` | yes | The code of the division the unit is in, such as `FEL` | `code` and `level`, and `parent` |
+| `Seksjon` | yes | The code of the department the unit is in, such as `FUT` | `code` and `level`, and `parent` |
+| `gruppe` | no | The section's code, such as `FBA` | `code` and `level` |
 
-Other columns are ignored.
+`Koststed` (cost centre) is in the file but not stored, because no
+requirement needs it. Other columns are ignored as well.
+
+The file still uses the names from before the new organisation structure. Its
+`Avdeling`, `Seksjon` and `gruppe` are what ilag calls divisjon, avdeling and
+seksjon.
+
+### Levels and parents
+
+The file has no parent column. ilag works out each unit's level, code and
+parent from the three code columns:
+
+| The line has | Level | Code | Parent |
+| --- | --- | --- | --- |
+| `orgEnhet` `10008925` | Direktorat | none | none |
+| `Avdeling` equal to `Seksjon`, and no `gruppe` | Divisjon | `Avdeling` | the directorate |
+| `Seksjon` different from `Avdeling`, and no `gruppe` | Avdeling | `Seksjon` | the division with that `Avdeling` |
+| a `gruppe` | Seksjon | `gruppe` | the department with that `Avdeling` and `Seksjon` |
+
+The directorate is recognised by its ID, because its `Avdeling` and `Seksjon`
+hold its name instead of a code.
+
+### Lines ilag skips
+
+`10013301` (BOD-ekstern) groups contractors in SAP. It is not a unit in
+Digdir, so ilag skips the line, and people whose `0001ORGEH` is `10013301`
+get no unit. The IDs of skipped units are a setting in ilag. If one of them
+should later be shown as a unit, an administrator handles it in ilag.
+
+### The leader
+
+The file has no leader. An administrator sets each unit's leader in ilag's
+admin panel, and the import never changes it. The leader may later come from
+the people file or a new column in this file.
 
 ### Example
 
+From Ansattmottak's example file.
+
 ```csv
-"externalUnitId","name","code","level","externalParentId","managerEmployeeNumber"
-"100","Samordning, sikkerhet og regelverk","SSR","Divisjon","","4711"
-"110","Strategi, råd og prioritering","","Avdeling","100","4712"
-"111","Analyse","","Seksjon","110",""
+orgEnhet,Betegnelse på organisasjonsenh,Koststed,Avdeling,Seksjon,gruppe
+10008925,Digitaliseringsdirektoratet,1000,Digitaliseringsdirektoratet,Digitaliseringsdirektoratet,
+10002031,Fellesløsninger,7100,FEL,FEL,
+10003276,FEL - Utvikling,7120,FEL,FUT,
+10014302,FEL – Backend,7120,FEL,FUT,FBA
+10013301,BOD-ekstern,7200,BOD-ekstern,BEK,
 ```
+
+This gives the directorate, the division FEL under it, the department FUT
+under FEL, and the section FBA under FUT. BOD-ekstern is skipped.
 
 ### What makes ilag refuse a file
 
-The whole file is refused, and nothing changes, if any row:
+The whole file is refused, and nothing changes, if any line that isn't
+skipped:
 
 - lacks a required column or value
-- has a `level` other than `Divisjon`, `Avdeling` or `Seksjon`
-- repeats an `externalUnitId` already in the file
-- has an `externalParentId` that isn't the `externalUnitId` of another row
-- is, through its parents, its own ancestor
+- repeats an `orgEnhet` already in the file
+- repeats the code of another unit at the same level: two divisions with the
+  same `Avdeling`, two departments with the same `Avdeling` and `Seksjon`, or
+  two sections with the same `gruppe`
+- is a department whose `Avdeling` has no division in the file
+- is a section whose `Avdeling` and `Seksjon` have no department in the file
 
-A leader's employee number ilag doesn't know is **not** an error, because the
-people file may come later. It is listed in the import's result.
+ilag also refuses a file without the directorate.
 
 ## Responses
 
@@ -81,7 +126,7 @@ people file may come later. It is listed in the import's result.
 ```json
 {
   "importRunId": 42,
-  "rows": 46,
+  "rows": 50,
   "statusUrl": "https://<ilag>/api/enheter/import/42"
 }
 ```
@@ -91,8 +136,8 @@ people file may come later. It is listed in the import's result.
 ```json
 {
   "errors": [
-    { "line": 3, "column": "level", "message": "«Team» is not Divisjon, Avdeling or Seksjon" },
-    { "line": 7, "column": "externalParentId", "message": "No unit in the file has the ID «999»" }
+    { "line": 3, "column": "Avdeling", "message": "No division in the file has the code «KOMM»" },
+    { "line": 7, "column": "orgEnhet", "message": "«10003276» is already on line 5" }
   ]
 }
 ```
@@ -116,14 +161,21 @@ started). A finished run also has its result:
   "status": "succeeded",
   "result": {
     "created": 2,
-    "updated": 43,
+    "updated": 46,
     "deactivated": 1,
-    "unknownLeaders": ["4799"]
+    "skipped": ["10013301"]
   }
 }
 ```
 
 Polling is optional. Administrators see the same in ilag's admin panel.
+
+## Still to confirm
+
+- [ ] **Names cut off at 40 characters.** Two names in the example are exactly
+  40 characters long and seem to lack their last letter, such as
+  «Sammenhengende tjenester og livshendelse». Can the file carry the full
+  name, for example from SAP's long text?
 
 ## Example script
 
@@ -138,7 +190,7 @@ $key  = $env:ILAG_API_KEY   # or read it from Windows Credential Manager
 
 # Write the file as UTF-8. Windows PowerShell 5.1 otherwise writes ASCII,
 # and æ, ø and å turn into question marks.
-$units | Export-Csv -Path $file -NoTypeInformation -Encoding UTF8
+$units | Export-Csv -Path $file -NoTypeInformation -Encoding UTF8 -Delimiter ';'
 
 try {
     # -InFile sends the file's bytes as they are. A string in -Body can be

@@ -84,13 +84,15 @@ apply to both.
 
 1. **An endpoint per kind of data**, starting with `POST /api/enheter/import`.
    The body is the CSV file. The [contract](../integrations/unit-import.md)
-   describes the format, the responses and an example script.
+   describes the format, the responses and an example script. The files come
+   from SAP with SAP's field names, and each contract maps them to ilag's
+   fields.
 2. **Only the integration user may call it.** `brukere` gets API keys, and a
    new role, `integration`, that may call the import endpoints and nothing
    else: no admin panel, no content, no password login.
 3. **Every row is validated before the file is accepted**: the columns,
-   required values, valid levels, unique IDs, parents that exist in the file,
-   and no unit that is its own ancestor. A file with errors is refused as a
+   required values, unique IDs and codes, and a parent in the file for every
+   unit below the directorate. A file with errors is refused as a
    whole with `400`, listing every error with its line number, and nothing is
    queued.
 4. **An accepted file becomes an import run** (`importkjoringer`): the kind of
@@ -99,12 +101,13 @@ apply to both.
    status URL, which the script may poll.
 5. **A job, `importUnits`, applies the file** in one database transaction:
    - create or update each unit, matched on `externalUnitId`
-   - set `parent` and `leader` from the external IDs, once all units exist
+   - set `parent` from the codes in the file, once all units exist. The
+     leader is set by an administrator, and the import leaves it alone
    - mark units missing from the file as inactive, never delete them
    - link people's `units` again from their `externalUnitIds`, so the order
      of the people and unit imports doesn't matter
-   - write the result to the import run: created, updated, deactivated, and
-     leaders not found in `personer`
+   - write the result to the import run: created, updated, deactivated and
+     skipped
 
    If anything fails, nothing changes.
 6. **One unit import at a time.** The task uses Payload's concurrency control
@@ -115,11 +118,6 @@ apply to both.
 
 ### Still to agree
 
-- [ ] **Column names.** The people file comes from SAP with SAP's field
-  names, and the [people contract](../integrations/people-import.md) maps
-  them to ilag's fields. The unit contract uses ilag's field names for now,
-  and changes if the unit file also comes with SAP's names. The mapping is in
-  one place per kind of data.
 - [ ] **Protection against a truncated file.** Every row is checked, but a
   file that is cut off or nearly empty is still valid row by row, and as a
   full snapshot it would deactivate the units it lacks. Proposed: refuse a
