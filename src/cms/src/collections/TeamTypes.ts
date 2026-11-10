@@ -1,23 +1,6 @@
-import { APIError, type CollectionBeforeDeleteHook, type CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-
-// Every team has a type, so a type in use cannot be deleted.
-const refuseWhileInUse: CollectionBeforeDeleteHook = async ({ id, req }) => {
-  const { totalDocs } = await req.payload.count({
-    collection: 'team',
-    where: { teamType: { equals: id } },
-    req,
-  })
-  if (totalDocs > 0) {
-    throw new APIError(
-      `Teamtypen brukes av ${totalDocs} team og kan ikke slettes.`,
-      400,
-      null,
-      true,
-    )
-  }
-}
 
 // The kinds of team in Digdir (TO-02), such as produktteam or fagnettverk.
 // Administrators maintain them (2.3); the ones in Vedlegg 2 are created in a
@@ -41,9 +24,6 @@ export const TeamTypes: CollectionConfig = {
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),
-  },
-  hooks: {
-    beforeDelete: [refuseWhileInUse],
   },
   defaultSort: 'name',
   fields: [
