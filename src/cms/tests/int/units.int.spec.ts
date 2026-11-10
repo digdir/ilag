@@ -26,7 +26,8 @@ const person = (n: number, extra: Partial<Person> = {}) =>
     lastName: `Nordmann ${n}`,
     email: `${prefix}-${n}@example.com`,
     externalId: `${prefix}-person-${n}`,
-    externalLocationId: location.externalLocationId,
+    employeeNumber: `${prefix}-${n}`,
+    locationCode: location.code,
     ...extra,
   }) as RequiredDataFromCollectionSlug<'personer'>
 

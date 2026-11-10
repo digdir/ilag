@@ -197,11 +197,11 @@ export interface Person {
   fullName?: string | null;
   email: string;
   title?: string | null;
-  employeeNumber?: string | null;
+  employeeNumber: string;
   externalId: string;
-  externalManagerId?: string | null;
+  managerEmployeeNumber?: string | null;
   manager?: (number | null) | Person;
-  externalLocationId: string;
+  locationCode: string;
   location?: (number | null) | Location;
   externalUnitIds?: string[] | null;
   units?: (number | Unit)[] | null;
@@ -406,9 +406,9 @@ export interface PersonerSelect<T extends boolean = true> {
   title?: T;
   employeeNumber?: T;
   externalId?: T;
-  externalManagerId?: T;
+  managerEmployeeNumber?: T;
   manager?: T;
-  externalLocationId?: T;
+  locationCode?: T;
   location?: T;
   externalUnitIds?: T;
   units?: T;

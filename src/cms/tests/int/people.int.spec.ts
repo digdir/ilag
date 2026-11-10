@@ -19,7 +19,8 @@ const person = (n: number, extra: Record<string, unknown> = {}) =>
     lastName: `Nordmann ${n}`,
     email: `${prefix}-${n}@example.com`,
     externalId: `${prefix}-person-${n}`,
-    externalLocationId: location.externalLocationId,
+    employeeNumber: `${prefix}-${n}`,
+    locationCode: location.code,
     ...extra,
   }) as RequiredDataFromCollectionSlug<'personer'>
 
@@ -70,11 +71,21 @@ describe('People and locations', () => {
     ).rejects.toThrow()
   })
 
-  it('NF-07: requires externalLocationId', async () => {
+  it('NF-07: rejects a duplicate employeeNumber', async () => {
+    await payload.create({ collection: 'personer', data: person(11) })
     await expect(
       payload.create({
         collection: 'personer',
-        data: person(5, { externalLocationId: undefined }),
+        data: person(12, { employeeNumber: `${prefix}-11` }),
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('NF-07: requires locationCode', async () => {
+    await expect(
+      payload.create({
+        collection: 'personer',
+        data: person(5, { locationCode: undefined }),
       }),
     ).rejects.toThrow()
   })
@@ -93,7 +104,7 @@ describe('People and locations', () => {
     const employee = await payload.create({
       collection: 'personer',
       data: person(7, {
-        externalManagerId: manager.externalId,
+        managerEmployeeNumber: manager.employeeNumber,
         manager: manager.id,
         location: location.id,
         isEmployee: true,
