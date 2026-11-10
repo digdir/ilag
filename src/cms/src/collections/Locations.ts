@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
 
 // Offices. Administrators register them in the admin panel; the source has
 // no list of locations. People come from the source with the location's
@@ -20,7 +21,7 @@ export const Locations: CollectionConfig = {
     defaultColumns: ['name', 'code'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),

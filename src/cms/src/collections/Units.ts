@@ -1,6 +1,8 @@
 import type { CollectionConfig, FieldAccess } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
+import { importEndpoints } from '../imports/endpoints'
 
 // The directorate, its divisions, departments and sections, imported from
 // their own file from Digdir's authoritative source (NF-07). The import writes
@@ -29,8 +31,9 @@ export const Units: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'level', 'parent', 'leader', 'active'],
   },
+  endpoints: importEndpoints('units'),
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: () => false,
     update: ({ req }) => isAdmin(req.user),
     delete: () => false,

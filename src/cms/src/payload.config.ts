@@ -12,6 +12,9 @@ import { Media } from './collections/Media'
 import { People } from './collections/People'
 import { Locations } from './collections/Locations'
 import { Units } from './collections/Units'
+import { ImportRuns } from './collections/ImportRuns'
+import { isAdmin } from './access/isAdmin'
+import { importTasks } from './imports/tasks'
 import { health } from './endpoints/health'
 import { serverURL, webURL } from './urls'
 
@@ -38,7 +41,22 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units],
+  collections: [Users, Media, People, Locations, Units, ImportRuns],
+  // The imports from the authoritative source (ADR-0003). Only administrators
+  // may queue, run or cancel jobs through the API; the import endpoints queue
+  // them through the Local API.
+  jobs: {
+    tasks: importTasks,
+    enableConcurrencyControl: true,
+    access: {
+      queue: ({ req }) => isAdmin(req.user),
+      run: ({ req }) => isAdmin(req.user),
+      cancel: ({ req }) => isAdmin(req.user),
+    },
+    autoRun: [{ cron: '*/10 * * * * *', queue: 'imports' }],
+    // The tests run jobs themselves, when they need them.
+    shouldAutoRun: () => process.env.NODE_ENV !== 'test',
+  },
   endpoints: [health],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

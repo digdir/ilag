@@ -1,5 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+import { isSignedIn } from '../access/isSignedIn'
+import { importEndpoints } from '../imports/endpoints'
+
 // Employees and contractors, imported from Digdir's authoritative source
 // (NF-07). The import writes through the Local API, which bypasses access
 // control, so nobody can change people through the admin panel or the
@@ -26,8 +29,9 @@ export const People: CollectionConfig = {
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'title', 'units', 'location', 'isEmployee', 'active'],
   },
+  endpoints: importEndpoints('people'),
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: () => false,
     update: () => false,
     delete: () => false,
