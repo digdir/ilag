@@ -464,6 +464,8 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Team** – jobber sammen om leveranser. Kan være produktteam, prosjektteam, støtteteam etc.
 
+- **Teamtype** – hva slags team et team er, f.eks. produktteam, prosjektteam eller fagnettverk (jf. Vedlegg 2). Administrator vedlikeholder teamtypene.
+
 - **Teammedlemskap** – at en person er med i et team, og hvilke roller personen har i teamet. En person har høyst ett medlemskap per team, med én eller flere roller.
 
 - **Enhet** – gruppe i linjeorganisasjonen (divisjon/avdeling/seksjon). En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå, overordnet enhet og leder hentes fra Digdirs autoritative kilde (jf. NF-07).
@@ -501,6 +503,8 @@ erDiagram
     Person ||--o{ Teammedlemskap : "har"
     Team ||--o{ Teammedlemskap : "har"
     Teammedlemskap }o--|{ Rolle : "med"
+    Teamtype ||--o{ Team : "er av"
+    Rolle }o--o{ Teamtype : "er relevant for"
     Rolle }o--o{ Prinsipp : "hører til"
     Prinsipp }o--o{ Enhet : "hører til"
     Prinsipp }o--o{ Team : "hører til"
