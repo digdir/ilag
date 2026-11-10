@@ -48,15 +48,16 @@ Content-Type: text/csv; charset=utf-8
 
 | Column | Meaning in SAP | Required | Field in ilag |
 | --- | --- | --- | --- |
-| `0000PERNR` | Employee number (AnsattNr) | yes | `externalId` and `employeeNumber`. Unique in the file |
+| `01050001USRID` | SAP user ID (SapUserId) | yes | `externalId`. ilag matches people on it. Unique in the file |
+| `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber`. Unique in the file |
 | `0002VORNA` | First name (Fornavn) | yes | `firstName` |
 | `0002NACHN` | Last name (Etternavn) | yes | `lastName` |
 | `01050010USRID_LONG` | Email (Epost) | yes | `email`. Unique in the file |
 | `9999PLANS_TEKST` | Job title (Stillingstittel) | no | `title` |
 | `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `externalUnitId` in the unit file |
-| `0001BTRTL` | Location (Lokasjon) | yes | `externalLocationId`, then `location` |
-| `9999LEDER_PERNR` | The manager's employee number (LederAnsattNr) | no | `externalManagerId`, then `manager` |
-| `0001PERSG` | Employee group (AnsattType) | yes | `isEmployee`. See «Still to confirm» |
+| `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code` |
+| `9999LEDER_PERNR` | The manager's employee number (LederAnsattNr) | no | `managerEmployeeNumber`, then `manager`: the person with that `employeeNumber` |
+| `0001PERSG` | Employee group (AnsattType) | yes | `isEmployee`: `1` or `4` is an employee, `8` or `9` a contractor |
 | `01059003USRID` | Mobile 1 (Mobil1) | no | `mobile` |
 | `01059004USRID` | Mobile 2 (Mobil2) | no | `mobile`, when Mobile 1 is empty |
 
@@ -68,7 +69,6 @@ requirement needs them:
 
 | Column | Meaning in SAP |
 | --- | --- |
-| `01050001USRID` | SAP user ID (SapUserId) |
 | `0001STELL` | Job ID (StillingstittelId). The title comes from `9999PLANS_TEKST` |
 | `9999BEGDA` | Start date (AnsattDato) |
 
@@ -82,9 +82,9 @@ The people are made up.
 
 ```csv
 0000PERNR;0001BTRTL;0001ORGEH;0001PERSG;0001STELL;0002NACHN;0002VORNA;01050001USRID;01050010USRID_LONG;01059003USRID;01059004USRID;9999BEGDA;9999LEDER_PERNR;9999PLANS_TEKST
-4711;0001;100;1;50001234;Nordmann;Kari;KNORDMANN;kari.nordmann@digdir.no;+4791234567;;01.03.2019;;Divisjonsdirektør
-4712;0002;110;1;50001240;Hansen;Ola;OHANSEN;ola.hansen@digdir.no;;+4799887766;15.08.2021;4711;Avdelingsdirektør
-4720;0002;111;1;50001301;Ødegård;Åse;AODEGARD;ase.odegard@digdir.no;+4790011223;;02.01.2024;4712;Seniorrådgiver
+4711;LEI;100;1;50001234;Nordmann;Kari;KNORDMANN;kari.nordmann@digdir.no;+4791234567;;01.03.2019;;Divisjonsdirektør
+4712;OSL;110;1;50001240;Hansen;Ola;OHANSEN;ola.hansen@digdir.no;;+4799887766;15.08.2021;4711;Avdelingsdirektør
+4720;OSL;111;8;50001301;Ødegård;Åse;AODEGARD;ase.odegard@digdir.no;+4790011223;;02.01.2024;4712;Seniorrådgiver
 ```
 
 ### What makes ilag refuse a file
@@ -92,16 +92,16 @@ The people are made up.
 The whole file is refused, and nothing changes, if any row:
 
 - lacks a required column or value
-- repeats a `0000PERNR` already in the file
+- repeats a `01050001USRID` or a `0000PERNR` already in the file
 - repeats an email already in the file, or has an email that isn't valid
-- has a `0001PERSG` that isn't one of the agreed employee groups
+- has a `0001PERSG` other than `1`, `4`, `8` or `9`
 
 These are **not** errors, because the other files may come later or the
 person may be outside the file. They are listed in the import's result:
 
 - a `0001ORGEH` that isn't a unit in ilag
-- a `0001BTRTL` that isn't a location in ilag
-- a `9999LEDER_PERNR` that isn't a person in the file
+- a `0001BTRTL` that isn't the code of a location in ilag
+- a `9999LEDER_PERNR` that isn't the `0000PERNR` of a person in the file
 
 A `9999LEDER_PERNR` equal to the person's own `0000PERNR` means the person has
 no manager in ilag.
@@ -161,23 +161,21 @@ Polling is optional. Administrators see the same in ilag's admin panel.
 
 ## Still to confirm
 
-- [ ] **Employee groups.** Which `0001PERSG` values does the file use, and
-  which of them are employees? Are contractors (innleide) in the file at all?
-  If they aren't, ilag needs another source for them, since a person is either
-  an employee or a contractor (section 4.1 of the specification).
 - [ ] **One unit per person.** `0001ORGEH` holds one unit. A person can belong
   to more than one unit (FO-02). Does SAP ever have more than one for a
   person, and if so, how would it come in the file?
-- [ ] **Locations.** Is `0001BTRTL` the same ID the location file will use?
-  There is no location contract yet.
+- [ ] **Locations.** `0001BTRTL` is matched on the location's `code`. The
+  location file needs to use the same abbreviations. There is no location
+  contract yet.
 - [ ] **Mobile 1 and 2.** ilag stores one mobile number. The proposal is
   Mobile 1, then Mobile 2 when Mobile 1 is empty.
 - [ ] **The email.** Is `01050010USRID_LONG` always the person's Digdir email,
   the one they sign in with through Entra ID?
 - [ ] **Unit file columns.** If the unit file also comes from SAP, it should
   use SAP's names too, and the [unit contract](unit-import.md) changes to
-  match.
-- [ ] **A durable ID.** Does `0000PERNR` stay the same when a contractor
+  match. It should also say whether a unit's leader is given by employee
+  number or by SAP user ID. ilag matches it on `externalId` today.
+- [ ] **A durable ID.** Does the SAP user ID stay the same when a contractor
   becomes an employee, or when someone leaves and comes back? Open question 7
   in the specification.
 
