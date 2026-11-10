@@ -12,7 +12,11 @@ import { Media } from './collections/Media'
 import { People } from './collections/People'
 import { Locations } from './collections/Locations'
 import { Units } from './collections/Units'
+import { Roles } from './collections/Roles'
+import { Teams } from './collections/Teams'
+import { TeamMemberships } from './collections/TeamMemberships'
 import { health } from './endpoints/health'
+import { seed } from './seed'
 import { serverURL, webURL } from './urls'
 
 const filename = fileURLToPath(import.meta.url)
@@ -38,8 +42,9 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units],
+  collections: [Users, Media, People, Locations, Units, Roles, Teams, TeamMemberships],
   endpoints: [health],
+  onInit: seed,
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

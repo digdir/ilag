@@ -72,18 +72,27 @@ export interface Config {
     personer: Person;
     lokasjoner: Location;
     enheter: Unit;
+    roller: Role;
+    team: Team;
+    teammedlemskap: TeamMembership;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    personer: {
+      teams: 'teammedlemskap';
+    };
     lokasjoner: {
       people: 'personer';
     };
     enheter: {
       children: 'enheter';
       people: 'personer';
+    };
+    team: {
+      members: 'teammedlemskap';
     };
   };
   collectionsSelect: {
@@ -92,6 +101,9 @@ export interface Config {
     personer: PersonerSelect<false> | PersonerSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
+    roller: RollerSelect<false> | RollerSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -209,6 +221,11 @@ export interface Person {
   active: boolean;
   mobile?: string | null;
   photo?: (number | null) | Media;
+  teams?: {
+    docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -259,6 +276,47 @@ export interface Unit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap".
+ */
+export interface TeamMembership {
+  id: number;
+  team: number | Team;
+  person: number | Person;
+  roles: (number | Role)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  description?: string | null;
+  teamType: 'project' | 'support' | 'delivery' | 'product' | 'network';
+  active: boolean;
+  members?: {
+    docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roller".
+ */
+export interface Role {
+  id: number;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -300,6 +358,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'enheter';
         value: number | Unit;
+      } | null)
+    | ({
+        relationTo: 'roller';
+        value: number | Role;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
+      } | null)
+    | ({
+        relationTo: 'teammedlemskap';
+        value: number | TeamMembership;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -416,6 +486,7 @@ export interface PersonerSelect<T extends boolean = true> {
   active?: T;
   mobile?: T;
   photo?: T;
+  teams?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -447,6 +518,40 @@ export interface EnheterSelect<T extends boolean = true> {
   active?: T;
   children?: T;
   people?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roller_select".
+ */
+export interface RollerSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  teamType?: T;
+  active?: T;
+  members?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap_select".
+ */
+export interface TeammedlemskapSelect<T extends boolean = true> {
+  team?: T;
+  person?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
 }

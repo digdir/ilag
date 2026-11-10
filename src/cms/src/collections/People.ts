@@ -143,5 +143,13 @@ export const People: CollectionConfig = {
       type: 'upload',
       relationTo: 'medier',
     },
+    {
+      // The teams the person is in, with their roles there (FO-02).
+      name: 'teams',
+      type: 'join',
+      collection: 'teammedlemskap',
+      on: 'person',
+      defaultLimit: 0,
+    },
   ],
 }
