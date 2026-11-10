@@ -42,17 +42,18 @@ Content-Type: text/csv; charset=utf-8
 - The first line is the header, with SAP's field names. ilag matches them
   without regard to case or surrounding spaces, in any order.
 - Values may be quoted, as `Export-Csv` does.
-- One person per line, all people in every file.
+- One line per person and unit, all people in every file. See «A person in
+  more than one unit».
 
 ### Columns
 
 | Column | Meaning in SAP | Required | Field in ilag |
 | --- | --- | --- | --- |
-| `01050001USRID` | SAP user ID (SapUserId) | yes | `externalId`. ilag matches people on it. Unique in the file |
-| `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber`. Unique in the file |
+| `01050001USRID` | SAP user ID (SapUserId) | yes | `externalId`. ilag matches people on it |
+| `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber` |
 | `0002VORNA` | First name (Fornavn) | yes | `firstName` |
 | `0002NACHN` | Last name (Etternavn) | yes | `lastName` |
-| `01050010USRID_LONG` | Email (Epost) | yes | `email`, the same address the person signs in with through Entra ID. Unique in the file |
+| `01050010USRID_LONG` | Email (Epost) | yes | `email`, the same address the person signs in with through Entra ID |
 | `9999PLANS_TEKST` | Job title (Stillingstittel) | no | `title` |
 | `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `externalUnitId` in the unit file |
 | `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code` |
@@ -87,13 +88,32 @@ The people are made up.
 4720;OSL;111;8;50001301;Ødegård;Åse;AODEGARD;ase.odegard@digdir.no;+4790011223;;02.01.2024;4712;Seniorrådgiver
 ```
 
+### A person in more than one unit
+
+A person usually has one line. ilag can link a person to more than one unit
+(FO-02), so a person may also have one line per unit: the same `0000PERNR`
+with a different `0001ORGEH` on each line. ilag links the person to every
+unit on their lines.
+
+The other values come from the person's first line. If a later line has
+different values, ilag uses the first line's and lists the employee number in
+the import's result.
+
+### A contractor who becomes an employee
+
+Both the SAP user ID and the employee number change when a contractor becomes
+an employee. ilag then sees a new person, and marks the contractor as no
+longer working in Digdir. Their history in teams stays with the contractor.
+
 ### What makes ilag refuse a file
 
 The whole file is refused, and nothing changes, if any row:
 
 - lacks a required column or value
-- repeats a `01050001USRID` or a `0000PERNR` already in the file
-- repeats an email already in the file, or has an email that isn't valid
+- repeats both the `0000PERNR` and the `0001ORGEH` of another line
+- has a `01050001USRID` or an email that another line has with a different
+  `0000PERNR`
+- has an email that isn't valid
 - has a `0001PERSG` other than `1`, `4`, `8` or `9`
 
 These are **not** errors, because the other files may come later or the
@@ -113,7 +133,8 @@ no manager in ilag.
 ```json
 {
   "importRunId": 43,
-  "rows": 412,
+  "rows": 415,
+  "people": 412,
   "statusUrl": "https://<ilag>/api/personer/import/43"
 }
 ```
@@ -124,7 +145,7 @@ no manager in ilag.
 {
   "errors": [
     { "line": 3, "column": "01050010USRID_LONG", "message": "«kari.nordmann» is not a valid email" },
-    { "line": 9, "column": "0000PERNR", "message": "«4712» is already on line 2" }
+    { "line": 9, "column": "0001ORGEH", "message": "«4712» is already in unit «110» on line 2" }
   ]
 }
 ```
@@ -152,7 +173,8 @@ started). A finished run also has its result:
     "deactivated": 2,
     "unknownUnits": ["199"],
     "unknownLocations": [],
-    "unknownManagers": ["4799"]
+    "unknownManagers": ["4799"],
+    "differingLines": ["4720"]
   }
 }
 ```
@@ -161,20 +183,14 @@ Polling is optional. Administrators see the same in ilag's admin panel.
 
 ## Still to confirm
 
-- [ ] **One unit per person.** `0001ORGEH` holds one unit. A person can belong
-  to more than one unit (FO-02). Does SAP ever have more than one for a
-  person, and if so, how would it come in the file?
 - [ ] **Locations.** `0001BTRTL` is matched on the location's `code`, which
   is also how ilag identifies a location. The location file needs to use the
   same abbreviations. There is no location contract yet.
-- [ ] **Mobile 1 and 2.** ilag stores one mobile number. The proposal is
-  Mobile 1, then Mobile 2 when Mobile 1 is empty.
 - [ ] **Unit file columns.** If the unit file also comes from SAP, it should
   use SAP's names too, and the [unit contract](unit-import.md) changes to
   match.
-- [ ] **A durable ID.** Does the SAP user ID stay the same when a contractor
-  becomes an employee, or when someone leaves and comes back? Open question 7
-  in the specification.
+- [ ] **Someone who leaves and comes back.** Do they get the same SAP user ID
+  and employee number again?
 
 ## Example script
 
