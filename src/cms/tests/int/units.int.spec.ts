@@ -43,7 +43,7 @@ describe('Units', () => {
     })
     location = await payload.create({
       collection: 'lokasjoner',
-      data: { externalLocationId: `${prefix}-loc`, code: `${prefix}-LEI`, name: 'Leikanger' },
+      data: { code: `${prefix}-LEI`, name: 'Leikanger' },
     })
   })
 
@@ -56,7 +56,7 @@ describe('Units', () => {
         where: { externalUnitId: { like: prefix }, level: { equals: level } },
       })
     }
-    await payload.delete({ collection: 'lokasjoner', where: { externalLocationId: { like: prefix } } })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 
@@ -109,7 +109,7 @@ describe('Units', () => {
     const leader = await payload.create({ collection: 'personer', data: person(1) })
     const led = await payload.create({
       collection: 'enheter',
-      data: unit(10, { externalLeaderId: leader.externalId, leader: leader.id }),
+      data: unit(10, { managerEmployeeNumber: leader.employeeNumber, leader: leader.id }),
     })
     const member = await payload.create({
       collection: 'personer',

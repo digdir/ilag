@@ -218,7 +218,6 @@ export interface Person {
  */
 export interface Location {
   id: number;
-  externalLocationId: string;
   code: string;
   name: string;
   people?: {
@@ -241,7 +240,7 @@ export interface Unit {
   level: 'division' | 'department' | 'section';
   externalParentId?: string | null;
   parent?: (number | null) | Unit;
-  externalLeaderId?: string | null;
+  managerEmployeeNumber?: string | null;
   leader?: (number | null) | Person;
   active: boolean;
   children?: {
@@ -424,7 +423,6 @@ export interface PersonerSelect<T extends boolean = true> {
  * via the `definition` "lokasjoner_select".
  */
 export interface LokasjonerSelect<T extends boolean = true> {
-  externalLocationId?: T;
   code?: T;
   name?: T;
   people?: T;
@@ -442,7 +440,7 @@ export interface EnheterSelect<T extends boolean = true> {
   level?: T;
   externalParentId?: T;
   parent?: T;
-  externalLeaderId?: T;
+  managerEmployeeNumber?: T;
   leader?: T;
   active?: T;
   children?: T;

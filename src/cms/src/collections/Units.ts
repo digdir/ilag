@@ -6,10 +6,11 @@ import type { CollectionConfig } from 'payload'
 // admin panel or the REST/GraphQL API. What a unit leader maintains in ilag
 // (LO-03) will live elsewhere.
 //
-// The import matches units on externalUnitId. It stores the source's IDs for
-// the parent unit and the leader as they come, and sets the `parent` and
-// `leader` relationships from them once all units and people exist. An ID
-// with no match leaves the relationship empty and keeps the raw ID.
+// The import matches units on externalUnitId. It stores the parent unit's ID
+// and the leader's employee number as they come from the source, and sets the
+// `parent` and `leader` relationships from them once all units and people
+// exist. A value with no match leaves the relationship empty and keeps the
+// raw value.
 export const Units: CollectionConfig = {
   slug: 'enheter',
   dbName: 'units',
@@ -75,13 +76,13 @@ export const Units: CollectionConfig = {
       relationTo: 'enheter',
     },
     {
-      // The leader's externalId in personer, as it comes from the source.
-      name: 'externalLeaderId',
+      // The leader's employeeNumber in personer, as it comes from the source.
+      name: 'managerEmployeeNumber',
       type: 'text',
       index: true,
     },
     {
-      // Enhetsleder (LO-02), set from externalLeaderId.
+      // Enhetsleder (LO-02), set from managerEmployeeNumber.
       name: 'leader',
       type: 'relationship',
       relationTo: 'personer',

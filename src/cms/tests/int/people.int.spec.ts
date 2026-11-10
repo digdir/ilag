@@ -33,13 +33,13 @@ describe('People and locations', () => {
     })
     location = await payload.create({
       collection: 'lokasjoner',
-      data: { externalLocationId: `${prefix}-loc`, code: `${prefix}-LEI`, name: 'Leikanger' },
+      data: { code: `${prefix}-LEI`, name: 'Leikanger' },
     })
   })
 
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
-    await payload.delete({ collection: 'lokasjoner', where: { externalLocationId: { like: prefix } } })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 
@@ -94,7 +94,7 @@ describe('People and locations', () => {
     await expect(
       payload.create({
         collection: 'lokasjoner',
-        data: { externalLocationId: `${prefix}-loc-2`, code: location.code, name: 'Oslo' },
+        data: { code: location.code, name: 'Oslo' },
       }),
     ).rejects.toThrow()
   })
