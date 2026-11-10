@@ -48,7 +48,7 @@ Content-Type: text/csv; charset=utf-8
 | Column | Required | Content | Field in ilag |
 | --- | --- | --- | --- |
 | `orgEnhet` | yes | The unit's ID in SAP. Unique in the file. The same ID as `0001ORGEH` in the people file | `externalUnitId` |
-| `Betegnelse på organisasjonsenh` | yes | The unit's name | `name` |
+| `Betegnelse på organisasjonsenh` | yes | The unit's full name, not SAP's short text of at most 40 characters | `name` |
 | `Avdeling` | yes | The code of the division the unit is in, such as `FEL` | `code` and `level`, and `parent` |
 | `Seksjon` | yes | The code of the department the unit is in, such as `FUT` | `code` and `level`, and `parent` |
 | `gruppe` | no | The section's code, such as `FBA` | `code` and `level` |
@@ -169,13 +169,6 @@ started). A finished run also has its result:
 ```
 
 Polling is optional. Administrators see the same in ilag's admin panel.
-
-## Still to confirm
-
-- [ ] **Names cut off at 40 characters.** Two names in the example are exactly
-  40 characters long and seem to lack their last letter, such as
-  «Sammenhengende tjenester og livshendelse». Can the file carry the full
-  name, for example from SAP's long text?
 
 ## Example script
 

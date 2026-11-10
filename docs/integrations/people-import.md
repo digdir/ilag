@@ -6,8 +6,7 @@ SAP, with SAP's field names in the header. The design behind it is in
 the same way as the [unit import](unit-import.md).
 
 > **Status:** proposed, not built yet. The columns are the ones Ansattmottak
-> has said it will send. The points under «Still to confirm» need an answer
-> from Ansattmottak before the import is built.
+> has said it will send.
 
 ## In short
 
@@ -116,8 +115,10 @@ ilag matches people on the employee number.
   again, marks them as active and keeps their history in teams. A new SAP user
   ID replaces the old one.
 - **A contractor who becomes an employee** gets a new SAP user ID and a new
-  employee number. ilag then sees a new person, and marks the contractor as no
-  longer working in Digdir. Their history in teams stays with the contractor.
+  employee number, but keeps their email. ilag then sees a new person, and
+  marks the contractor as no longer working in Digdir. Their history in teams
+  stays with the contractor. The two share the email, so ilag only requires
+  an email to be unique in the file, not among people who have left.
 
 ### What makes ilag refuse a file
 
@@ -196,12 +197,6 @@ started). A finished run also has its result:
 ```
 
 Polling is optional. Administrators see the same in ilag's admin panel.
-
-## Still to confirm
-
-- [ ] **The email of a contractor who becomes an employee.** Do they keep
-  the same address? ilag allows each email only once, also for people who
-  have left, so the new employee would collide with the old contractor.
 
 ## Example script
 

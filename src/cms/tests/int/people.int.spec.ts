@@ -87,6 +87,15 @@ describe('People and locations', () => {
     ).rejects.toThrow()
   })
 
+  it('NF-07: lets a contractor and the employee they became share an email', async () => {
+    const contractor = await payload.create({ collection: 'personer', data: person(13, { active: false }) })
+    const employee = await payload.create({
+      collection: 'personer',
+      data: person(14, { email: contractor.email, isEmployee: true }),
+    })
+    expect(employee.email).toBe(contractor.email)
+  })
+
   it('NF-07: requires locationCode', async () => {
     await expect(
       payload.create({

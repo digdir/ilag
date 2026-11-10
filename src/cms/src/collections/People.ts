@@ -60,10 +60,13 @@ export const People: CollectionConfig = {
       },
     },
     {
+      // Unique among active people, which the import checks in the file. Not
+      // unique in the collection: a contractor who becomes an employee keeps
+      // the address, and comes back as a new person beside the old one.
       name: 'email',
       type: 'email',
       required: true,
-      unique: true,
+      index: true,
     },
     {
       // The formal job title, e.g. «Seniorrådgiver». Roles in a team, unit or
