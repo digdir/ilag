@@ -14,6 +14,7 @@ export default defineConfig({
     // In parallel, two files race to create the same new tables, and they
     // share one database anyway, so run them one at a time.
     fileParallelism: false,
+    globalSetup: ['./tests/helpers/globalSetup.ts'],
     setupFiles: ['./vitest.setup.ts'],
     include: ['tests/int/**/*.int.spec.ts'],
   },

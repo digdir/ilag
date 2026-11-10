@@ -67,6 +67,9 @@ importers:
       '@types/node':
         specifier: 24.19.2
         version: 24.19.2
+      '@types/pg':
+        specifier: 8.20.0
+        version: 8.20.0
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
@@ -88,6 +91,9 @@ importers:
       oauth2-mock-server:
         specifier: 9.3.0
         version: 9.3.0
+      pg:
+        specifier: 8.20.0
+        version: 8.20.0
       prettier:
         specifier: ^3.4.2
         version: 3.9.10
