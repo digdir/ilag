@@ -7,6 +7,7 @@ import type { Location, Person, Unit, User } from '@/payload-types'
 
 let payload: Payload
 let user: User
+let admin: User
 let location: Location
 
 // Prefix for every test row, so cleanup never touches other data.
@@ -37,6 +38,11 @@ const ids = (docs: (number | { id: number })[] | undefined) =>
 describe('Units', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
+    // Created first, so the first-user rule never makes `user` an administrator.
+    admin = await payload.create({
+      collection: 'brukere',
+      data: { email: `${prefix}-admin@example.com`, password: 'test-password', roles: ['admin'] },
+    })
     user = await payload.create({
       collection: 'brukere',
       data: { email: `${prefix}@example.com`, password: 'test-password' },
@@ -50,7 +56,7 @@ describe('Units', () => {
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
     // Children before parents, so no unit is left pointing at a deleted one.
-    for (const level of ['section', 'department', 'division'] as const) {
+    for (const level of ['section', 'department', 'division', 'directorate'] as const) {
       await payload.delete({
         collection: 'enheter',
         where: { externalUnitId: { like: prefix }, level: { equals: level } },
@@ -82,17 +88,15 @@ describe('Units', () => {
   })
 
   it('LO-01: builds the hierarchy from parents and lists each unit\'s sub-units', async () => {
-    const division = await payload.create({ collection: 'enheter', data: unit(6) })
+    const directorate = await payload.create({ collection: 'enheter', data: unit(16, { level: 'directorate' }) })
+    const division = await payload.create({ collection: 'enheter', data: unit(6, { parent: directorate.id }) })
     const department = await payload.create({
       collection: 'enheter',
-      data: unit(7, { level: 'department', externalParentId: division.externalUnitId, parent: division.id }),
+      data: unit(7, { level: 'department', parent: division.id }),
     })
     const sections = await Promise.all(
       [8, 9].map((n) =>
-        payload.create({
-          collection: 'enheter',
-          data: unit(n, { level: 'section', externalParentId: department.externalUnitId, parent: department.id }),
-        }),
+        payload.create({ collection: 'enheter', data: unit(n, { level: 'section', parent: department.id }) }),
       ),
     )
 
@@ -100,17 +104,14 @@ describe('Units', () => {
     expect((read.parent as Unit).id).toBe(division.id)
     expect(ids(read.children?.docs as never).sort()).toEqual(sections.map((s) => s.id).sort())
 
-    const top = await payload.findByID({ collection: 'enheter', id: division.id })
+    const top = await payload.findByID({ collection: 'enheter', id: directorate.id })
     expect(top.parent).toBeFalsy()
-    expect(ids(top.children?.docs as never)).toEqual([department.id])
+    expect(ids(top.children?.docs as never)).toEqual([division.id])
   })
 
   it('LO-02: links the leader and lists the people in a unit', async () => {
     const leader = await payload.create({ collection: 'personer', data: person(1) })
-    const led = await payload.create({
-      collection: 'enheter',
-      data: unit(10, { managerEmployeeNumber: leader.employeeNumber, leader: leader.id }),
-    })
+    const led = await payload.create({ collection: 'enheter', data: unit(10, { leader: leader.id }) })
     const member = await payload.create({
       collection: 'personer',
       data: person(2, { externalUnitIds: [led.externalUnitId], units: [led.id] }),
@@ -148,24 +149,50 @@ describe('Units', () => {
     await expect(payload.find({ collection: 'enheter', where, overrideAccess: false })).rejects.toThrow()
   })
 
-  it('NF-07: only the import can change units, not even an administrator', async () => {
-    const admin = { ...user, roles: ['admin' as const] }
+  it('NF-07: only the import can create, delete or change units, not even an administrator', async () => {
     const created = await payload.create({ collection: 'enheter', data: unit(14) })
 
     await expect(
       payload.create({ collection: 'enheter', data: unit(15), overrideAccess: false, user: admin }),
     ).rejects.toThrow()
     await expect(
+      payload.delete({ collection: 'enheter', id: created.id, overrideAccess: false, user: admin }),
+    ).rejects.toThrow()
+
+    // Payload drops fields the user may not update, rather than refusing the request.
+    const updated = await payload.update({
+      collection: 'enheter',
+      id: created.id,
+      data: { name: 'Nytt navn', level: 'section', active: false },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.name).toBe('Enhet 14')
+    expect(updated.level).toBe('division')
+    expect(updated.active).toBe(true)
+  })
+
+  it('LO-02: lets administrators set the leader, and nobody else', async () => {
+    const leader = await payload.create({ collection: 'personer', data: person(4) })
+    const created = await payload.create({ collection: 'enheter', data: unit(17) })
+
+    const updated = await payload.update({
+      collection: 'enheter',
+      id: created.id,
+      data: { leader: leader.id },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.leader).toBeTruthy()
+
+    await expect(
       payload.update({
         collection: 'enheter',
         id: created.id,
-        data: { name: 'Nytt navn' },
+        data: { leader: null },
         overrideAccess: false,
-        user: admin,
+        user,
       }),
-    ).rejects.toThrow()
-    await expect(
-      payload.delete({ collection: 'enheter', id: created.id, overrideAccess: false, user: admin }),
     ).rejects.toThrow()
   })
 })

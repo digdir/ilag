@@ -1,16 +1,20 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, FieldAccess } from 'payload'
 
-// Divisions, departments and sections, imported from their own file from
-// Digdir's authoritative source (NF-07). The import writes through the Local
-// API, which bypasses access control, so nobody can change units through the
-// admin panel or the REST/GraphQL API. What a unit leader maintains in ilag
-// (LO-03) will live elsewhere.
+import { isAdmin } from '../access/isAdmin'
+
+// The directorate, its divisions, departments and sections, imported from
+// their own file from Digdir's authoritative source (NF-07). The import writes
+// through the Local API, which bypasses access control. Nobody can create or
+// delete units through the admin panel or the REST/GraphQL API, or change what
+// the import sets. Administrators set the leader, which the file doesn't have.
+// What a unit leader maintains in ilag (LO-03) will live elsewhere.
 //
-// The import matches units on externalUnitId. It stores the parent unit's ID
-// and the leader's employee number as they come from the source, and sets the
-// `parent` and `leader` relationships from them once all units and people
-// exist. A value with no match leaves the relationship empty and keeps the
-// raw value.
+// The import matches units on externalUnitId, and sets `parent` from the
+// codes in the file. The field mapping is in docs/integrations/unit-import.md.
+
+// For the fields the import sets.
+const importOnly: FieldAccess = () => false
+
 export const Units: CollectionConfig = {
   slug: 'enheter',
   dbName: 'units',
@@ -28,7 +32,7 @@ export const Units: CollectionConfig = {
   access: {
     read: ({ req }) => Boolean(req.user),
     create: () => false,
-    update: () => false,
+    update: ({ req }) => isAdmin(req.user),
     delete: () => false,
   },
   defaultSort: 'name',
@@ -39,50 +43,45 @@ export const Units: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      access: { update: importOnly },
     },
     {
       name: 'name',
       type: 'text',
       required: true,
       index: true,
+      access: { update: importOnly },
     },
     {
-      // A short code such as «SSR». Not every unit has one.
+      // A short code such as «FEL». The directorate has none.
       name: 'code',
       type: 'text',
+      access: { update: importOnly },
     },
     {
-      // The levels of the organisation chart (LO-01).
+      // The levels of the organisation chart (LO-01), with the directorate
+      // at the top.
       name: 'level',
       type: 'select',
       required: true,
       options: [
+        { label: 'Direktorat', value: 'directorate' },
         { label: 'Divisjon', value: 'division' },
         { label: 'Avdeling', value: 'department' },
         { label: 'Seksjon', value: 'section' },
       ],
+      access: { update: importOnly },
     },
     {
-      // The parent unit's externalUnitId, as it comes from the source. Empty
-      // for the divisions at the top.
-      name: 'externalParentId',
-      type: 'text',
-      index: true,
-    },
-    {
-      // Set from externalParentId. A unit has at most one parent.
+      // A unit has at most one parent. Empty for the directorate.
       name: 'parent',
       type: 'relationship',
       relationTo: 'enheter',
+      access: { update: importOnly },
     },
     {
-      // The leader's employeeNumber in personer, as it comes from the source.
-      name: 'managerEmployeeNumber',
-      type: 'text',
-      index: true,
-    },
-    {
-      // Enhetsleder (LO-02), set from managerEmployeeNumber.
+      // Enhetsleder (LO-02), set by an administrator. The import never
+      // changes it.
       name: 'leader',
       type: 'relationship',
       relationTo: 'personer',
@@ -94,6 +93,7 @@ export const Units: CollectionConfig = {
       type: 'checkbox',
       required: true,
       defaultValue: true,
+      access: { update: importOnly },
     },
     {
       // Sub-units (LO-02).

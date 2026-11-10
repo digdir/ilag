@@ -74,7 +74,7 @@ export const People: CollectionConfig = {
     {
       // The employee number in SAP (PERNR); the import matches on it. It stays
       // the same when someone leaves and comes back, but changes when a
-      // contractor becomes an employee. Managers and unit leaders refer to it.
+      // contractor becomes an employee. Managers refer to it.
       name: 'employeeNumber',
       type: 'text',
       required: true,

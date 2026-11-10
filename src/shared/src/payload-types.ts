@@ -237,10 +237,8 @@ export interface Unit {
   externalUnitId: string;
   name: string;
   code?: string | null;
-  level: 'division' | 'department' | 'section';
-  externalParentId?: string | null;
+  level: 'directorate' | 'division' | 'department' | 'section';
   parent?: (number | null) | Unit;
-  managerEmployeeNumber?: string | null;
   leader?: (number | null) | Person;
   active: boolean;
   children?: {
@@ -438,9 +436,7 @@ export interface EnheterSelect<T extends boolean = true> {
   name?: T;
   code?: T;
   level?: T;
-  externalParentId?: T;
   parent?: T;
-  managerEmployeeNumber?: T;
   leader?: T;
   active?: T;
   children?: T;
