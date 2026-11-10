@@ -1,6 +1,6 @@
 # ADR-0003: Imports from the authoritative source
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-11-10)
 - **Requirements:** NF-07, LO-01, LO-02, FO-02
 - **Related:** [ADR-0001](0001-login-and-sessions.md),
   [ADR-0002](0002-password-login-only-for-break-glass-accounts.md),
