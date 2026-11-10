@@ -3,8 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 
 // The kinds of team in Digdir (TO-02), such as produktteam or fagnettverk.
-// Administrators maintain them (2.3); the ones in Vedlegg 2 are created in a
-// database without any (see seed.ts).
+// Administrators maintain them (2.3).
 export const TeamTypes: CollectionConfig = {
   slug: 'teamtyper',
   dbName: 'team_types',

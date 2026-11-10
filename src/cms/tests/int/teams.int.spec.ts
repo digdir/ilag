@@ -58,14 +58,16 @@ describe('Teams', () => {
       collection: 'lokasjoner',
       data: { externalLocationId: `${prefix}-loc`, code: `${prefix}-LEI`, name: 'Leikanger' },
     })
-    const role = async (name: string) =>
-      (await payload.find({ collection: 'roller', where: { name: { equals: name } } })).docs[0]
+    // Roles and team types are content that administrators create.
+    const role = (name: string) =>
+      payload.create({ collection: 'roller', data: { name: `${prefix} ${name}` } })
     teamLead = await role('Teamleder')
     productOwner = await role('Produkteier')
     teamMember = await role('Teammedlem')
-    productTeam = (
-      await payload.find({ collection: 'teamtyper', where: { name: { equals: 'Produktteam' } } })
-    ).docs[0]
+    productTeam = await payload.create({
+      collection: 'teamtyper',
+      data: { name: `${prefix} Produktteam` },
+    })
   })
 
   afterAll(async () => {
@@ -79,26 +81,6 @@ describe('Teams', () => {
       where: { externalLocationId: { like: prefix } },
     })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
-  })
-
-  it('RO-07: creates teameier, teamleder, teammedlem and produkteier in a database without roles', async () => {
-    const { docs } = await payload.find({ collection: 'roller', limit: 0 })
-    expect(docs.map((d) => d.name)).toEqual(
-      expect.arrayContaining(['Teameier', 'Teamleder', 'Teammedlem', 'Produkteier']),
-    )
-  })
-
-  it('TO-02: creates the team types from Vedlegg 2 in a database without any', async () => {
-    const { docs } = await payload.find({ collection: 'teamtyper', limit: 0 })
-    expect(docs.map((d) => d.name)).toEqual(
-      expect.arrayContaining([
-        'Prosjektteam',
-        'Støtteteam',
-        'Leveranseteam',
-        'Produktteam',
-        'Fagnettverk',
-      ]),
-    )
   })
 
   it('TO-02: requires a known team type', async () => {

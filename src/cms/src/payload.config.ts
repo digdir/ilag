@@ -17,7 +17,6 @@ import { TeamTypes } from './collections/TeamTypes'
 import { Teams } from './collections/Teams'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { health } from './endpoints/health'
-import { seed } from './seed'
 import { serverURL, webURL } from './urls'
 
 const filename = fileURLToPath(import.meta.url)
@@ -45,7 +44,6 @@ export default buildConfig({
   },
   collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, Teams, TeamMemberships],
   endpoints: [health],
-  onInit: seed,
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
