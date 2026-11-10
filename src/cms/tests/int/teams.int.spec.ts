@@ -46,13 +46,15 @@ const ids = (docs: (number | { id: number })[] | undefined) =>
 describe('Teams', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
-    user = await payload.create({
-      collection: 'brukere',
-      data: { email: `${prefix}@example.com`, password: 'test-password' },
-    })
+    // The administrator first: in an empty database, the first user becomes
+    // an administrator whatever their roles.
     admin = await payload.create({
       collection: 'brukere',
       data: { email: `${prefix}-admin@example.com`, password: 'test-password', roles: ['admin'] },
+    })
+    user = await payload.create({
+      collection: 'brukere',
+      data: { email: `${prefix}@example.com`, password: 'test-password' },
     })
     location = await payload.create({
       collection: 'lokasjoner',
