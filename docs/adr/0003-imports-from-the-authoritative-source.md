@@ -5,6 +5,7 @@
 - **Related:** [ADR-0001](0001-login-and-sessions.md),
   [ADR-0002](0002-password-login-only-for-break-glass-accounts.md),
   [unit import contract](../integrations/unit-import.md),
+  [people import contract](../integrations/people-import.md),
   [architecture overview](../diagrams/architecture.md), #30
 
 ## Context
@@ -113,8 +114,11 @@ choices here apply to all three.
 
 ### Still to agree
 
-- [ ] **Column names.** The contract uses ilag's field names for now. The
-  source may end up with its own; the mapping is in one place.
+- [ ] **Column names.** The people file comes from SAP with SAP's field
+  names, and the [people contract](../integrations/people-import.md) maps
+  them to ilag's fields. The unit contract uses ilag's field names for now,
+  and changes if the unit file also comes with SAP's names. The mapping is in
+  one place per kind of data.
 - [ ] **Protection against a truncated file.** Every row is checked, but a
   file that is cut off or nearly empty is still valid row by row, and as a
   full snapshot it would deactivate the units it lacks. Proposed: refuse a

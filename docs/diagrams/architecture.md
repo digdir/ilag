@@ -140,9 +140,10 @@ one-time import from baksia.digdir.no to get realistic test data.
   through the cluster's ingress, or over a private connection.
 - **The batch endpoint's contract**: proposed in
   [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md), starting with
-  the [unit import](../integrations/unit-import.md): one endpoint per kind of
-  data, a full snapshot in each CSV file, and units missing from the file
-  marked as closed.
+  the [unit import](../integrations/unit-import.md) and the
+  [people import](../integrations/people-import.md): one endpoint per kind of
+  data, a full snapshot in each CSV file, and units and people missing from
+  the file marked as closed or no longer working in Digdir.
 
 ## Later: public pages
 
