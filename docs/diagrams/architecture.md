@@ -78,7 +78,7 @@ flowchart TB
 | **CMS** (`src/cms`) | Runs in the same namespace as the frontend. Owns the content model, access control and data. It runs the sign-in with Entra ID and issues the session both apps use. Editors work in the admin UI; the frontend reads through the REST API, and Ansattmottak posts employees and the org structure to a custom batch endpoint on it. GraphQL is exposed but nothing uses it yet. CORS and CSRF only allow the frontend's URL. |
 | **`@ilag/shared`** (`src/shared`) | A pnpm workspace package, not a running service; it is drawn inside the frontend because that is where its code runs. It holds the types generated from the collection configs (`pnpm generate:types`) and a thin REST client, so the frontend is typed against the CMS schema. |
 | **Microsoft Entra ID** | Identity provider for both employees and editors, through OpenID Connect against Digdir's tenant. The CMS's login talks to it; the frontend never does. It says who someone is; what they may see and do is managed in Payload. It is a global Microsoft service, so it sits outside the Norway region in the diagram. |
-| **Ansattmottak** | The source of employee information and the organisation structure (units). It runs on a server in Digdir's own server room in Leikanger, outside Azure, and posts this data in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. ilag does not edit this data; it receives it. |
+| **Ansattmottak** | The source of employee information and the organisation structure (units). It runs on a server in Digdir's own server room in Leikanger, outside Azure, and posts this data in batches to a custom endpoint on the CMS's API, authenticated with a Payload API key. ilag does not edit this data; it receives it. [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md) describes how, with a contract for the [units](../integrations/unit-import.md) and the [people](../integrations/people-import.md). |
 | **Azure Database for PostgreSQL** | The only database. In Azure the schema is applied with migrations, not pushed on startup. |
 | **Azure Blob Storage** | Files uploaded to Payload's `media` collection. |
 
@@ -138,11 +138,6 @@ one-time import from baksia.digdir.no to get realistic test data.
 
 - **The network path** from Leikanger to the CMS on DIS Core: over the internet
   through the cluster's ingress, or over a private connection.
-- **The batch endpoint's contract**: proposed in
-  [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md), starting with
-  the [unit import](../integrations/unit-import.md): one endpoint per kind of
-  data, a full snapshot in each CSV file, and units missing from the file
-  marked as closed.
 
 ## Later: public pages
 

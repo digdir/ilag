@@ -464,7 +464,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Team** – jobber sammen om leveranser. Kan være produktteam, prosjektteam, støtteteam etc.
 
-- **Enhet** – gruppe i linjeorganisasjonen (divisjon/avdeling/seksjon). En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå, overordnet enhet og leder hentes fra Digdirs autoritative kilde (jf. NF-07).
+- **Enhet** – gruppe i linjeorganisasjonen (direktorat/divisjon/avdeling/seksjon). Øverst er direktoratet selv. En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå og overordnet enhet hentes fra Digdirs autoritative kilde (jf. NF-07). Lederen registreres foreløpig i ilag av en administrator.
 
 - **Person** – ansatt eller innleid i Digdir som inngår i ett eller flere team, prosjekter eller enheter, tilknyttet én lokasjon. Personen er merket som ansatt eller innleid, og som aktiv eller sluttet. Opplysningene hentes fra Digdirs autoritative kilde (jf. NF-07).
 
@@ -482,7 +482,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Innhold** – tekstinnhold av en definert type knyttet til team eller prosjekt, f.eks. mandat
 
-- **Lokasjon** – kontor i en by som en person hører til, med kode og navn fra Digdirs autoritative kilde (jf. NF-07)
+- **Lokasjon** – kontor i en by som en person hører til, med kode og navn. Lokasjonene registreres manuelt i ilag av en administrator. Personens lokasjon hentes som en kode fra Digdirs autoritative kilde (jf. NF-07)
 
 - **Innholdstype** – definert type innhold f eks mandat og strategi
 
@@ -495,7 +495,7 @@ erDiagram
 
     Enhet }o--o| Enhet : "hører til"
     Lokasjon ||--|{ Person : "hører til"
-    Person }o--|{ Enhet : "er ansatt i"
+    Person }o--o{ Enhet : "er ansatt i"
     Person }o--o{ Team : "hører til"
     Person }o--o{ Rolle : "har"
     Rolle }o--o{ Team : "hører til"
@@ -548,7 +548,7 @@ Punkter som er identifisert underveis, men som krever avklaring med flere enn kj
 | 4   | Språkmodell for KI-assistenten                      | Hvilken språkmodelltjeneste skal Spør ilag bruke, og hvordan sikres databehandleravtale, personvern og en akseptabel kostnadsmodell?                                                                                                                                                 | TBD                                 |
 | 5   | Innhold i Porteføljestyring                         | Hva skal funksjonsområdet Porteføljestyring inneholde: forklaring av porteføljestyringen, oversikt over porteføljen, støtte for prioriteringsprosessen, eller en kombinasjon? Støtte for prioriteringsprosessen vil kreve endring i 2.2.                                             | Arbeidspakken for porteføljestyring |
 | 6   | Kilde for ansatte og enheter                        | Skal ansatte, enhetstilhørighet og ledere hentes fra HR-systemet eller fra Entra ID? Valget påvirker datakvalitet, hvor raskt endringer blir synlige og hvilke opplysninger som er tilgjengelige.                                                                                    | TBD                                 |
-| 7   | Varig ID for personer                               | Personer kobles mot kilden med kildens egen ID. Det er ikke avklart om ID-en er den samme når en innleid blir ansatt. Endres den, blir personen registrert to ganger, og teamhistorikken følger ikke med. | TBD                                 |
+| 7   | Varig ID for personer                               | Delvis avklart 2026-11-10: når en innleid blir ansatt, endres både SAP-brukeridenten og ansattnummeret. Personen blir da registrert to ganger, som innleid som har sluttet og som ny ansatt, og teamhistorikken følger ikke med. En som slutter og kommer tilbake, får samme ansattnummer, og kobles til den samme personen. Fortsatt åpent: om og hvordan en innleid og den samme personen som ansatt skal kobles. Opprinnelig spørsmål: Personer kobles mot kilden med kildens egen ID. Det er ikke avklart om ID-en er den samme når en innleid blir ansatt. | TBD                                 |
 | 8   | Kobling av Ansattporten til brukere                 | Ansattporten (jf. NF-13) identifiserer brukeren med fødselsnummer, mens Entra ID bruker en ID i Digdirs tenant. Det er ikke avklart hvordan en innlogging med Ansattporten kobles til samme bruker, og om ilag kan lagre fødselsnummer for å gjøre det. | Personvernombud                     |
 
 ## Vedlegg 1: Klassifisering av team (team veiviser)

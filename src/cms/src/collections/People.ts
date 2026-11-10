@@ -5,11 +5,13 @@ import type { CollectionConfig } from 'payload'
 // control, so nobody can change people through the admin panel or the
 // REST/GraphQL API.
 //
-// The import matches people on externalId. It stores the source's IDs for
-// the manager, the location and the units as they come, and sets the
-// `manager`, `location` and `units` relationships from them once all people,
-// locations and units exist. An ID with no match leaves the relationship
-// empty and keeps the raw ID.
+// The import matches people on employeeNumber. It stores the manager's employee
+// number, the location's code and the units' IDs as they come from the
+// source, and sets the `manager`, `location` and `units` relationships from
+// them once all people, locations and units exist. A value with no match
+// leaves the relationship empty and keeps the raw value.
+//
+// The field mapping from the SAP file is in docs/integrations/people-import.md.
 export const People: CollectionConfig = {
   slug: 'personer',
   dbName: 'people',
@@ -58,10 +60,13 @@ export const People: CollectionConfig = {
       },
     },
     {
+      // Unique among active people, which the import checks in the file. Not
+      // unique in the collection: a contractor who becomes an employee keeps
+      // the address, and comes back as a new person beside the old one.
       name: 'email',
       type: 'email',
       required: true,
-      unique: true,
+      index: true,
     },
     {
       // The formal job title, e.g. «Seniorrådgiver». Roles in a team, unit or
@@ -70,37 +75,42 @@ export const People: CollectionConfig = {
       type: 'text',
     },
     {
+      // The employee number in SAP (PERNR); the import matches on it. It stays
+      // the same when someone leaves and comes back, but changes when a
+      // contractor becomes an employee. Managers refer to it.
       name: 'employeeNumber',
       type: 'text',
+      required: true,
+      unique: true,
     },
     {
-      // The source's own ID for the person; the import matches on it.
+      // The SAP user ID.
       name: 'externalId',
       type: 'text',
       required: true,
       unique: true,
     },
     {
-      // The manager's externalId, as it comes from the source.
-      name: 'externalManagerId',
+      // The manager's employeeNumber, as it comes from the source.
+      name: 'managerEmployeeNumber',
       type: 'text',
       index: true,
     },
     {
-      // Personalleder, set from externalManagerId.
+      // Personalleder, set from managerEmployeeNumber.
       name: 'manager',
       type: 'relationship',
       relationTo: 'personer',
     },
     {
-      // The location's externalLocationId, as it comes from the source.
-      name: 'externalLocationId',
+      // The location's code, such as «LEI», as it comes from the source.
+      name: 'locationCode',
       type: 'text',
       required: true,
       index: true,
     },
     {
-      // Set from externalLocationId.
+      // Set from locationCode, matched on the location's code.
       name: 'location',
       type: 'relationship',
       relationTo: 'lokasjoner',

@@ -7,6 +7,7 @@ import type { Location, User } from '@/payload-types'
 
 let payload: Payload
 let user: User
+let admin: User
 let location: Location
 
 // Prefix for every test row, so cleanup never touches other data.
@@ -19,26 +20,32 @@ const person = (n: number, extra: Record<string, unknown> = {}) =>
     lastName: `Nordmann ${n}`,
     email: `${prefix}-${n}@example.com`,
     externalId: `${prefix}-person-${n}`,
-    externalLocationId: location.externalLocationId,
+    employeeNumber: `${prefix}-${n}`,
+    locationCode: location.code,
     ...extra,
   }) as RequiredDataFromCollectionSlug<'personer'>
 
 describe('People and locations', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
+    // Created first, so the first-user rule never makes `user` an administrator.
+    admin = await payload.create({
+      collection: 'brukere',
+      data: { email: `${prefix}-admin@example.com`, password: 'test-password', roles: ['admin'] },
+    })
     user = await payload.create({
       collection: 'brukere',
       data: { email: `${prefix}@example.com`, password: 'test-password' },
     })
     location = await payload.create({
       collection: 'lokasjoner',
-      data: { externalLocationId: `${prefix}-loc`, code: `${prefix}-LEI`, name: 'Leikanger' },
+      data: { code: `${prefix}-LEI`, name: 'Leikanger' },
     })
   })
 
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
-    await payload.delete({ collection: 'lokasjoner', where: { externalLocationId: { like: prefix } } })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 
@@ -70,11 +77,30 @@ describe('People and locations', () => {
     ).rejects.toThrow()
   })
 
-  it('NF-07: requires externalLocationId', async () => {
+  it('NF-07: rejects a duplicate employeeNumber', async () => {
+    await payload.create({ collection: 'personer', data: person(11) })
     await expect(
       payload.create({
         collection: 'personer',
-        data: person(5, { externalLocationId: undefined }),
+        data: person(12, { employeeNumber: `${prefix}-11` }),
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('NF-07: lets a contractor and the employee they became share an email', async () => {
+    const contractor = await payload.create({ collection: 'personer', data: person(13, { active: false }) })
+    const employee = await payload.create({
+      collection: 'personer',
+      data: person(14, { email: contractor.email, isEmployee: true }),
+    })
+    expect(employee.email).toBe(contractor.email)
+  })
+
+  it('NF-07: requires locationCode', async () => {
+    await expect(
+      payload.create({
+        collection: 'personer',
+        data: person(5, { locationCode: undefined }),
       }),
     ).rejects.toThrow()
   })
@@ -83,7 +109,7 @@ describe('People and locations', () => {
     await expect(
       payload.create({
         collection: 'lokasjoner',
-        data: { externalLocationId: `${prefix}-loc-2`, code: location.code, name: 'Oslo' },
+        data: { code: location.code, name: 'Oslo' },
       }),
     ).rejects.toThrow()
   })
@@ -93,7 +119,7 @@ describe('People and locations', () => {
     const employee = await payload.create({
       collection: 'personer',
       data: person(7, {
-        externalManagerId: manager.externalId,
+        managerEmployeeNumber: manager.employeeNumber,
         manager: manager.id,
         location: location.id,
         isEmployee: true,
@@ -119,7 +145,7 @@ describe('People and locations', () => {
     await expect(payload.find({ collection: 'lokasjoner', overrideAccess: false })).rejects.toThrow()
   })
 
-  it('NF-07: only the import can change people and locations', async () => {
+  it('NF-07: only the import can change people', async () => {
     const created = await payload.create({ collection: 'personer', data: person(9) })
 
     await expect(
@@ -137,6 +163,32 @@ describe('People and locations', () => {
     await expect(
       payload.delete({ collection: 'personer', id: created.id, overrideAccess: false, user }),
     ).rejects.toThrow()
+  })
+
+  it('lets administrators register locations, and nobody else', async () => {
+    const created = await payload.create({
+      collection: 'lokasjoner',
+      data: { code: `${prefix}-OSL`, name: 'Oslo' },
+      overrideAccess: false,
+      user: admin,
+    })
+    const updated = await payload.update({
+      collection: 'lokasjoner',
+      id: created.id,
+      data: { name: 'Oslo sentrum' },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.name).toBe('Oslo sentrum')
+
+    await expect(
+      payload.create({
+        collection: 'lokasjoner',
+        data: { code: `${prefix}-BRG`, name: 'Bergen' },
+        overrideAccess: false,
+        user,
+      }),
+    ).rejects.toThrow()
     await expect(
       payload.update({
         collection: 'lokasjoner',
@@ -146,5 +198,10 @@ describe('People and locations', () => {
         user,
       }),
     ).rejects.toThrow()
+    await expect(
+      payload.delete({ collection: 'lokasjoner', id: location.id, overrideAccess: false, user }),
+    ).rejects.toThrow()
+
+    await payload.delete({ collection: 'lokasjoner', id: created.id, overrideAccess: false, user: admin })
   })
 })
