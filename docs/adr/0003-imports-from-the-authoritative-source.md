@@ -10,9 +10,10 @@
 
 ## Context
 
-Units, people and locations come from Digdir's authoritative source (NF-07),
-and nobody can change them in ilag. Units come in a file of their own. The
-collections exist (#30), but nothing fills them yet.
+Units and people come from Digdir's authoritative source (NF-07), and nobody
+can change them in ilag. Units come in a file of their own. The collections
+exist (#30), but nothing fills them yet. Locations are not in the source:
+administrators register them in ilag, and people refer to them by code.
 
 The sending system sets the limits:
 
@@ -21,8 +22,8 @@ The sending system sets the limits:
 - The data is a CSV file.
 - The script should not have to wait while ilag updates the database.
 
-Units come first. People and locations will follow the same pattern, so the
-choices here apply to all three.
+Units come first. People will follow the same pattern, so the choices here
+apply to both.
 
 ## Options
 
@@ -137,8 +138,8 @@ choices here apply to all three.
   changed.
 - A failed or partial import never leaves a half-updated organisation chart.
 - Closed units stay in ilag, marked inactive, with their history.
-- The people and location imports reuse the endpoint pattern, the import runs,
-  the integration user and the job setup.
+- The people import reuses the endpoint pattern, the import runs, the
+  integration user and the job setup.
 - The API key is a way into ilag that doesn't go through Entra ID. It is
   limited to the import endpoints, kept on the sending server, and each use is
   recorded on an import run. Changing `PAYLOAD_SECRET` makes it unreadable, so

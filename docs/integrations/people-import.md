@@ -49,14 +49,14 @@ Content-Type: text/csv; charset=utf-8
 
 | Column | Meaning in SAP | Required | Field in ilag |
 | --- | --- | --- | --- |
-| `01050001USRID` | SAP user ID (SapUserId) | yes | `externalId`. ilag matches people on it |
-| `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber` |
+| `01050001USRID` | SAP user ID (SapUserId) | yes | `externalId` |
+| `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber`. ilag matches people on it |
 | `0002VORNA` | First name (Fornavn) | yes | `firstName` |
 | `0002NACHN` | Last name (Etternavn) | yes | `lastName` |
 | `01050010USRID_LONG` | Email (Epost) | yes | `email`, the same address the person signs in with through Entra ID |
 | `9999PLANS_TEKST` | Job title (Stillingstittel) | no | `title` |
 | `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `externalUnitId` in the unit file |
-| `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code` |
+| `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code`. See «Locations» |
 | `9999LEDER_PERNR` | The manager's employee number (LederAnsattNr) | no | `managerEmployeeNumber`, then `manager`: the person with that `employeeNumber` |
 | `0001PERSG` | Employee group (AnsattType) | yes | `isEmployee`: `1` or `4` is an employee, `8` or `9` a contractor |
 | `01059003USRID` | Mobile 1 (Mobil1) | no | `mobile` |
@@ -99,11 +99,25 @@ The other values come from the person's first line. If a later line has
 different values, ilag uses the first line's and lists the employee number in
 the import's result.
 
-### A contractor who becomes an employee
+### Locations
 
-Both the SAP user ID and the employee number change when a contractor becomes
-an employee. ilag then sees a new person, and marks the contractor as no
-longer working in Digdir. Their history in teams stays with the contractor.
+Locations are not in a file. Administrators register them in ilag's admin
+panel, with the same abbreviation as `0001BTRTL` in the `code` field. A person
+whose code has no location yet is listed in the import's result, and is
+linked by the first import after the location is registered.
+
+### Leaving, coming back, and becoming an employee
+
+ilag matches people on the employee number.
+
+- **Someone who leaves** is missing from the file, and ilag marks them as no
+  longer working in Digdir.
+- **Someone who comes back** keeps their employee number. ilag finds them
+  again, marks them as active and keeps their history in teams. A new SAP user
+  ID replaces the old one.
+- **A contractor who becomes an employee** gets a new SAP user ID and a new
+  employee number. ilag then sees a new person, and marks the contractor as no
+  longer working in Digdir. Their history in teams stays with the contractor.
 
 ### What makes ilag refuse a file
 
@@ -120,7 +134,7 @@ These are **not** errors, because the other files may come later or the
 person may be outside the file. They are listed in the import's result:
 
 - a `0001ORGEH` that isn't a unit in ilag
-- a `0001BTRTL` that isn't the code of a location in ilag
+- a `0001BTRTL` that isn't the code of a location registered in ilag
 - a `9999LEDER_PERNR` that isn't the `0000PERNR` of a person in the file
 
 A `9999LEDER_PERNR` equal to the person's own `0000PERNR` means the person has
@@ -183,14 +197,12 @@ Polling is optional. Administrators see the same in ilag's admin panel.
 
 ## Still to confirm
 
-- [ ] **Locations.** `0001BTRTL` is matched on the location's `code`, which
-  is also how ilag identifies a location. The location file needs to use the
-  same abbreviations. There is no location contract yet.
 - [ ] **Unit file columns.** If the unit file also comes from SAP, it should
   use SAP's names too, and the [unit contract](unit-import.md) changes to
   match.
-- [ ] **Someone who leaves and comes back.** Do they get the same SAP user ID
-  and employee number again?
+- [ ] **The email of a contractor who becomes an employee.** Do they keep
+  the same address? ilag allows each email only once, also for people who
+  have left, so the new employee would collide with the old contractor.
 
 ## Example script
 

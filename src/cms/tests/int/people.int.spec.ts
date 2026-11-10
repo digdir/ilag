@@ -7,6 +7,7 @@ import type { Location, User } from '@/payload-types'
 
 let payload: Payload
 let user: User
+let admin: User
 let location: Location
 
 // Prefix for every test row, so cleanup never touches other data.
@@ -27,6 +28,11 @@ const person = (n: number, extra: Record<string, unknown> = {}) =>
 describe('People and locations', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
+    // Created first, so the first-user rule never makes `user` an administrator.
+    admin = await payload.create({
+      collection: 'brukere',
+      data: { email: `${prefix}-admin@example.com`, password: 'test-password', roles: ['admin'] },
+    })
     user = await payload.create({
       collection: 'brukere',
       data: { email: `${prefix}@example.com`, password: 'test-password' },
@@ -130,7 +136,7 @@ describe('People and locations', () => {
     await expect(payload.find({ collection: 'lokasjoner', overrideAccess: false })).rejects.toThrow()
   })
 
-  it('NF-07: only the import can change people and locations', async () => {
+  it('NF-07: only the import can change people', async () => {
     const created = await payload.create({ collection: 'personer', data: person(9) })
 
     await expect(
@@ -148,6 +154,32 @@ describe('People and locations', () => {
     await expect(
       payload.delete({ collection: 'personer', id: created.id, overrideAccess: false, user }),
     ).rejects.toThrow()
+  })
+
+  it('lets administrators register locations, and nobody else', async () => {
+    const created = await payload.create({
+      collection: 'lokasjoner',
+      data: { code: `${prefix}-OSL`, name: 'Oslo' },
+      overrideAccess: false,
+      user: admin,
+    })
+    const updated = await payload.update({
+      collection: 'lokasjoner',
+      id: created.id,
+      data: { name: 'Oslo sentrum' },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.name).toBe('Oslo sentrum')
+
+    await expect(
+      payload.create({
+        collection: 'lokasjoner',
+        data: { code: `${prefix}-BRG`, name: 'Bergen' },
+        overrideAccess: false,
+        user,
+      }),
+    ).rejects.toThrow()
     await expect(
       payload.update({
         collection: 'lokasjoner',
@@ -157,5 +189,10 @@ describe('People and locations', () => {
         user,
       }),
     ).rejects.toThrow()
+    await expect(
+      payload.delete({ collection: 'lokasjoner', id: location.id, overrideAccess: false, user }),
+    ).rejects.toThrow()
+
+    await payload.delete({ collection: 'lokasjoner', id: created.id, overrideAccess: false, user: admin })
   })
 })

@@ -5,7 +5,7 @@ import type { CollectionConfig } from 'payload'
 // control, so nobody can change people through the admin panel or the
 // REST/GraphQL API.
 //
-// The import matches people on externalId. It stores the manager's employee
+// The import matches people on employeeNumber. It stores the manager's employee
 // number, the location's code and the units' IDs as they come from the
 // source, and sets the `manager`, `location` and `units` relationships from
 // them once all people, locations and units exist. A value with no match
@@ -72,15 +72,16 @@ export const People: CollectionConfig = {
       type: 'text',
     },
     {
-      // The employee number in SAP (PERNR). Managers refer to it.
+      // The employee number in SAP (PERNR); the import matches on it. It stays
+      // the same when someone leaves and comes back, but changes when a
+      // contractor becomes an employee. Managers and unit leaders refer to it.
       name: 'employeeNumber',
       type: 'text',
       required: true,
       unique: true,
     },
     {
-      // The source's own ID for the person, the SAP user ID; the import
-      // matches on it.
+      // The SAP user ID.
       name: 'externalId',
       type: 'text',
       required: true,
