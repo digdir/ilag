@@ -82,7 +82,8 @@ apply to both.
 
 ## Decision
 
-1. **An endpoint per kind of data**, starting with `POST /api/enheter/import`.
+1. **An endpoint per kind of data**: `POST /api/enheter/import` for units and
+   `POST /api/personer/import` for people.
    The body is the CSV file. The [contract](../integrations/unit-import.md)
    describes the format, the responses and an example script. The files come
    from SAP with SAP's field names, and each contract maps them to ilag's
@@ -104,8 +105,7 @@ apply to both.
    - set `parent` from the codes in the file, once all units exist. The
      leader is set by an administrator, and the import leaves it alone
    - mark units missing from the file as inactive, never delete them
-   - link people's `units` again from their `externalUnitIds`, so the order
-     of the people and unit imports doesn't matter
+   - link people's `units` again from their `externalUnitIds` (see 8)
    - write the result to the import run: created, updated, deactivated and
      skipped
 
@@ -115,6 +115,22 @@ apply to both.
    together, and a newer file replaces an older one that hasn't started.
 7. **Retries.** A failed job is retried up to 3 times with backoff. The import
    is idempotent, so a retry is safe.
+8. **The files can come in any order.** The unit file and the people file are
+   sent independently, and either may come first, come alone, or come several
+   times before the other. Neither import is an error because the other file
+   is missing or older:
+   - the unit import links people's `units` from the `externalUnitIds` the
+     people already have
+   - the people import links `units` to the units already in ilag, `manager`
+     to the people in the same file, and `location` to the locations
+     administrators have registered
+   - a unit or location that isn't there yet is listed in the result, and is
+     linked by the next import of either kind
+
+   Each import holds the same database lock while it applies a file, so a
+   unit import and a people import never run at the same time, and the second
+   one sees everything the first one wrote. Concurrency control (6) still
+   works per kind, so a newer people file never supersedes a unit file.
 
 ### Still to agree
 

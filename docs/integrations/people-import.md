@@ -16,6 +16,8 @@ the same way as the [unit import](unit-import.md).
 - ilag applies an accepted file shortly after, usually within seconds.
 - A person missing from the file is marked as no longer working in Digdir.
   They are not deleted, so their history in teams survives.
+- The people file and the [unit file](unit-import.md) can come in any order.
+  Whichever comes second links people to their units.
 
 ## Request
 
@@ -131,8 +133,8 @@ The whole file is refused, and nothing changes, if any row:
 - has an email that isn't valid
 - has a `0001PERSG` other than `1`, `4`, `8` or `9`
 
-These are **not** errors, because the other files may come later or the
-person may be outside the file. They are listed in the import's result:
+These are **not** errors, because the unit file may come later, the location
+may not be registered yet, or the manager may be outside the file. They are listed in the import's result:
 
 - a `0001ORGEH` that isn't a unit in ilag. A unit the unit import skips,
   such as `10013301` (BOD-ekstern), is not listed: the person just gets no

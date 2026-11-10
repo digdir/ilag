@@ -15,6 +15,8 @@ field names in the header. The design behind it is in
   `400` with every error when it isn't.
 - ilag applies an accepted file shortly after, usually within seconds.
 - A unit missing from the file is marked as closed in ilag. It is not deleted.
+- The unit file and the [people file](people-import.md) can come in any
+  order. Whichever comes second links people to their units.
 
 ## Request
 
