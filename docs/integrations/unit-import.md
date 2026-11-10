@@ -5,7 +5,7 @@ departments and sections) to ilag. The file is an export from SAP, with SAP's
 field names in the header. The design behind it is in
 [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md).
 
-> **Status:** proposed, not built yet. The columns are the ones in
+> **Status:** agreed, not built yet. The columns are the ones in
 > Ansattmottak's example file.
 
 ## In short

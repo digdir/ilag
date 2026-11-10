@@ -5,7 +5,7 @@ SAP, with SAP's field names in the header. The design behind it is in
 [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md), and it works
 the same way as the [unit import](unit-import.md).
 
-> **Status:** proposed, not built yet. The columns are the ones Ansattmottak
+> **Status:** agreed, not built yet. The columns are the ones Ansattmottak
 > has said it will send.
 
 ## In short
