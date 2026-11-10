@@ -1,6 +1,7 @@
 import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { teamTypeField } from '../fields/teamType'
 
 // A team's memberships mean nothing without the team, and point at it with a
 // required relationship, so they go first.
@@ -50,13 +51,8 @@ export const Teams: CollectionConfig = {
       name: 'description',
       type: 'textarea',
     },
-    {
-      // TO-02.
-      name: 'teamType',
-      type: 'relationship',
-      relationTo: 'teamtyper',
-      required: true,
-    },
+    // TO-02.
+    teamTypeField({ required: true }),
     {
       // False once the team is closed. Kept rather than deleted, so its
       // history survives.
