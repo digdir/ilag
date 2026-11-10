@@ -1,17 +1,19 @@
 # ADR-0003: Imports from the authoritative source
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-11-10)
 - **Requirements:** NF-07, LO-01, LO-02, FO-02
 - **Related:** [ADR-0001](0001-login-and-sessions.md),
   [ADR-0002](0002-password-login-only-for-break-glass-accounts.md),
   [unit import contract](../integrations/unit-import.md),
+  [people import contract](../integrations/people-import.md),
   [architecture overview](../diagrams/architecture.md), #30
 
 ## Context
 
-Units, people and locations come from Digdir's authoritative source (NF-07),
-and nobody can change them in ilag. Units come in a file of their own. The
-collections exist (#30), but nothing fills them yet.
+Units and people come from Digdir's authoritative source (NF-07), and nobody
+can change them in ilag. Units come in a file of their own. The collections
+exist (#30), but nothing fills them yet. Locations are not in the source:
+administrators register them in ilag, and people refer to them by code.
 
 The sending system sets the limits:
 
@@ -20,8 +22,8 @@ The sending system sets the limits:
 - The data is a CSV file.
 - The script should not have to wait while ilag updates the database.
 
-Units come first. People and locations will follow the same pattern, so the
-choices here apply to all three.
+Units come first. People will follow the same pattern, so the choices here
+apply to both.
 
 ## Options
 
@@ -80,15 +82,18 @@ choices here apply to all three.
 
 ## Decision
 
-1. **An endpoint per kind of data**, starting with `POST /api/enheter/import`.
+1. **An endpoint per kind of data**: `POST /api/enheter/import` for units and
+   `POST /api/personer/import` for people.
    The body is the CSV file. The [contract](../integrations/unit-import.md)
-   describes the format, the responses and an example script.
+   describes the format, the responses and an example script. The files come
+   from SAP with SAP's field names, and each contract maps them to ilag's
+   fields.
 2. **Only the integration user may call it.** `brukere` gets API keys, and a
    new role, `integration`, that may call the import endpoints and nothing
    else: no admin panel, no content, no password login.
 3. **Every row is validated before the file is accepted**: the columns,
-   required values, valid levels, unique IDs, parents that exist in the file,
-   and no unit that is its own ancestor. A file with errors is refused as a
+   required values, unique IDs and codes, and a parent in the file for every
+   unit below the directorate. A file with errors is refused as a
    whole with `400`, listing every error with its line number, and nothing is
    queued.
 4. **An accepted file becomes an import run** (`importkjoringer`): the kind of
@@ -97,12 +102,12 @@ choices here apply to all three.
    status URL, which the script may poll.
 5. **A job, `importUnits`, applies the file** in one database transaction:
    - create or update each unit, matched on `externalUnitId`
-   - set `parent` and `leader` from the external IDs, once all units exist
+   - set `parent` from the codes in the file, once all units exist. The
+     leader is set by an administrator, and the import leaves it alone
    - mark units missing from the file as inactive, never delete them
-   - link people's `units` again from their `externalUnitIds`, so the order
-     of the people and unit imports doesn't matter
-   - write the result to the import run: created, updated, deactivated, and
-     leaders not found in `personer`
+   - link people's `units` again from their `externalUnitIds` (see 8)
+   - write the result to the import run: created, updated, deactivated and
+     skipped
 
    If anything fails, nothing changes.
 6. **One unit import at a time.** The task uses Payload's concurrency control
@@ -110,11 +115,25 @@ choices here apply to all three.
    together, and a newer file replaces an older one that hasn't started.
 7. **Retries.** A failed job is retried up to 3 times with backoff. The import
    is idempotent, so a retry is safe.
+8. **The files can come in any order.** The unit file and the people file are
+   sent independently, and either may come first, come alone, or come several
+   times before the other. Neither import is an error because the other file
+   is missing or older:
+   - the unit import links people's `units` from the `externalUnitIds` the
+     people already have
+   - the people import links `units` to the units already in ilag, `manager`
+     to the people in the same file, and `location` to the locations
+     administrators have registered
+   - a unit or location that isn't there yet is listed in the result, and is
+     linked by the next import of either kind
+
+   Each import holds the same database lock while it applies a file, so a
+   unit import and a people import never run at the same time, and the second
+   one sees everything the first one wrote. Concurrency control (6) still
+   works per kind, so a newer people file never supersedes a unit file.
 
 ### Still to agree
 
-- [ ] **Column names.** The contract uses ilag's field names for now. The
-  source may end up with its own; the mapping is in one place.
 - [ ] **Protection against a truncated file.** Every row is checked, but a
   file that is cut off or nearly empty is still valid row by row, and as a
   full snapshot it would deactivate the units it lacks. Proposed: refuse a
@@ -133,8 +152,8 @@ choices here apply to all three.
   changed.
 - A failed or partial import never leaves a half-updated organisation chart.
 - Closed units stay in ilag, marked inactive, with their history.
-- The people and location imports reuse the endpoint pattern, the import runs,
-  the integration user and the job setup.
+- The people import reuses the endpoint pattern, the import runs, the
+  integration user and the job setup.
 - The API key is a way into ilag that doesn't go through Entra ID. It is
   limited to the import endpoints, kept on the sending server, and each use is
   recorded on an import run. Changing `PAYLOAD_SECRET` makes it unreadable, so

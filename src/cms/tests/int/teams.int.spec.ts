@@ -26,7 +26,8 @@ const person = (n: number) =>
       lastName: `Nordmann ${n}`,
       email: `${prefix}-${n}@example.com`,
       externalId: `${prefix}-person-${n}`,
-      externalLocationId: location.externalLocationId,
+      employeeNumber: `${prefix}-${n}`,
+      locationCode: location.code,
     } as RequiredDataFromCollectionSlug<'personer'>,
   })
 
@@ -57,7 +58,7 @@ describe('Teams', () => {
     })
     location = await payload.create({
       collection: 'lokasjoner',
-      data: { externalLocationId: `${prefix}-loc`, code: `${prefix}-LEI`, name: 'Leikanger' },
+      data: { code: `${prefix}-LEI`, name: 'Leikanger' },
     })
     // Roles and team types are content that administrators create.
     const role = (name: string) =>
@@ -72,10 +73,7 @@ describe('Teams', () => {
     await payload.delete({ collection: 'team', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'roller', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
-    await payload.delete({
-      collection: 'lokasjoner',
-      where: { externalLocationId: { like: prefix } },
-    })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 

@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
-// Offices, imported from Digdir's authoritative source (NF-07). The import
-// writes through the Local API, which bypasses access control, so nobody can
-// change locations through the admin panel or the REST/GraphQL API.
+import { isAdmin } from '../access/isAdmin'
+
+// Offices. Administrators register them in the admin panel; the source has
+// no list of locations. People come from the source with the location's
+// code in locationCode, and the people import links them by it.
 export const Locations: CollectionConfig = {
   slug: 'lokasjoner',
   dbName: 'locations',
@@ -15,24 +17,18 @@ export const Locations: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'code', 'externalLocationId'],
+    defaultColumns: ['name', 'code'],
   },
   access: {
     read: ({ req }) => Boolean(req.user),
-    create: () => false,
-    update: () => false,
-    delete: () => false,
+    create: ({ req }) => isAdmin(req.user),
+    update: ({ req }) => isAdmin(req.user),
+    delete: ({ req }) => isAdmin(req.user),
   },
   defaultSort: 'name',
   fields: [
     {
-      // The source's own ID for the location; the import matches on it.
-      name: 'externalLocationId',
-      type: 'text',
-      required: true,
-      unique: true,
-    },
-    {
+      // The abbreviation, such as «LEI».
       name: 'code',
       type: 'text',
       required: true,

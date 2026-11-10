@@ -214,11 +214,11 @@ export interface Person {
   fullName?: string | null;
   email: string;
   title?: string | null;
-  employeeNumber?: string | null;
+  employeeNumber: string;
   externalId: string;
-  externalManagerId?: string | null;
+  managerEmployeeNumber?: string | null;
   manager?: (number | null) | Person;
-  externalLocationId: string;
+  locationCode: string;
   location?: (number | null) | Location;
   externalUnitIds?: string[] | null;
   units?: (number | Unit)[] | null;
@@ -240,7 +240,6 @@ export interface Person {
  */
 export interface Location {
   id: number;
-  externalLocationId: string;
   code: string;
   name: string;
   people?: {
@@ -260,10 +259,8 @@ export interface Unit {
   externalUnitId: string;
   name: string;
   code?: string | null;
-  level: 'division' | 'department' | 'section';
-  externalParentId?: string | null;
+  level: 'directorate' | 'division' | 'department' | 'section';
   parent?: (number | null) | Unit;
-  externalLeaderId?: string | null;
   leader?: (number | null) | Person;
   active: boolean;
   children?: {
@@ -481,9 +478,9 @@ export interface PersonerSelect<T extends boolean = true> {
   title?: T;
   employeeNumber?: T;
   externalId?: T;
-  externalManagerId?: T;
+  managerEmployeeNumber?: T;
   manager?: T;
-  externalLocationId?: T;
+  locationCode?: T;
   location?: T;
   externalUnitIds?: T;
   units?: T;
@@ -500,7 +497,6 @@ export interface PersonerSelect<T extends boolean = true> {
  * via the `definition` "lokasjoner_select".
  */
 export interface LokasjonerSelect<T extends boolean = true> {
-  externalLocationId?: T;
   code?: T;
   name?: T;
   people?: T;
@@ -516,9 +512,7 @@ export interface EnheterSelect<T extends boolean = true> {
   name?: T;
   code?: T;
   level?: T;
-  externalParentId?: T;
   parent?: T;
-  externalLeaderId?: T;
   leader?: T;
   active?: T;
   children?: T;
