@@ -48,14 +48,14 @@ Content-Type: text/csv; charset=utf-8
 | `code` | no | A short code, such as `SSR` |
 | `level` | yes | `Divisjon`, `Avdeling` or `Seksjon` |
 | `externalParentId` | no | The `externalUnitId` of the unit above. Empty for divisions |
-| `externalLeaderId` | no | The leader's ID, the same ID as in the people file |
+| `managerEmployeeNumber` | no | The leader's employee number, `0000PERNR` in the [people file](people-import.md) |
 
 Other columns are ignored.
 
 ### Example
 
 ```csv
-"externalUnitId","name","code","level","externalParentId","externalLeaderId"
+"externalUnitId","name","code","level","externalParentId","managerEmployeeNumber"
 "100","Samordning, sikkerhet og regelverk","SSR","Divisjon","","4711"
 "110","Strategi, råd og prioritering","","Avdeling","100","4712"
 "111","Analyse","","Seksjon","110",""
@@ -71,8 +71,8 @@ The whole file is refused, and nothing changes, if any row:
 - has an `externalParentId` that isn't the `externalUnitId` of another row
 - is, through its parents, its own ancestor
 
-A leader ID ilag doesn't know is **not** an error, because the people file may
-come later. It is listed in the import's result.
+A leader's employee number ilag doesn't know is **not** an error, because the
+people file may come later. It is listed in the import's result.
 
 ## Responses
 

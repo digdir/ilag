@@ -52,7 +52,7 @@ Content-Type: text/csv; charset=utf-8
 | `0000PERNR` | Employee number (AnsattNr) | yes | `employeeNumber`. Unique in the file |
 | `0002VORNA` | First name (Fornavn) | yes | `firstName` |
 | `0002NACHN` | Last name (Etternavn) | yes | `lastName` |
-| `01050010USRID_LONG` | Email (Epost) | yes | `email`. Unique in the file |
+| `01050010USRID_LONG` | Email (Epost) | yes | `email`, the same address the person signs in with through Entra ID. Unique in the file |
 | `9999PLANS_TEKST` | Job title (Stillingstittel) | no | `title` |
 | `0001ORGEH` | Organisational unit (OrgEnhetId) | yes | `externalUnitIds`, then `units`. The same ID as `externalUnitId` in the unit file |
 | `0001BTRTL` | Location, as an abbreviation such as `LEI` (Lokasjon) | yes | `locationCode`, then `location`: the location with that `code` |
@@ -164,17 +164,14 @@ Polling is optional. Administrators see the same in ilag's admin panel.
 - [ ] **One unit per person.** `0001ORGEH` holds one unit. A person can belong
   to more than one unit (FO-02). Does SAP ever have more than one for a
   person, and if so, how would it come in the file?
-- [ ] **Locations.** `0001BTRTL` is matched on the location's `code`. The
-  location file needs to use the same abbreviations. There is no location
-  contract yet.
+- [ ] **Locations.** `0001BTRTL` is matched on the location's `code`, which
+  is also how ilag identifies a location. The location file needs to use the
+  same abbreviations. There is no location contract yet.
 - [ ] **Mobile 1 and 2.** ilag stores one mobile number. The proposal is
   Mobile 1, then Mobile 2 when Mobile 1 is empty.
-- [ ] **The email.** Is `01050010USRID_LONG` always the person's Digdir email,
-  the one they sign in with through Entra ID?
 - [ ] **Unit file columns.** If the unit file also comes from SAP, it should
   use SAP's names too, and the [unit contract](unit-import.md) changes to
-  match. It should also say whether a unit's leader is given by employee
-  number or by SAP user ID. ilag matches it on `externalId` today.
+  match.
 - [ ] **A durable ID.** Does the SAP user ID stay the same when a contractor
   becomes an employee, or when someone leaves and comes back? Open question 7
   in the specification.
