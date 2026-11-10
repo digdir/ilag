@@ -103,4 +103,12 @@ describe('login page', () => {
     expect(res.status).toBe(401)
     expect(await res.text()).toContain('Feil e-post eller passord')
   })
+
+  it('shows a failed login as a Designsystemet error alert', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => providers([])))
+
+    const html = await (await render('/logg-inn?feil')).text()
+
+    expect(html).toMatch(/<div class="ds-alert" data-color="danger" role="alert"[^>]*>\s*<p[^>]*>Innloggingen mislyktes/)
+  })
 })

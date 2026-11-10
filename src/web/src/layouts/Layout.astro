@@ -1,0 +1,35 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="text-scale" content="scale" />
+    <title>{title}</title>
+    {/* Inter, the default theme's font, from Altinn's CDN as Designsystemet recommends. */}
+    <link
+      rel="stylesheet"
+      href="https://altinncdn.no/fonts/inter/v4.1/inter.css"
+      integrity="sha384-OcHzc/By/OPw9uJREawUCjP2inbOGKtKb4A/I2iXxmknUfog2H8Adx71tWVZRscD"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body data-color-scheme="auto" data-size="md">
+    <a class="ds-skip-link" href="#hovedinnhold">Hopp til hovedinnhold</a>
+    <main id="hovedinnhold" tabindex="-1">
+      <slot />
+    </main>
+    <script>
+      // Behaviour for Designsystemet's components, such as ds-field.
+      import '@digdir/designsystemet-web'
+    </script>
+  </body>
+</html>

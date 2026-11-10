@@ -1,6 +1,8 @@
 ---
 import { login, loginProviders, providerLoginURL, type LoginProvider } from '@ilag/shared'
 
+import Layout from '../layouts/Layout.astro'
+
 // Only pages on this site, so a crafted link can't send people elsewhere.
 // The target is resolved the way a browser resolves a Location header, which
 // drops tabs and newlines and reads backslashes as slashes, so a target like
@@ -41,35 +43,62 @@ try {
 }
 ---
 
-<html lang="no">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Logg inn — ilag</title>
-  </head>
-  <body>
-    <h1>Logg inn i ilag</h1>
-    {error && <p role="alert">{error}</p>}
-    {
-      providers.map(({ id, label }) => (
-        <p>
-          <a href={providerLoginURL(id, new URL(redirect, Astro.url).href)}>Logg inn med {label}</a>
-        </p>
-      ))
-    }
-    <details open={providers.length === 0 || Astro.request.method === 'POST'}>
-      <summary>Logg inn med e-post og passord</summary>
+<Layout title="Logg inn — ilag">
+  <h1 class="ds-heading" data-size="xl">Logg inn i ilag</h1>
+  {
+    error && (
+      <div class="ds-alert" data-color="danger" role="alert">
+        <p class="ds-paragraph">{error}</p>
+      </div>
+    )
+  }
+  {
+    providers.map(({ id, label }) => (
+      <p>
+        <a class="ds-button" href={providerLoginURL(id, new URL(redirect, Astro.url).href)}>
+          Logg inn med {label}
+        </a>
+      </p>
+    ))
+  }
+  <details class="ds-details" open={providers.length === 0 || Astro.request.method === 'POST'}>
+    <summary>Logg inn med e-post og passord</summary>
+    <div>
       <form method="post">
-        <p>
-          <label for="email">E-post</label>
-          <input id="email" name="email" type="email" autocomplete="username" required />
-        </p>
-        <p>
-          <label for="password">Passord</label>
-          <input id="password" name="password" type="password" autocomplete="current-password" required />
-        </p>
-        <button type="submit">Logg inn</button>
+        <ds-field class="ds-field">
+          <label class="ds-label" for="email">E-post</label>
+          <input class="ds-input" id="email" name="email" type="email" autocomplete="username" required />
+        </ds-field>
+        <ds-field class="ds-field">
+          <label class="ds-label" for="password">Passord</label>
+          <input
+            class="ds-input"
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </ds-field>
+        <button class="ds-button" type="submit">Logg inn</button>
       </form>
-    </details>
-  </body>
-</html>
+    </div>
+  </details>
+</Layout>
+
+<style>
+  .ds-alert,
+  .ds-details {
+    margin-block: var(--ds-size-6);
+  }
+
+  form {
+    display: grid;
+    gap: var(--ds-size-5);
+    justify-items: start;
+  }
+
+  .ds-field {
+    justify-self: stretch;
+  }
+</style>

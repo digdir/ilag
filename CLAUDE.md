@@ -140,6 +140,12 @@ Once the content model settles, snapshot it with
 - `.env` files are per machine and never committed. `PAYLOAD_SECRET` is generated
   per environment; changing it logs everyone out and makes encrypted values and
   API keys unreadable.
+- The frontend uses [Designsystemet](https://designsystemet.no) (`NF-04`): the
+  `ds-*` classes and data attributes from `@digdir/designsystemet-css`, with
+  behaviour from `@digdir/designsystemet-web`. Pages go in `src/web/src/layouts/Layout.astro`,
+  which loads both. Look components up in <https://designsystemet.no/llms.txt>
+  (add `.md` to any page URL) instead of guessing class names, and use `--ds-*`
+  tokens for your own styles.
 - The e2e tests write to whatever `DATABASE_URL` points at — they seed and delete
   a user and a media document. Local databases only.
 
