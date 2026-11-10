@@ -3,7 +3,7 @@ import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { Location, Role, Team, User } from '@/payload-types'
+import type { Location, Role, TeamType, User } from '@/payload-types'
 
 let payload: Payload
 let user: User
@@ -12,6 +12,7 @@ let location: Location
 let teamLead: Role
 let productOwner: Role
 let teamMember: Role
+let productTeam: TeamType
 
 // Prefix for every test row, so cleanup never touches other data.
 const prefix = `int-teams-${Date.now()}`
@@ -35,7 +36,7 @@ const team = (n: number) =>
     collection: 'team',
     data: {
       name: `${prefix} Team ${n}`,
-      teamType: 'product',
+      teamType: productTeam.id,
     } as RequiredDataFromCollectionSlug<'team'>,
   })
 
@@ -62,12 +63,16 @@ describe('Teams', () => {
     teamLead = await role('Teamleder')
     productOwner = await role('Produkteier')
     teamMember = await role('Teammedlem')
+    productTeam = (
+      await payload.find({ collection: 'teamtyper', where: { name: { equals: 'Produktteam' } } })
+    ).docs[0]
   })
 
   afterAll(async () => {
     // Deleting the teams deletes their memberships.
     await payload.delete({ collection: 'team', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'roller', where: { name: { like: prefix } } })
+    await payload.delete({ collection: 'teamtyper', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
     await payload.delete({
       collection: 'lokasjoner',
@@ -83,6 +88,19 @@ describe('Teams', () => {
     )
   })
 
+  it('TO-02: creates the team types from Vedlegg 2 in a database without any', async () => {
+    const { docs } = await payload.find({ collection: 'teamtyper', limit: 0 })
+    expect(docs.map((d) => d.name)).toEqual(
+      expect.arrayContaining([
+        'Prosjektteam',
+        'Støtteteam',
+        'Leveranseteam',
+        'Produktteam',
+        'Fagnettverk',
+      ]),
+    )
+  })
+
   it('TO-02: requires a known team type', async () => {
     await expect(
       payload.create({
@@ -95,7 +113,7 @@ describe('Teams', () => {
         collection: 'team',
         data: {
           name: `${prefix} Ukjent type`,
-          teamType: 'squad' as Team['teamType'],
+          teamType: 999999999,
         } as RequiredDataFromCollectionSlug<'team'>,
       }),
     ).rejects.toThrow()
@@ -178,8 +196,8 @@ describe('Teams', () => {
     expect(totalDocs).toBe(0)
   })
 
-  it('hides teams, roles and memberships from anonymous users', async () => {
-    for (const collection of ['team', 'roller', 'teammedlemskap'] as const) {
+  it('hides teams, team types, roles and memberships from anonymous users', async () => {
+    for (const collection of ['team', 'teamtyper', 'roller', 'teammedlemskap'] as const) {
       await expect(payload.find({ collection, overrideAccess: false })).rejects.toThrow()
       await expect(payload.find({ collection, ...as(user) })).resolves.toBeDefined()
     }
@@ -193,7 +211,7 @@ describe('Teams', () => {
         collection: 'team',
         data: {
           name: `${prefix} Team 7`,
-          teamType: 'product',
+          teamType: productTeam.id,
         } as RequiredDataFromCollectionSlug<'team'>,
         ...as(user),
       }),
@@ -236,5 +254,38 @@ describe('Teams', () => {
       payload.delete({ collection: 'roller', id: created.id, ...as(user) }),
     ).rejects.toThrow()
     await payload.delete({ collection: 'roller', id: created.id, ...as(admin) })
+  })
+
+  it('2.3: lets only administrators maintain team types', async () => {
+    await expect(
+      payload.create({ collection: 'teamtyper', data: { name: `${prefix} Type 1` }, ...as(user) }),
+    ).rejects.toThrow()
+
+    const created = await payload.create({
+      collection: 'teamtyper',
+      data: { name: `${prefix} Type 2` },
+      ...as(admin),
+    })
+    await payload.delete({ collection: 'teamtyper', id: created.id, ...as(admin) })
+  })
+
+  it('TO-02: refuses to delete a team type that teams use', async () => {
+    const type = await payload.create({
+      collection: 'teamtyper',
+      data: { name: `${prefix} Type 3` },
+    })
+    const t = await payload.create({
+      collection: 'team',
+      data: {
+        name: `${prefix} Team 8`,
+        teamType: type.id,
+      } as RequiredDataFromCollectionSlug<'team'>,
+    })
+    await expect(payload.delete({ collection: 'teamtyper', id: type.id })).rejects.toThrow(
+      'brukes av 1 team',
+    )
+
+    await payload.delete({ collection: 'team', id: t.id })
+    await payload.delete({ collection: 'teamtyper', id: type.id })
   })
 })

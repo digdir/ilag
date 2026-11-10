@@ -1,8 +1,7 @@
 import type { Payload } from 'payload'
 
 // The roles every team has (Vedlegg 7), and teamleder and teameier from the
-// start (RO-07). Only created in a database without any roles, since
-// administrators maintain them from there.
+// start (RO-07).
 const roles = [
   {
     name: 'Teameier',
@@ -24,11 +23,46 @@ const roles = [
   },
 ]
 
-export const seed = async (payload: Payload) => {
-  const { totalDocs } = await payload.count({ collection: 'roller' })
+// The team types in Vedlegg 2 (TO-02).
+const teamTypes = [
+  {
+    name: 'Prosjektteam',
+    description: 'Løser en avgrenset oppgave med et definert mål og en tydelig avslutning.',
+  },
+  {
+    name: 'Støtteteam',
+    description: 'Har et varig ansvar for å skape verdi internt i Digdir.',
+  },
+  {
+    name: 'Leveranseteam',
+    description:
+      'Har et varig og helhetlig ansvar for en definert leveranse som skaper verdi utenfor Digdir.',
+  },
+  {
+    name: 'Produktteam',
+    description: 'Et leveranseteam med varig og helhetlig ansvar for ett eller flere produkter.',
+  },
+  {
+    name: 'Fagnettverk',
+    description:
+      'Samler personer med et felles fagområde for å dele kunnskap. Har vanligvis ikke ansvar for en felles leveranse.',
+  },
+]
+
+// Only fills a collection that is empty, since administrators maintain the
+// content from there.
+const seedIfEmpty = async (
+  payload: Payload,
+  collection: 'roller' | 'teamtyper',
+  docs: { name: string; description: string }[],
+) => {
+  const { totalDocs } = await payload.count({ collection })
   if (totalDocs === 0) {
-    for (const role of roles) {
-      await payload.create({ collection: 'roller', data: role })
-    }
+    for (const data of docs) await payload.create({ collection, data })
   }
+}
+
+export const seed = async (payload: Payload) => {
+  await seedIfEmpty(payload, 'roller', roles)
+  await seedIfEmpty(payload, 'teamtyper', teamTypes)
 }

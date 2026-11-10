@@ -13,6 +13,7 @@ import { People } from './collections/People'
 import { Locations } from './collections/Locations'
 import { Units } from './collections/Units'
 import { Roles } from './collections/Roles'
+import { TeamTypes } from './collections/TeamTypes'
 import { Teams } from './collections/Teams'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { health } from './endpoints/health'
@@ -42,7 +43,7 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units, Roles, Teams, TeamMemberships],
+  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, Teams, TeamMemberships],
   endpoints: [health],
   onInit: seed,
   editor: lexicalEditor(),

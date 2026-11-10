@@ -51,18 +51,11 @@ export const Teams: CollectionConfig = {
       type: 'textarea',
     },
     {
-      // The team types in Vedlegg 2 (TO-02). A fixed list for now; a new
-      // type is a code change.
+      // TO-02.
       name: 'teamType',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'teamtyper',
       required: true,
-      options: [
-        { label: 'Prosjektteam', value: 'project' },
-        { label: 'Støtteteam', value: 'support' },
-        { label: 'Leveranseteam', value: 'delivery' },
-        { label: 'Produktteam', value: 'product' },
-        { label: 'Fagnettverk', value: 'network' },
-      ],
     },
     {
       // False once the team is closed. Kept rather than deleted, so its
