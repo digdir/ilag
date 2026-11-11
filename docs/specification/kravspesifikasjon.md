@@ -472,7 +472,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Person** – ansatt eller innleid i Digdir som inngår i ett eller flere team, prosjekter eller enheter, tilknyttet én lokasjon. Personen er merket som ansatt eller innleid, og som aktiv eller sluttet. Opplysningene hentes fra Digdirs autoritative kilde (jf. NF-07).
 
-- **Rolle** – funksjon en person har, inkludert navn og beskrivelse (f.eks. teamleder, produkteier, prosjektleder, prosjektdeltager)
+- **Rolle** – funksjon en person har, inkludert navn og beskrivelse (f.eks. teamleder, produkteier, prosjektleder, prosjektdeltager). Knyttes til teamtypene rollen er relevant for (jf. RO-03).
 
 - **Prosjekt** – definisjonen av et prosjekt med navn, mandat, start-/sluttdato etc. Kan ha et eller flere team tilknyttet.
 
@@ -503,6 +503,7 @@ erDiagram
     Person ||--o{ Teammedlemskap : "har"
     Team ||--o{ Teammedlemskap : "har"
     Teamtype ||--o{ Team : "har"
+    Rolle }o--o{ Teamtype : "er relevant for"
     Teammedlemskap }o--|{ Rolle : "med"
     Rolle }o--o{ Prinsipp : "hører til"
     Prinsipp }o--o{ Enhet : "hører til"
