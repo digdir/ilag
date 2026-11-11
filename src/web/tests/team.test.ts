@@ -38,7 +38,6 @@ describe('team overview', () => {
     expect(html).toContain('Team Skjemabygger')
     expect(html).toContain('Produktteam')
     expect(html).toContain('Fagnettverk')
-    expect(html).toContain('data-color="info"')
     expect(html).toContain('href="/team/7"')
   })
 
