@@ -1,13 +1,13 @@
 ---
 import type { TeamType } from '@ilag/shared'
 
-import { teamTypes } from '../lib/teamTypes'
+import { teamTypeColors } from '../lib/teamTypes'
 
 interface Props {
   type: TeamType
 }
 
-const { label, color } = teamTypes[Astro.props.type]
+const { name } = Astro.props.type
 ---
 
-<span class="ds-tag" data-color={color} data-size="sm">{label}</span>
+<span class="ds-tag" data-color={teamTypeColors[name] ?? 'neutral'} data-size="sm">{name}</span>

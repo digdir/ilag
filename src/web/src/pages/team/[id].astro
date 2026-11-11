@@ -13,7 +13,7 @@ if (!team) Astro.response.status = 404
   {
     team ? (
       <>
-        <TeamTypeTag type={team.teamType} />
+        {team.teamType && <TeamTypeTag type={team.teamType} />}
         <h1 class="ds-heading" data-size="lg">{team.name}</h1>
         {team.description && <p class="ds-paragraph">{team.description}</p>}
         <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>

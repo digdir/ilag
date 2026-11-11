@@ -21,7 +21,7 @@ const meta = team.members.length
 ---
 
 <a class="ds-card" data-color="neutral" href={`/team/${team.id}`}>
-  <TeamTypeTag type={team.teamType} />
+  {team.teamType && <TeamTypeTag type={team.teamType} />}
   <h2 class="ds-heading" data-size="xs">{team.name}</h2>
   {team.description && <p class="ds-paragraph" data-size="sm">{team.description}</p>}
   <p class="ds-paragraph meta" data-size="xs">{meta}</p>

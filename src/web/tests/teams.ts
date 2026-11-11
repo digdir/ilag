@@ -10,7 +10,7 @@ export const skjemabygger = {
   id: 7,
   name: 'Team Skjemabygger',
   description: 'Utvikler og forvalter verktøyet for å lage digitale skjema.',
-  teamType: 'product',
+  teamType: { id: 1, name: 'Produktteam' },
   members: {
     docs: [
       membership(1, 'Magnus Johansen', ['Teameier']),
@@ -24,7 +24,7 @@ export const nettverk = {
   id: 8,
   name: 'Fagnettverk for universell utforming',
   description: null,
-  teamType: 'network',
+  teamType: { id: 5, name: 'Fagnettverk' },
   members: { docs: [] },
 }
 

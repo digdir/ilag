@@ -1,4 +1,11 @@
-import { authHeaders, PayloadSDKError, sdk, type Team, type TeamMembership } from '@ilag/shared'
+import {
+  authHeaders,
+  PayloadSDKError,
+  sdk,
+  type Team,
+  type TeamMembership,
+  type TeamType,
+} from '@ilag/shared'
 
 // The team queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. The members join on Team brings each
@@ -7,7 +14,10 @@ import { authHeaders, PayloadSDKError, sdk, type Team, type TeamMembership } fro
 /** A person in a team, with the names of their roles there. */
 export type Member = { id: number; name: string; roles: string[] }
 
-export type TeamWithMembers = Omit<Team, 'members'> & { members: Member[] }
+export type TeamWithMembers = Omit<Team, 'members' | 'teamType'> & {
+  teamType: TeamType | null
+  members: Member[]
+}
 
 /** All active teams by name, with their members (TO-01, TO-03). */
 export async function getTeams(cookie: string | null): Promise<TeamWithMembers[]> {
@@ -36,8 +46,9 @@ export const withRole = (members: Member[], role: string) =>
 
 // The generated types allow a relationship to be either the document or just
 // its ID, whatever depth was asked for, so the IDs are left out.
-const withMembers = ({ members, ...team }: Team): TeamWithMembers => ({
+const withMembers = ({ members, teamType, ...team }: Team): TeamWithMembers => ({
   ...team,
+  teamType: typeof teamType === 'object' ? teamType : null,
   members: (members?.docs ?? [])
     .filter((m) => typeof m === 'object')
     .map(toMember)
