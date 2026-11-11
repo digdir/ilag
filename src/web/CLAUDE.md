@@ -2,9 +2,13 @@
 
 ## Conventions
 
-- **Pages** (`src/pages/`) have Norwegian URLs (`/team`, `/team/[id]`). A page
-  fetches its data through `src/lib/cms/` and arranges components; markup that is
-  repeated or has a meaning of its own goes in a component.
+- **Pages** (`src/pages/`) have Norwegian URLs and sit in a folder for their
+  main menu group, as in the prototype's `NAV_GROUPS`: `styring/`, `folk/`,
+  `organisering/` and `verktoy/`. A subject gets its own folder there, such as
+  `organisering/team/` with `index.astro` (`/organisering/team`) and
+  `[id].astro`. A page fetches its data through `src/lib/cms/` and arranges
+  components; markup that is repeated or has a meaning of its own goes in a
+  component.
 - **Queries** (`src/lib/cms/`, one file per subject, such as `teams.ts`) read
   the CMS with `sdk` and `authHeaders` from `@ilag/shared`, as the visitor:
   `sdk.find({ collection: 'team' }, { headers: authHeaders(cookie) })`. They

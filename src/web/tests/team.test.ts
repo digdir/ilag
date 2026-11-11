@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import Teams from '../src/pages/team/index.astro'
+import Teams from '../src/pages/organisering/team/index.astro'
 import { cookie, json, nettverk, skjemabygger } from './teams'
 
 const render = async () => {
@@ -39,7 +39,7 @@ describe('team overview', () => {
     expect(html).toContain('Produktteam')
     expect(html).toContain('Fagnettverk')
     expect(html).toContain('class="ds-tag" data-color="info"')
-    expect(html).toContain('href="/team/7"')
+    expect(html).toContain('href="/organisering/team/7"')
   })
 
   it('shows the number of members, the team lead and the owner', async () => {

@@ -20,7 +20,7 @@ const meta = team.members.length
   : 'Medlemmer ikke registrert'
 ---
 
-<a class="ds-card" data-color="neutral" href={`/team/${team.id}`}>
+<a class="ds-card" data-color="neutral" href={`/organisering/team/${team.id}`}>
   {team.teamType && <TeamTypeTag type={team.teamType} />}
   <h2 class="ds-heading" data-size="xs">{team.name}</h2>
   {team.description && <p class="ds-paragraph" data-size="sm">{team.description}</p>}

@@ -1,7 +1,7 @@
 ---
-import TeamCard from '../../components/TeamCard.astro'
-import Layout from '../../layouts/Layout.astro'
-import { getTeams } from '../../lib/cms/teams'
+import TeamCard from '../../../components/TeamCard.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getTeams } from '../../../lib/cms/teams'
 
 const teams = await getTeams(Astro.request.headers.get('cookie'))
 ---
