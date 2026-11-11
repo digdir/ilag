@@ -39,6 +39,8 @@ the front page then verifies that the frontend can reach the CMS.
 | `pnpm setup` | Create missing `.env` files from the examples (safe to re-run) |
 | `pnpm db:up` / `pnpm db:down` | Start/stop PostgreSQL |
 | `pnpm db:reset` | Drop the volume and start a fresh database |
+| `pnpm db:seed` | Fill the database with made-up test data: locations, units, people, roles and teams. Leaves what already exists |
+| `pnpm db:seed:reset` | Delete the test data and create it again |
 | `pnpm generate:types` | Regenerate Payload types into `src/shared` |
 | `pnpm make-admin <email>` | Make an existing user an administrator |
 | `pnpm lint` | ESLint for the CMS |
