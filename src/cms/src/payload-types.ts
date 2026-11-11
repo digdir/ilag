@@ -94,6 +94,9 @@ export interface Config {
       children: 'enheter';
       people: 'personer';
     };
+    teamtyper: {
+      roles: 'roller';
+    };
     team: {
       members: 'teammedlemskap';
     };
@@ -331,6 +334,11 @@ export interface TeamType {
   id: number;
   name: string;
   description?: string | null;
+  roles?: {
+    docs?: (number | Role)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -345,6 +353,7 @@ export interface Role {
   responsibility?: string | null;
   authority?: string | null;
   tasks?: string | null;
+  teamTypes?: (number | TeamType)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -708,6 +717,7 @@ export interface RollerSelect<T extends boolean = true> {
   responsibility?: T;
   authority?: T;
   tasks?: T;
+  teamTypes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -718,6 +728,7 @@ export interface RollerSelect<T extends boolean = true> {
 export interface TeamtyperSelect<T extends boolean = true> {
   name?: T;
   description?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
 }

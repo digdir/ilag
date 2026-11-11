@@ -5,8 +5,8 @@ import { isSignedIn } from '../access/isSignedIn'
 
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier,
 // described after RAMO: rolle, ansvar, myndighet og oppgaver (RO-02).
-// Administrators maintain them (RO-07). Which team types a role is relevant
-// for (RO-03) comes later.
+// Administrators maintain them (RO-07), and link each role to the team types
+// it is relevant for (RO-03).
 export const Roles: CollectionConfig = {
   slug: 'roller',
   dbName: 'roles',
@@ -55,6 +55,15 @@ export const Roles: CollectionConfig = {
       name: 'tasks',
       label: 'Oppgaver',
       type: 'textarea',
+    },
+    {
+      // RO-03. Every type the role applies to, also for roles all teams have;
+      // a new team type is added here by hand. Empty for the roles teams work
+      // with that aren't roles in a team, such as linjeleder.
+      name: 'teamTypes',
+      type: 'relationship',
+      relationTo: 'teamtyper',
+      hasMany: true,
     },
   ],
 }

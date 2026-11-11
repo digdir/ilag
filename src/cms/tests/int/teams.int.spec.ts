@@ -113,6 +113,15 @@ describe('Teams', () => {
     expect(created.description).toBe('Et lite team.')
   })
 
+  it('RO-03: shows the roles relevant for a team type', async () => {
+    const coordinator = await payload.create({
+      collection: 'roller',
+      data: { name: `${prefix} Produkteier for typen`, teamTypes: [productTeam.id] },
+    })
+    const withRoles = await payload.findByID({ collection: 'teamtyper', id: productTeam.id })
+    expect(ids(withRoles.roles?.docs)).toEqual([coordinator.id])
+  })
+
   it('marks new teams as active by default', async () => {
     expect((await team(1)).active).toBe(true)
   })

@@ -113,16 +113,6 @@ const seed = async (payload: Payload) => {
     }
   }
 
-  const roleIds = new Map<string, number>()
-  for (const role of data.roles) {
-    let id = await findId(payload, 'roller', { name: { equals: role.name } })
-    if (!id) {
-      id = (await payload.create({ collection: 'roller', data: role })).id
-      count('roller')
-    }
-    roleIds.set(role.name, id)
-  }
-
   const teamTypeIds = new Map<string, number>()
   for (const teamType of data.teamTypes) {
     let id = await findId(payload, 'teamtyper', { name: { equals: teamType.name } })
@@ -131,6 +121,22 @@ const seed = async (payload: Payload) => {
       count('teamtyper')
     }
     teamTypeIds.set(teamType.name, id)
+  }
+
+  const roleIds = new Map<string, number>()
+  for (const role of data.roles) {
+    let id = await findId(payload, 'roller', { name: { equals: role.name } })
+    if (!id) {
+      const { teamTypes, ...fields } = role
+      id = (
+        await payload.create({
+          collection: 'roller',
+          data: { ...fields, teamTypes: teamTypes.map((name) => teamTypeIds.get(name)!) },
+        })
+      ).id
+      count('roller')
+    }
+    roleIds.set(role.name, id)
   }
 
   for (const { members, teamType, ...team } of data.teams) {

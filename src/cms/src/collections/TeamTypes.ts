@@ -38,5 +38,13 @@ export const TeamTypes: CollectionConfig = {
       name: 'description',
       type: 'textarea',
     },
+    {
+      // The roles relevant for this type (RO-03), set on each role.
+      name: 'roles',
+      type: 'join',
+      collection: 'roller',
+      on: 'teamTypes',
+      defaultLimit: 0,
+    },
   ],
 }

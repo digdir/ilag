@@ -27,7 +27,11 @@ export const leaders = [
 ]
 
 // The roles in the prototype, with RAMO as it shows them (ROLES, ROLE_EXTRA,
-// LINE_MANAGER, AREA_OWNER, EMPLOYEE and AI_AGENT in prototype/Saman.dc.html).
+// LINE_MANAGER, AREA_OWNER, EMPLOYEE and AI_AGENT in prototype/Saman.dc.html),
+// and the team types they are relevant for by name (RO-03, Vedlegg 7): the
+// project roles replace teameier, teamleder and teammedlem in a prosjektteam,
+// and a fagnettverk has a fagkoordinator instead of a teamleder. The roles
+// teams work with, but that aren't roles in a team, have none.
 export const roles = [
   {
     name: 'Teameier',
@@ -37,6 +41,7 @@ export const roles = [
     authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
     tasks:
       'Definere mål og forventninger, godkjenne mandat og teamkontrakt, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere teamets måloppnåelse og tilrettelegge for samspill med andre team. Tett dialog med teamleder.',
+    teamTypes: ['Produktteam', 'Leveranseteam', 'Støtteteam', 'Fagnettverk'],
   },
   {
     name: 'Teamleder',
@@ -46,6 +51,7 @@ export const roles = [
       'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med teamets mandat og teamkontrakt.',
     tasks:
       'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til teameier og tilrettelegge for faglig medarbeiderutvikling.',
+    teamTypes: ['Produktteam', 'Leveranseteam', 'Støtteteam'],
   },
   {
     name: 'Teammedlem',
@@ -55,6 +61,7 @@ export const roles = [
       'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
     tasks:
       'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
+    teamTypes: ['Produktteam', 'Leveranseteam', 'Støtteteam', 'Fagnettverk'],
   },
   {
     name: 'Produkteier',
@@ -64,6 +71,7 @@ export const roles = [
     authority: 'Forvalter og prioriterer produktkøen innenfor produktets mål, mandat og rammer.',
     tasks:
       'Produkteieren har vanligvis ansvar for å forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
+    teamTypes: ['Produktteam'],
   },
   {
     name: 'Fagkoordinator',
@@ -74,6 +82,7 @@ export const roles = [
       'Beslutter møteform, tema og hvordan kunnskap deles, innenfor formålet nettverket er opprettet for. Kan ikke pålegge deltakerne oppgaver eller leveranser.',
     tasks:
       'Legge til rette for aktivitet, kalle inn og fasilitere samlinger, avklare hvem nettverket er for og hvordan deltakelse fungerer, og sørge for at kunnskap, erfaringer og praksis deles videre.',
+    teamTypes: ['Fagnettverk'],
   },
   {
     name: 'Prosjekteier',
@@ -83,6 +92,7 @@ export const roles = [
     authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
     tasks:
       'Definere mål og forventninger, godkjenne mandat, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere prosjektets måloppnåelse og tilrettelegge for samspill med andre prosjekter. Tett dialog med prosjektleder.',
+    teamTypes: ['Prosjektteam'],
   },
   {
     name: 'Prosjektleder',
@@ -92,6 +102,7 @@ export const roles = [
       'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med prosjektets mandat.',
     tasks:
       'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til prosjekteier og tilrettelegge for faglig medarbeiderutvikling.',
+    teamTypes: ['Prosjektteam'],
   },
   {
     name: 'Prosjektdeltaker',
@@ -101,6 +112,7 @@ export const roles = [
       'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
     tasks:
       'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
+    teamTypes: ['Prosjektteam'],
   },
   {
     name: 'Linjeleder',
@@ -111,6 +123,7 @@ export const roles = [
       'Godkjenner ansettelser og oppsigelser. Setter lønn, godkjenner ferie og fravær. Godkjenner kurs, sertifiseringer og opplæringsbudsjetter og rollebeskrivelser. Bestemmer endelig ressurstildeling ved konflikter.',
     tasks:
       'Gjennomfører medarbeidersamtaler og lønnssamtaler. Følger opp sykefravær og HR-prosesser. Planlegger langsiktige kompetanseløp og kurs. Kjører rekrutteringsprosesser. Matcher konsulenter/ansatte mot ressursforespørsler.',
+    teamTypes: [],
   },
   {
     name: 'Områdeansvarlig',
@@ -121,6 +134,7 @@ export const roles = [
       'Sette retning og prioritere mål, tiltak og behov innenfor sitt innsatsområde. Disponere dedikerte ressurser og midler tildelt området, og prioritere innenfor avtalte bidrag fra linjen. Kan ikke ensidig øke linjens bidrag eller styre teamenes daglige arbeid.',
     tasks:
       'Konkretisere effektmål/OKR for innsatsområdet, holde et samlet porteføljebilde for området, avtale bidrag med linjeledere, vurdere virkemiddelbruken, varsle når målene er truet og gi porteføljestyret beslutningsgrunnlag. Tett dialog med linjeledere/teameiere, produkteiere og teamledere.',
+    teamTypes: [],
   },
   {
     name: 'Medarbeider',
@@ -131,6 +145,7 @@ export const roles = [
       'Tar beslutninger innenfor eget ansvarsområde (fagområde). Eskalerer til relevant leder ang. ev. risiko og avvik.',
     tasks:
       'Utfører avtalte arbeidsoppgaver. Oppfyller avtalte forpliktelser om kompetanseheving. Bidrar til forbedring av leveranser, og måten vi jobber på.',
+    teamTypes: [],
   },
   {
     name: 'KI-agent',
@@ -139,6 +154,7 @@ export const roles = [
     authority: 'Ingen formell avgjerdsmynde',
     tasks:
       'Analyse, samanfatting, utkast til dokument, idéutvikling, informasjonsinnhenting og automatisert støtte',
+    teamTypes: [],
   },
 ]
 
@@ -171,7 +187,8 @@ export const teamTypes = [
   },
 ]
 
-// Team types by name, and members by employeeNumber with their roles by name.
+// Team types by name, and members by employeeNumber with their roles by name,
+// following the roles recommended for each team type (RO-03).
 export const teams = [
   {
     name: 'Team Skjemabygger',
@@ -192,7 +209,7 @@ export const teams = [
     members: [
       { person: '1004', roles: ['Teameier'] },
       { person: '1007', roles: ['Teamleder'] },
-      { person: '1009', roles: ['Produkteier'] },
+      { person: '1009', roles: ['Teammedlem'] },
       { person: '1010', roles: ['Teammedlem'] },
       { person: '1017', roles: ['Teammedlem'] },
       { person: '1019', roles: ['Teammedlem'] },
@@ -203,11 +220,11 @@ export const teams = [
     teamType: 'Prosjektteam',
     description: 'Erstatter dagens intranett innen utgangen av 2027.',
     members: [
-      { person: '1003', roles: ['Teameier'] },
-      { person: '1006', roles: ['Teamleder'] },
-      { person: '1014', roles: ['Teammedlem'] },
-      { person: '1015', roles: ['Teammedlem'] },
-      { person: '1011', roles: ['Teammedlem'] },
+      { person: '1003', roles: ['Prosjekteier'] },
+      { person: '1006', roles: ['Prosjektleder'] },
+      { person: '1014', roles: ['Prosjektdeltaker'] },
+      { person: '1015', roles: ['Prosjektdeltaker'] },
+      { person: '1011', roles: ['Prosjektdeltaker'] },
     ],
   },
   {
@@ -226,7 +243,7 @@ export const teams = [
     description: 'Deler kunnskap om universell utforming på tvers av divisjonene.',
     members: [
       { person: '1006', roles: ['Teameier'] },
-      { person: '1012', roles: ['Teamleder'] },
+      { person: '1012', roles: ['Fagkoordinator'] },
       { person: '1018', roles: ['Teammedlem'] },
       { person: '1010', roles: ['Teammedlem'] },
     ],
