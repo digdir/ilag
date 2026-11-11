@@ -5,8 +5,8 @@ SAP, with SAP's field names in the header. The design behind it is in
 [ADR-0003](../adr/0003-imports-from-the-authoritative-source.md), and it works
 the same way as the [unit import](unit-import.md).
 
-> **Status:** agreed, not built yet. The columns are the ones Ansattmottak
-> has said it will send.
+> **Status:** built. The columns are the ones Ansattmottak has said it will
+> send.
 
 ## In short
 
@@ -16,6 +16,8 @@ the same way as the [unit import](unit-import.md).
 - ilag applies an accepted file shortly after, usually within seconds.
 - A person missing from the file is marked as no longer working in Digdir.
   They are not deleted, so their history in teams survives.
+- A file with fewer than half as many people as ilag has active is held
+  until an administrator confirms it, in case it was cut off.
 - The people file and the [unit file](unit-import.md) can come in any order.
   Whichever comes second links people to their units.
 
@@ -147,11 +149,14 @@ no manager in ilag.
 
 ## Responses
 
-**`202 Accepted`**: the file is valid and queued.
+**`202 Accepted`**: the file is valid. `status` is `queued`, or `held` if it
+has fewer than half as many people as ilag has active; an administrator then
+has to confirm it. `people` counts people, not lines.
 
 ```json
 {
   "importRunId": 43,
+  "status": "queued",
   "rows": 415,
   "people": 412,
   "statusUrl": "https://<ilag>/api/personer/import/43"
@@ -179,12 +184,22 @@ no manager in ilag.
 ### Status of an import
 
 `GET https://<ilag>/api/personer/import/<importRunId>`, with the same
-`Authorization` header, returns the run's status: `queued`, `running`,
-`succeeded`, `failed` or `superseded` (a newer file arrived before this one
-started). A finished run also has its result:
+`Authorization` header, returns the run's status:
+
+| Status | Meaning |
+| --- | --- |
+| `queued` | Waiting to be applied, usually for a few seconds |
+| `held` | Far fewer rows than ilag has active; waits for an administrator |
+| `running` | Being applied |
+| `succeeded` | Applied. The result says what changed |
+| `failed` | Nothing changed. The run has an `error`, and is tried again up to three times |
+| `superseded` | A newer file arrived before this one was applied |
+
+A finished run also has its result:
 
 ```json
 {
+  "importRunId": 43,
   "status": "succeeded",
   "result": {
     "created": 3,
