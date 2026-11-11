@@ -63,10 +63,13 @@ they need the `Set-Cookie` headers from the response.
 
 ## Consequences
 
-- Queries are typed against the content model: after `pnpm generate:types`,
-  renaming a field or a collection makes the queries that use it type errors
-  instead of returning nothing at runtime. Nothing type-checks the frontend in
-  CI yet, so for now these errors only show in the editor.
+- Queries are partly typed against the content model: after
+  `pnpm generate:types`, a wrong collection name or a wrong field in
+  `populate` is a type error, and results have the right type. Field names in
+  `where` and `sort` are not checked, since Payload types them as any string;
+  a typo there gives wrong results at runtime, so tests must cover the filters.
+  Nothing type-checks the frontend in CI yet, so for now even the checked
+  errors only show in the editor.
 - Upgrading Payload may need changes to the queries while the SDK is in beta.
   Read the SDK's changelog on every upgrade. Since all queries are in
   `src/lib/cms/`, the changes stay there, and replacing the SDK later would
