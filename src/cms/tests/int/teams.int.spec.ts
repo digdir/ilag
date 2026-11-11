@@ -122,6 +122,28 @@ describe('Teams', () => {
     expect(ids(withRoles.roles?.docs)).toEqual([coordinator.id])
   })
 
+  it('keeps earlier versions of a membership when its roles change', async () => {
+    const t = await team(8)
+    const p = await person(8)
+    const membership = await payload.create({
+      collection: 'teammedlemskap',
+      data: { team: t.id, person: p.id, roles: [teamMember.id] },
+    })
+    await payload.update({
+      collection: 'teammedlemskap',
+      id: membership.id,
+      data: { roles: [teamLead.id] },
+    })
+
+    const { docs } = await payload.findVersions({
+      collection: 'teammedlemskap',
+      where: { parent: { equals: membership.id } },
+      sort: 'createdAt',
+      depth: 0,
+    })
+    expect(docs.map((v) => v.version.roles)).toEqual([[teamMember.id], [teamLead.id]])
+  })
+
   it('marks new teams as active by default', async () => {
     expect((await team(1)).active).toBe(true)
   })

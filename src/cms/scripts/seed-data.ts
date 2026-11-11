@@ -187,7 +187,8 @@ export const teamTypes = [
   },
 ]
 
-// Team types by name, and members by employeeNumber with their roles by name.
+// Team types by name, and members by employeeNumber with their roles by name,
+// following the roles recommended for each team type (RO-03).
 export const teams = [
   {
     name: 'Team Skjemabygger',
@@ -208,7 +209,7 @@ export const teams = [
     members: [
       { person: '1004', roles: ['Teameier'] },
       { person: '1007', roles: ['Teamleder'] },
-      { person: '1009', roles: ['Produkteier'] },
+      { person: '1009', roles: ['Teammedlem'] },
       { person: '1010', roles: ['Teammedlem'] },
       { person: '1017', roles: ['Teammedlem'] },
       { person: '1019', roles: ['Teammedlem'] },
@@ -219,11 +220,11 @@ export const teams = [
     teamType: 'Prosjektteam',
     description: 'Erstatter dagens intranett innen utgangen av 2027.',
     members: [
-      { person: '1003', roles: ['Teameier'] },
-      { person: '1006', roles: ['Teamleder'] },
-      { person: '1014', roles: ['Teammedlem'] },
-      { person: '1015', roles: ['Teammedlem'] },
-      { person: '1011', roles: ['Teammedlem'] },
+      { person: '1003', roles: ['Prosjekteier'] },
+      { person: '1006', roles: ['Prosjektleder'] },
+      { person: '1014', roles: ['Prosjektdeltaker'] },
+      { person: '1015', roles: ['Prosjektdeltaker'] },
+      { person: '1011', roles: ['Prosjektdeltaker'] },
     ],
   },
   {
@@ -242,7 +243,7 @@ export const teams = [
     description: 'Deler kunnskap om universell utforming på tvers av divisjonene.',
     members: [
       { person: '1006', roles: ['Teameier'] },
-      { person: '1012', roles: ['Teamleder'] },
+      { person: '1012', roles: ['Fagkoordinator'] },
       { person: '1018', roles: ['Teammedlem'] },
       { person: '1010', roles: ['Teammedlem'] },
     ],
