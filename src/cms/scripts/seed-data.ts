@@ -142,11 +142,40 @@ export const roles = [
   },
 ]
 
-// Members by employeeNumber, with their roles by name.
+// The team types in TK-01, described as in the prototype.
+export const teamTypes = [
+  {
+    name: 'Prosjektteam',
+    description:
+      'Et prosjektteam etableres for å løse en avgrenset oppgave med et definert mål og en tydelig avslutning. Når målet er nådd og oppgaven er løst, kan teamet oppløses.',
+  },
+  {
+    name: 'Støtteteam',
+    description:
+      'Et støtteteam har et varig ansvar for å skape verdi internt i Digdir, slik at medarbeidere, ledere og andre team kan løse sine oppgaver på en effektiv og god måte.',
+  },
+  {
+    name: 'Leveranseteam',
+    description:
+      'Et leveranseteam har et varig og helhetlig ansvar for en definert leveranse som skaper verdi utenfor Digdir. Teamet skal kjenne behovene til brukerne og bruke innsikten til å utvikle, levere og forbedre leveransen over tid.',
+  },
+  {
+    name: 'Produktteam',
+    description:
+      'Et produktteam er et leveranseteam med varig og helhetlig ansvar for ett eller flere produkter. Teamet skal ha tilstrekkelig kompetanse, myndighet og handlingsrom til å prioritere ut fra brukerbehov, mål og ønskede effekter.',
+  },
+  {
+    name: 'Fagnettverk',
+    description:
+      'Et fagnettverk samler personer som har et felles fagområde, kompetanse, interesse eller profesjonell bakgrunn, og som ønsker å dele kunnskap, lære av hverandre og utvikle fagområdet. Nettverket kan for eksempel organiseres som et fagforum, nettverk eller laug — eller med et helt annet navn.\n\nI motsetning til et team har et fagnettverk vanligvis ikke ansvar for en felles leveranse eller et felles resultat, og medlemmene har normalt sitt ansvar og sine oppgaver andre steder i organisasjonen.\n\nEt tydelig formål gjør det enklere å skape relevant aktivitet og verdi for deltakerne, samtidig som nettverket beholder den fleksible formen som skiller det fra et team.',
+  },
+]
+
+// Team types by name, and members by employeeNumber with their roles by name.
 export const teams = [
   {
     name: 'Team Skjemabygger',
-    teamType: 'product',
+    teamType: 'Produktteam',
     description: 'Utvikler og forvalter verktøyet for å lage digitale skjema.',
     members: [
       { person: '1005', roles: ['Teameier'] },
@@ -158,7 +187,7 @@ export const teams = [
   },
   {
     name: 'Team Innlogging',
-    teamType: 'delivery',
+    teamType: 'Leveranseteam',
     description: 'Leverer innloggingsløsningen til offentlige tjenester.',
     members: [
       { person: '1004', roles: ['Teameier'] },
@@ -171,7 +200,7 @@ export const teams = [
   },
   {
     name: 'Prosjekt Nytt intranett',
-    teamType: 'project',
+    teamType: 'Prosjektteam',
     description: 'Erstatter dagens intranett innen utgangen av 2027.',
     members: [
       { person: '1003', roles: ['Teameier'] },
@@ -183,7 +212,7 @@ export const teams = [
   },
   {
     name: 'Støtteteam Arbeidsflate',
-    teamType: 'support',
+    teamType: 'Støtteteam',
     description: 'Gir de andre teamene felles verktøy og arbeidsflater.',
     members: [
       { person: '1002', roles: ['Teameier'] },
@@ -193,7 +222,7 @@ export const teams = [
   },
   {
     name: 'Fagnettverk for universell utforming',
-    teamType: 'network',
+    teamType: 'Fagnettverk',
     description: 'Deler kunnskap om universell utforming på tvers av divisjonene.',
     members: [
       { person: '1006', roles: ['Teameier'] },

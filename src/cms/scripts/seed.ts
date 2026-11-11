@@ -21,7 +21,15 @@ import * as data from './seed-data'
 // `clear` without dashes, since `payload run` only hands the script arguments
 // that aren't flags.
 
-type Slug = 'brukere' | 'lokasjoner' | 'enheter' | 'personer' | 'roller' | 'team' | 'teammedlemskap'
+type Slug =
+  | 'brukere'
+  | 'lokasjoner'
+  | 'enheter'
+  | 'personer'
+  | 'roller'
+  | 'teamtyper'
+  | 'team'
+  | 'teammedlemskap'
 
 // An administrator to log in to the admin panel with.
 const ADMIN = { email: 'admin@example.com', password: 'ilag' }
@@ -115,13 +123,26 @@ const seed = async (payload: Payload) => {
     roleIds.set(role.name, id)
   }
 
-  for (const { members, ...team } of data.teams) {
+  const teamTypeIds = new Map<string, number>()
+  for (const teamType of data.teamTypes) {
+    let id = await findId(payload, 'teamtyper', { name: { equals: teamType.name } })
+    if (!id) {
+      id = (await payload.create({ collection: 'teamtyper', data: teamType })).id
+      count('teamtyper')
+    }
+    teamTypeIds.set(teamType.name, id)
+  }
+
+  for (const { members, teamType, ...team } of data.teams) {
     let teamId = await findId(payload, 'team', { name: { equals: team.name } })
     if (!teamId) {
       teamId = (
         await payload.create({
           collection: 'team',
-          data: team as RequiredDataFromCollectionSlug<'team'>,
+          data: {
+            ...team,
+            teamType: teamTypeIds.get(teamType)!,
+          } as RequiredDataFromCollectionSlug<'team'>,
         })
       ).id
       count('team')
@@ -157,6 +178,7 @@ const removeSeed = async (payload: Payload) => {
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['roller', { name: { in: data.roles.map((r) => r.name) } }],
+    ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.
     ...(['section', 'department', 'division', 'directorate'] as const).map(

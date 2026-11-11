@@ -7,11 +7,6 @@
  */
 
 /**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TeamType".
- */
-export type TeamType = 'project' | 'support' | 'delivery' | 'product' | 'network';
-/**
  * Supported timezones in IANA format.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -78,6 +73,7 @@ export interface Config {
     lokasjoner: Location;
     enheter: Unit;
     roller: Role;
+    teamtyper: TeamType;
     team: Team;
     teammedlemskap: TeamMembership;
     importkjoringer: ImportRun;
@@ -109,6 +105,7 @@ export interface Config {
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
+    teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
@@ -316,13 +313,24 @@ export interface Team {
   id: number;
   name: string;
   description?: string | null;
-  teamType: TeamType;
+  teamType: number | TeamType;
   active: boolean;
   members?: {
     docs?: (number | TeamMembership)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper".
+ */
+export interface TeamType {
+  id: number;
+  name: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -524,6 +532,10 @@ export interface PayloadLockedDocument {
         value: number | Role;
       } | null)
     | ({
+        relationTo: 'teamtyper';
+        value: number | TeamType;
+      } | null)
+    | ({
         relationTo: 'team';
         value: number | Team;
       } | null)
@@ -696,6 +708,16 @@ export interface RollerSelect<T extends boolean = true> {
   responsibility?: T;
   authority?: T;
   tasks?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper_select".
+ */
+export interface TeamtyperSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
