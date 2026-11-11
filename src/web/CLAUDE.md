@@ -15,7 +15,9 @@
   return what the pages need, in the shape the components take. Other helpers
   go elsewhere in `src/lib/`.
 - **Components** (`src/components/`) are one per file, named in PascalCase after
-  what they show (`TeamCard.astro`). They take typed `Props` and never fetch, so
+  what they show (`TeamCard.astro`). Components for one subject go in a folder
+  named like its pages folder (`components/team/` for `organisering/team/`);
+  ones used across subjects, such as `Avatar.astro`, stay at the top. They take typed `Props` and never fetch, so
   they can be used anywhere. Look there before making a new one, and extend an
   existing component with a prop rather than making a near copy.
 - **Behaviour** in the browser, such as filtering a list, goes in the

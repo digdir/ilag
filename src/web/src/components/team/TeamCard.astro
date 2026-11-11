@@ -1,5 +1,5 @@
 ---
-import { withRole, type TeamWithMembers } from '../lib/cms/teams'
+import { withRole, type TeamWithMembers } from '../../lib/cms/teams'
 import TeamTypeTag from './TeamTypeTag.astro'
 
 interface Props {
@@ -32,8 +32,6 @@ const meta = team.members.length
     text-decoration: none;
   }
 
-  /* Designsystemet underlines the heading of a link card; the prototype doesn't,
-     and the card's hover background already shows that it's clickable. */
   .ds-heading {
     text-decoration-line: none;
   }
