@@ -216,6 +216,30 @@ describe('Teams', () => {
     expect(ids(membership.roles)).toEqual([teamLead.id])
   })
 
+  it('RO-02: describes a role after RAMO, as rich text that can be filled in later', async () => {
+    const text = (t: string) => ({
+      root: {
+        type: 'root',
+        direction: 'ltr' as const,
+        format: '' as const,
+        indent: 0,
+        version: 1,
+        children: [{ type: 'paragraph', version: 1, children: [{ type: 'text', text: t, version: 1 }] }],
+      },
+    })
+    const created = await payload.create({
+      collection: 'roller',
+      data: {
+        name: `${prefix} Fagkoordinator`,
+        role: text('Utpekt som koordinator for fagnettverket.'),
+        responsibility: text('Sikre at nettverket har et tydelig formål.'),
+      },
+    })
+    expect(JSON.stringify(created.responsibility)).toContain('Sikre at nettverket har et tydelig formål.')
+    expect(created.authority ?? null).toBeNull()
+    expect(created.tasks ?? null).toBeNull()
+  })
+
   it('RO-07: lets only administrators create and delete roles', async () => {
     await expect(
       payload.create({ collection: 'roller', data: { name: `${prefix} Rolle 1` }, ...as(user) }),
