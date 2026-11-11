@@ -32,6 +32,12 @@ const meta = team.members.length
     text-decoration: none;
   }
 
+  /* Designsystemet underlines the heading of a link card; the prototype doesn't,
+     and the card's hover background already shows that it's clickable. */
+  .ds-heading {
+    text-decoration-line: none;
+  }
+
   .meta {
     color: var(--ds-color-text-subtle);
   }
