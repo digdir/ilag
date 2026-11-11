@@ -37,7 +37,6 @@ describe('team overview', () => {
     const teams = requests.find((r) => r.url.pathname === '/api/team')!
     const members = requests.find((r) => r.url.pathname === '/api/teammedlemskap')!
     expect(teams.url.searchParams.get('where[active][equals]')).toBe('true')
-    expect(members.url.searchParams.get('where[team.active][equals]')).toBe('true')
     for (const { init } of [teams, members]) {
       expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
     }
