@@ -1,0 +1,87 @@
+---
+import type { TeamType } from '@ilag/shared'
+
+interface Props {
+  types: TeamType[]
+  /** How many teams there are before filtering. */
+  count: number
+}
+
+const { types, count } = Astro.props
+---
+
+<!--
+  Search by name and filter by type (TO-05). The page has every team already,
+  so the script below only hides the cards that don't match, in the list marked
+  data-team-list. Without JavaScript, all teams show.
+-->
+<div class="team-filter" data-team-filter>
+  <ds-field class="ds-field">
+    <label class="ds-label" for="team-search">Søk i team</label>
+    <input class="ds-input" id="team-search" type="search" placeholder="Søk etter teamnavn" />
+  </ds-field>
+  <fieldset class="ds-fieldset">
+    <legend class="ds-label" data-weight="regular">Teamtype</legend>
+    <div class="chips" data-size="sm">
+      <label class="ds-chip">
+        <input class="ds-input" type="radio" name="teamtype" value="" checked />
+        Alle
+      </label>
+      {
+        types.map((type) => (
+          <label class="ds-chip">
+            <input class="ds-input" type="radio" name="teamtype" value={type.id} />
+            {type.name}
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <p class="ds-paragraph count" data-size="sm" data-color="neutral" aria-live="polite" data-team-count>
+    {count} team
+  </p>
+</div>
+
+<script>
+  const filter = document.querySelector<HTMLElement>('[data-team-filter]')!
+  const search = filter.querySelector<HTMLInputElement>('input[type=search]')!
+  const count = filter.querySelector<HTMLElement>('[data-team-count]')!
+  const empty = document.querySelector<HTMLElement>('[data-team-empty]')!
+  const teams = [...document.querySelectorAll<HTMLElement>('[data-team-list] > li')]
+
+  const update = () => {
+    const query = search.value.trim().toLowerCase()
+    const type = filter.querySelector<HTMLInputElement>('input[name=teamtype]:checked')!
+    let shown = 0
+    for (const team of teams) {
+      const wrongType = type.value !== '' && team.dataset.type !== type.value
+      team.hidden = wrongType || !team.dataset.name!.includes(query)
+      if (!team.hidden) shown++
+    }
+    // Like the prototype: «2 team av typen produktteam».
+    const typeName = type.value && type.parentElement!.textContent!.trim().toLowerCase()
+    count.textContent = `${shown} team` + (typeName ? ` av typen ${typeName}` : '')
+    empty.hidden = shown > 0
+  }
+
+  filter.addEventListener('input', update)
+</script>
+
+<style>
+  .team-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+
+  .count {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>

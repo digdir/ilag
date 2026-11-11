@@ -1,19 +1,12 @@
 ---
 import type { Member } from '../lib/cms/teams'
+import Avatar from './Avatar.astro'
 
 interface Props {
   members: Member[]
 }
 
 const { members } = Astro.props
-
-const initials = (name: string) =>
-  name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part[0])
-    .filter((_, i, all) => i === 0 || i === all.length - 1)
-    .join('')
 ---
 
 {
@@ -21,9 +14,7 @@ const initials = (name: string) =>
     <ul class="members">
       {members.map((member) => (
         <li>
-          <span class="ds-avatar" data-size="sm" aria-hidden="true">
-            {initials(member.name)}
-          </span>
+          <Avatar name={member.name} />
           <span class="ds-paragraph name">{member.name}</span>
           <span class="ds-paragraph roles" data-size="sm">
             {member.roles.join(', ')}

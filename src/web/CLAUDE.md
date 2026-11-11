@@ -18,6 +18,9 @@
   what they show (`TeamCard.astro`). They take typed `Props` and never fetch, so
   they can be used anywhere. Look there before making a new one, and extend an
   existing component with a prop rather than making a near copy.
+- **Behaviour** in the browser, such as filtering a list, goes in the
+  component's own `<script>`, with plain DOM and no framework. Pages render
+  everything on the server first, so they still work without it.
 - **Split a component** when it does more than one thing or gets hard to read
   (as a rule of thumb, around 100 lines), into smaller components in the same
   folder.

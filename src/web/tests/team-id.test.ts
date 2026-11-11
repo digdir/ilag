@@ -24,7 +24,9 @@ describe('team page', () => {
     const res = await render('7')
     const html = await res.text()
 
-    expect(new URL(fetchMock.mock.calls[0]![0]).pathname).toBe('/api/team/7')
+    const url = new URL(fetchMock.mock.calls[0]![0])
+    expect(url.pathname).toBe('/api/team/7')
+    expect(url.searchParams.get('depth')).toBe('3')
     expect(res.status).toBe(200)
     expect(html).toContain('Team Skjemabygger')
     expect(html).toContain('Produktteam')
@@ -32,12 +34,42 @@ describe('team page', () => {
     expect(html).toContain('href="/organisering/team"')
   })
 
+  it('TO-03: shows the team owner in a box of their own, with location and unit', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
+
+    const html = await (await render('7')).text()
+    const [members, owner] = html.split('Teameier</h2>')
+
+    expect(members).not.toContain('Magnus Johansen')
+    expect(owner).toContain('Magnus Johansen')
+    expect(owner).toContain('Leikanger')
+    expect(owner).toContain('Organisasjonslæring')
+  })
+
+  it('says when the owner has no location or unit, or there is no owner', async () => {
+    const withOwner = {
+      ...skjemabygger,
+      members: {
+        docs: [
+          { id: 9, person: { id: 9, fullName: 'Kari Nordmann' }, roles: [{ id: 1, name: 'Teameier' }] },
+        ],
+      },
+    }
+    vi.stubGlobal('fetch', vi.fn(async () => json(withOwner)))
+    expect(await (await render('7')).text()).toMatch(
+      /Lokasjon.*Ikke registrert.*Linjetilhørighet.*Ikke registrert/s,
+    )
+
+    vi.stubGlobal('fetch', vi.fn(async () => json(nettverk)))
+    expect(await (await render('8')).text()).toContain('Teameier ikke registrert.')
+  })
+
   it('lists the members by name', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
 
     const html = await (await render('7')).text()
 
-    const order = ['Emma Kristiansen', 'Ida Haugen', 'Magnus Johansen'].map((name) => html.indexOf(name))
+    const order = ['Emma Kristiansen', 'Ida Haugen'].map((name) => html.indexOf(name))
     expect(order).toEqual([...order].sort((a, b) => a - b))
   })
 

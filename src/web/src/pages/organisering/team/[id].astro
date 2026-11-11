@@ -1,29 +1,70 @@
 ---
 import MemberList from '../../../components/MemberList.astro'
+import TeamOwner from '../../../components/TeamOwner.astro'
 import TeamTypeTag from '../../../components/TeamTypeTag.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getTeam } from '../../../lib/cms/teams'
 
 const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!team) Astro.response.status = 404
+
+// The owner has a box of their own; everyone else is in «Hvem er vi?».
+const isOwner = (m: { roles: string[] }) => m.roles.includes('Teameier')
 ---
 
-<Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'}>
-  <p class="ds-paragraph"><a class="ds-link" href="/organisering/team">Tilbake til teamoversikten</a></p>
-  {
-    team ? (
-      <>
-        {team.teamType && <TeamTypeTag type={team.teamType} />}
-        <h1 class="ds-heading" data-size="lg">{team.name}</h1>
-        {team.description && <p class="ds-paragraph">{team.description}</p>}
-        <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
-        <MemberList members={team.members} />
-      </>
-    ) : (
-      <>
-        <h1 class="ds-heading" data-size="lg">Fant ikke teamet</h1>
-        <p class="ds-paragraph">Teamet finnes ikke, eller du har ikke tilgang til det.</p>
-      </>
-    )
-  }
+<Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'} wide>
+  <div class="page">
+    <p class="ds-paragraph">
+      <a class="ds-link" href="/organisering/team">Tilbake til teamoversikten</a>
+    </p>
+    {
+      team ? (
+        <>
+          <header>
+            {team.teamType && <TeamTypeTag type={team.teamType} />}
+            <h1 class="ds-heading" data-size="lg">{team.name}</h1>
+            {team.description && <p class="ds-paragraph">{team.description}</p>}
+          </header>
+          <div class="sections">
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
+              <MemberList members={team.members.filter((m) => !isOwner(m))} />
+            </section>
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">Teameier</h2>
+              <TeamOwner owners={team.members.filter(isOwner)} />
+            </section>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 class="ds-heading" data-size="lg">Fant ikke teamet</h1>
+          <p class="ds-paragraph">Teamet finnes ikke, eller du har ikke tilgang til det.</p>
+        </>
+      )
+    }
+  </div>
 </Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-8);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+    max-width: 48rem;
+  }
+
+  .sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: var(--ds-size-6);
+    align-items: start;
+  }
+</style>

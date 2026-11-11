@@ -9,10 +9,17 @@ import {
 
 // The team queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. The members join on Team brings each
-// membership with its person and roles (maxDepth 2 in Teams.ts).
+// membership with its person and roles (maxDepth in Teams.ts).
 
 /** A person in a team, with the names of their roles there. */
-export type Member = { id: number; name: string; roles: string[] }
+export type Member = {
+  id: number
+  name: string
+  roles: string[]
+  /** Only filled in by getTeam, which asks for one level more. */
+  location: string | null
+  units: string[]
+}
 
 export type TeamWithMembers = Omit<Team, 'members' | 'teamType'> & {
   teamType: TeamType | null
@@ -32,7 +39,26 @@ export async function getTeams(cookie: string | null): Promise<TeamWithMembers[]
 export async function getTeam(id: string, cookie: string | null): Promise<TeamWithMembers | null> {
   if (!/^\d+$/.test(id)) return null
   try {
-    const team = await sdk.findByID({ collection: 'team', id: Number(id) }, { headers: authHeaders(cookie) })
+    // Depth 3 reaches the people's location and units (team → membership →
+    // person → location), for the team owner. It would also fill in each
+    // person's manager and teams and each unit's people, so `populate` keeps
+    // only the fields the page shows from each collection.
+    const team = await sdk.findByID(
+      {
+        collection: 'team',
+        id: Number(id),
+        depth: 3,
+        populate: {
+          team: { name: true },
+          teamtyper: { name: true },
+          personer: { fullName: true, location: true, units: true },
+          roller: { name: true },
+          lokasjoner: { name: true },
+          enheter: { name: true },
+        },
+      },
+      { headers: authHeaders(cookie) },
+    )
     return withMembers(team)
   } catch (err) {
     if (err instanceof PayloadSDKError && err.status === 404) return null
@@ -59,4 +85,12 @@ const toMember = ({ id, person, roles }: TeamMembership): Member => ({
   id,
   name: typeof person === 'object' ? (person.fullName ?? '') : '',
   roles: roles.flatMap((r) => (typeof r === 'object' ? [r.name] : [])),
+  location:
+    typeof person === 'object' && typeof person.location === 'object'
+      ? (person.location?.name ?? null)
+      : null,
+  units:
+    typeof person === 'object'
+      ? (person.units ?? []).flatMap((u) => (typeof u === 'object' ? [u.name] : []))
+      : [],
 })
