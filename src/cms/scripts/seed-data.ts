@@ -26,15 +26,17 @@ export const leaders = [
   { unit: '10014301', person: '1008' }, // FEL - Arkitektur og produktutvikling
 ]
 
-// RAMO from Vedlegg 7 in the specification.
+// The roles in the prototype, with RAMO as it shows them (ROLES, ROLE_EXTRA,
+// LINE_MANAGER, AREA_OWNER, EMPLOYEE and AI_AGENT in prototype/Saman.dc.html).
 export const roles = [
   {
     name: 'Teameier',
-    role: 'Formelt utpekt som teameier ved etablering av teamet. Teameiere bør ha personalansvar for flere av teammedlemmene og/eller et tyngre fagansvar og risikoeierskap rundt teamets leveranser.',
-    responsibility: 'Sikre at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    role: 'Formelt utpekt som teameier ved etablering av teamet. Teameiere bør ha personalansvar for flere av teammedlemmene og/eller et tyngre fagansvar og risikoeierskap rundt teamets leveranser. For team som hører til et innsatsområde vil teameieren fortsatt måtte sørge for at teamet har de nødvendige rammene til å kunne levere, men teameierens ansvar, myndighet og oppgaver vil være avgrenset til drift/linjeoppgaver som ligger i teamet, mens områdeansvarlig vil styre ny utvikling og samkjøringsaktiviteter som kommer via innsatsområdet. Teameier og områdeansvarlig må formelt avtale kapasitetsfordeling og evt. endringer i mandat seg i mellom når et team går inn i et innsatsområde.',
+    responsibility:
+      'Sikre at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
     authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
     tasks:
-      'Definere mål og forventninger, godkjenne mandat og teamkontrakt, sikre linjeforankring og riktig bemanning (i dialog med andre linjeledere), evaluere teamets måloppnåelse og tilrettelegge for samspill med andre team. Tett dialog med teamleder.',
+      'Definere mål og forventninger, godkjenne mandat og teamkontrakt, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere teamets måloppnåelse og tilrettelegge for samspill med andre team. Tett dialog med teamleder.',
   },
   {
     name: 'Teamleder',
@@ -43,25 +45,100 @@ export const roles = [
     authority:
       'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med teamets mandat og teamkontrakt.',
     tasks:
-      'Planlegge, koordinere, følge opp fremdrift og leveranser, rapportere til teameier, tilrettelegge for faglig medarbeiderutvikling.',
+      'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til teameier og tilrettelegge for faglig medarbeiderutvikling.',
   },
   {
     name: 'Teammedlem',
-    role: 'Formelt utpekt som teammedlemmer ved etablering av teamet, eller evt. lagt til underveis ved behov.',
+    role: 'Formelt utpekt som teammedlem ved etablering av teamet, eller lagt til underveis ved behov.',
     responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
     authority:
       'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
     tasks:
-      'Bidra til felles planlegging og vurderinger samt utføre oppgaver og sikre faglig kvalitet/etterlevelse av krav innenfor med eget kompetanseområde (utvikler, designer, jurist, osv.).',
+      'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
   },
   {
     name: 'Produkteier',
     role: 'Produktteam bør ha produkteier, enten kombinert med teamlederrollen eller som egen rolle i tillegg. Rollen utøves i tråd med anbefaling for produktorganisering i offentlig sektor. Begrepet produktleder brukes ikke i Digdir.',
     responsibility:
-      'Sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer, slik at produktet utvikles og forbedres over tid på en måte som gir verdi for brukerne og bidrar til ønskede nytteverdier for virksomheten og samfunnet.',
-    authority: 'Forvalte og prioritere produktkøen innenfor produktets mål, mandat og rammer.',
+      'En produkteier har ansvar for å sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer. Rollen skal bidra til at produktet utvikles og forbedres over tid på en måte som gir verdi for brukerne og bidrar til ønskede nytteverdier for virksomheten og samfunnet.',
+    authority: 'Forvalter og prioriterer produktkøen innenfor produktets mål, mandat og rammer.',
     tasks:
-      'Forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
+      'Produkteieren har vanligvis ansvar for å forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
+  },
+  {
+    name: 'Fagkoordinator',
+    role: 'Utpekt som koordinator for fagnettverket. Et fagnettverk har ikke teamleder, siden det ikke svarer for en felles leveranse. Koordinatoren er registrert i teamoversikten.',
+    responsibility:
+      'Ansvar for at nettverket har et tydelig formål, relevant aktivitet og verdi for deltakerne.',
+    authority:
+      'Beslutter møteform, tema og hvordan kunnskap deles, innenfor formålet nettverket er opprettet for. Kan ikke pålegge deltakerne oppgaver eller leveranser.',
+    tasks:
+      'Legge til rette for aktivitet, kalle inn og fasilitere samlinger, avklare hvem nettverket er for og hvordan deltakelse fungerer, og sørge for at kunnskap, erfaringer og praksis deles videre.',
+  },
+  {
+    name: 'Prosjekteier',
+    role: 'Formelt utpekt som prosjekteier ved etablering av prosjektet.',
+    responsibility:
+      'Sikre at prosjektet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
+    tasks:
+      'Definere mål og forventninger, godkjenne mandat, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere prosjektets måloppnåelse og tilrettelegge for samspill med andre prosjekter. Tett dialog med prosjektleder.',
+  },
+  {
+    name: 'Prosjektleder',
+    role: 'Formelt utpekt som prosjektleder ved etablering av prosjektet.',
+    responsibility: 'Lede prosjektets daglige arbeid og måloppnåelse innenfor mandatet.',
+    authority:
+      'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med prosjektets mandat.',
+    tasks:
+      'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til prosjekteier og tilrettelegge for faglig medarbeiderutvikling.',
+  },
+  {
+    name: 'Prosjektdeltaker',
+    role: 'Formelt utpekt som prosjektdeltaker ved etablering av prosjektet, eller lagt til underveis ved behov.',
+    responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med prosjektets mål og mandat.',
+    authority:
+      'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
+    tasks:
+      'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
+  },
+  {
+    name: 'Linjeleder',
+    role: 'Formelt ansatt som divisjonsdirektør, avdelingsleder eller seksjonsleder med personalansvar.',
+    responsibility:
+      'Er ressurseier, har arbeidsgiveransvaret og beslutningsmyndighet i arbeidsforholdet. Har fagansvar og budsjettansvar. Bygger og sikrer riktig kompetansekapasitet basert på behov i linja og i innsatsområdene, sørger for ressurstildeling (allokering). Setter retning og fart på det arbeidet som skal løses i linja. Ivaretar personalansvar og medarbeiderutvikling. Leder strategisk rekruttering og omstilling (kompetanseutvikling).',
+    authority:
+      'Godkjenner ansettelser og oppsigelser. Setter lønn, godkjenner ferie og fravær. Godkjenner kurs, sertifiseringer og opplæringsbudsjetter og rollebeskrivelser. Bestemmer endelig ressurstildeling ved konflikter.',
+    tasks:
+      'Gjennomfører medarbeidersamtaler og lønnssamtaler. Følger opp sykefravær og HR-prosesser. Planlegger langsiktige kompetanseløp og kurs. Kjører rekrutteringsprosesser. Matcher konsulenter/ansatte mot ressursforespørsler.',
+  },
+  {
+    name: 'Områdeansvarlig',
+    role: 'Oppnevnt av TLG for ett strategisk innsatsområde, for en tidsavgrenset mandatperiode (evalueres årlig). Rapporterer til Frode og er medlem av porteføljestyret. Hører personalmessig til VSU (Strategi og styring). Er ikke linjeleder og har ikke personalansvar.',
+    responsibility:
+      'Sikre at summen av det Digdir gjør innen innsatsområdet gir ønsket effekt, innenfor avtalt mandat, økonomiske rammer og ressursallokering. Leveranseansvaret ligger imidlertid hos de teamene som er knyttet til innsatsområdet.',
+    authority:
+      'Sette retning og prioritere mål, tiltak og behov innenfor sitt innsatsområde. Disponere dedikerte ressurser og midler tildelt området, og prioritere innenfor avtalte bidrag fra linjen. Kan ikke ensidig øke linjens bidrag eller styre teamenes daglige arbeid.',
+    tasks:
+      'Konkretisere effektmål/OKR for innsatsområdet, holde et samlet porteføljebilde for området, avtale bidrag med linjeledere, vurdere virkemiddelbruken, varsle når målene er truet og gi porteføljestyret beslutningsgrunnlag. Tett dialog med linjeledere/teameiere, produkteiere og teamledere.',
+  },
+  {
+    name: 'Medarbeider',
+    role: 'Formelt ansatt under en divisjonsdirektør, avdelingsleder eller seksjonsleder.',
+    responsibility:
+      'Utfører arbeidsoppgaver og leverer på avtalte mål. Utviser faglig skjønn innenfor eget ansvarsområde (fagområde). Melder fra om eventuelle risikoer og avvik, kapasitet og belastning og om kompetansen brukes på riktig måte. Tar et aktivt medansvar for egen kompetanseutvikling ved å identifisere egne læringsbehov, søke ny kunnskap og ta initiativ til å utvikle ferdigheter som bidrar til faglig vekst og bedre oppgaveløsning. Og samarbeider med andre til forbedring av leveranser og arbeidsmåter.',
+    authority:
+      'Tar beslutninger innenfor eget ansvarsområde (fagområde). Eskalerer til relevant leder ang. ev. risiko og avvik.',
+    tasks:
+      'Utfører avtalte arbeidsoppgaver. Oppfyller avtalte forpliktelser om kompetanseheving. Bidrar til forbedring av leveranser, og måten vi jobber på.',
+  },
+  {
+    name: 'KI-agent',
+    role: 'Kunstig intelligens som deltar i teamets arbeid som støtte, ikke som medlem. Rollen er aktuell for alle team.',
+    responsibility: 'Støtte kunnskapsarbeid og effektivisering',
+    authority: 'Ingen formell avgjerdsmynde',
+    tasks:
+      'Analyse, samanfatting, utkast til dokument, idéutvikling, informasjonsinnhenting og automatisert støtte',
   },
 ]
 
