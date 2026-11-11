@@ -39,7 +39,7 @@ the front page then verifies that the frontend can reach the CMS.
 | `pnpm setup` | Create missing `.env` files from the examples (safe to re-run) |
 | `pnpm db:up` / `pnpm db:down` | Start/stop PostgreSQL |
 | `pnpm db:reset` | Drop the volume and start a fresh database |
-| `pnpm db:seed` | Fill the database with made-up test data: locations, units, people, roles and teams. Leaves what already exists |
+| `pnpm db:seed` | Fill the database with test data: an administrator (`admin@example.com`, password `ilag`), locations, roles and teams, and units and people imported from the files in `src/cms/scripts/seed-files/`. The imports mark other units and people inactive |
 | `pnpm db:seed:reset` | Delete the test data and create it again |
 | `pnpm db:seed:clear` | Delete the test data, and leave everything else |
 | `pnpm generate:types` | Regenerate Payload types into `src/shared` |
