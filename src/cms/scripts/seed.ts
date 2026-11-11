@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url'
 
 import { getPayload, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
 import config from '@payload-config'
-import { convertMarkdownToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 
 import type { ImportError } from '../src/imports/csv'
 import { readPeopleFile } from '../src/imports/people'
@@ -106,24 +105,11 @@ const seed = async (payload: Payload) => {
     }
   }
 
-  const editorConfig = await editorConfigFactory.default({ config: payload.config })
-  const richText = (markdown: string) => convertMarkdownToLexical({ editorConfig, markdown })
   const roleIds = new Map<string, number>()
   for (const role of data.roles) {
     let id = await findId(payload, 'roller', { name: { equals: role.name } })
     if (!id) {
-      id = (
-        await payload.create({
-          collection: 'roller',
-          data: {
-            name: role.name,
-            role: richText(role.role),
-            responsibility: richText(role.responsibility),
-            authority: richText(role.authority),
-            tasks: richText(role.tasks),
-          },
-        })
-      ).id
+      id = (await payload.create({ collection: 'roller', data: role })).id
       count('roller')
     }
     roleIds.set(role.name, id)

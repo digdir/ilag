@@ -26,8 +26,7 @@ export const leaders = [
   { unit: '10014301', person: '1008' }, // FEL - Arkitektur og produktutvikling
 ]
 
-// RAMO from Vedlegg 7 in the specification, as Markdown; the seed turns it
-// into rich text.
+// RAMO from Vedlegg 7 in the specification.
 export const roles = [
   {
     name: 'Teameier',

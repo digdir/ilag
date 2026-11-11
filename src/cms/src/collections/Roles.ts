@@ -39,22 +39,22 @@ export const Roles: CollectionConfig = {
     {
       name: 'role',
       label: 'Rolle',
-      type: 'richText',
+      type: 'textarea',
     },
     {
       name: 'responsibility',
       label: 'Ansvar',
-      type: 'richText',
+      type: 'textarea',
     },
     {
       name: 'authority',
       label: 'Myndighet',
-      type: 'richText',
+      type: 'textarea',
     },
     {
       name: 'tasks',
       label: 'Oppgaver',
-      type: 'richText',
+      type: 'textarea',
     },
   ],
 }
