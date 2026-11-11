@@ -1,0 +1,51 @@
+orgEnhet,Betegnelse på organisasjonsenh,Koststed,Avdeling,Seksjon,gruppe
+10008925,Digitaliseringsdirektoratet,1000,Digitaliseringsdirektoratet,Digitaliseringsdirektoratet,
+10003925,Kommunikasjon,1200,KOM,KOM,
+10014625,KOM – Gruppe Nett og innhold,1200,KOM,KNI,
+10014575,KI Norge,1600,KIN,KIN,
+10004805,Tilsyn for universell utforming av IKT,1300,TUU,TUU,
+10011800,TUU- seksjon for tilsyn,1310,TUU,TUS,
+10012275,TUU- Seksjon for Data,1320,TUU,TUD,
+10002026,Virksomhetsstyring,1400,VIS,VIS,
+10010526,VIS- Økonomi,1410,VIS,VOK,
+10003803,VIS- Innkjøp og drift,1420,VIS,VID,
+10003851,VIS- Arkiv og dokumentforvaltning,1430,VIS,VAD,
+10011625,VIS- Sikkerhet og beredskap,1440,VIS,VSB,
+10014200,VIS- Strategi og styring,1450,VIS,VSS,
+10012375,VIS- HR,1500,VIS,HR,
+10008675,Digital strategi og samordning,2100,DSS,DSS,
+10009528,DSS1,2110,DSS,DS1,
+10012376,DSS2,2130,DSS,DS2,
+10012377,DSS3,2140,DSS,DS3,
+10002030,Sammenhengende tjenester og livshendelse,6100,STL,STL,
+10008625,STL -Seksjon 1,6110,STL,ST1,
+10004806,STL- Seksjon 2,6120,STL,ST2,
+10002031,Fellesløsninger,7100,FEL,FEL,
+10006700,FEL - Strategi og forretningsutvikling,7110,FEL,FSF,
+10014300,FEL - Styring og utredning,7110,FEL,FSF,FSU
+10014301,FEL - Arkitektur og produktutvikling,7110,FEL,FSF,FAP
+10003276,FEL - Utvikling,7120,FEL,FUT,
+10014302,FEL – Backend,7120,FEL,FUT,FBA
+10014303,FEL – Frontend,7120,FEL,FUT,FFR
+10014304,FEL – Fullstack,7120,FEL,FUT,FFU
+10003277,FEL- Forvaltning og kundeoppfølging,7130,FEL,FFK,
+10003275,FEL - Brukerstøtte og service,7140,FEL,FBS,
+10004600,FEL- Drift og sikkerhet,7150,FEL,FDS,
+10014306,FEL – Marked,7160,FEL,FMA,
+10011026,Brukeropplevelse og datadeling,7200,BOD,BOD,
+10011056,BOD - Strategi og forretningsutvikling,7210,BOD,BSF,
+10011057,BOD - DevOps Oslo,7220,BOD,BDO,
+10014126,BOD - DevOps Oslo Gruppe TechSec,7220,BOD,BDO,BDOT
+10014425,BOD - DevOps Oslo Gruppe Dev 1,7220,BOD,BDO,BDO1
+10014600,BOD - DevOps Oslo Gruppe Dev 2,7220,BOD,BDO,BDO2
+10011055,BOD - Brukerstøtte og tjenesteoppfølging,7240,BOD,BBT,
+10013956,BOD - Gruppe brukerstøtte,7240,BOD,BBT,BGB
+10012378,BOD - Brukeropplevelse,7250,BOD,BBO,
+10014090,BOD – Interaksjonsdesign,7250,BOD,BBO,BB1
+10013950,BOD - DevOps Brønnøysund,7260,BOD,BDB,
+10013952,BOD - DevOps Gruppe Dev,7260,BOD,BDB,BDD
+10013955,BOD - Produkteier,7260,BOD,BDB,BPR
+10013953,BOD - DevOps Gruppe Techsec,7260,BOD,BDB,BDT
+10013954,BOD - Styring og støtte,7270,BOD,BSS,
+10014426,BOD - Styring,7230,BOD,BSS,BST
+10013301,BOD-ekstern,7200,BOD-ekstern,BEK,

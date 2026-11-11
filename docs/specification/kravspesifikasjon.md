@@ -462,13 +462,17 @@ Tilbakemeldinger skal gjøre det enkelt å melde fra om feil og mangler, og sikr
 ### 4.1 Entiteter
 Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplett, men understøtter kravene og funksjonaliteten diskutert så langt.
 
-- **Team** – jobber sammen om leveranser. Kan være produktteam, prosjektteam, støtteteam etc.
+- **Team** – jobber sammen om leveranser. Har én teamtype.
+
+- **Teamtype** – type team, med navn og kjennetegn (jf. TK-01): prosjektteam, støtteteam, leveranseteam, produktteam og fagnettverk. Teamtypene vedlikeholdes i ilag av en administrator.
+
+- **Teammedlemskap** – at en person er med i et team, og hvilke roller personen har i teamet. En person har høyst ett medlemskap per team, med én eller flere roller.
 
 - **Enhet** – gruppe i linjeorganisasjonen (direktorat/divisjon/avdeling/seksjon). Øverst er direktoratet selv. En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå og overordnet enhet hentes fra Digdirs autoritative kilde (jf. NF-07). Lederen registreres foreløpig i ilag av en administrator.
 
 - **Person** – ansatt eller innleid i Digdir som inngår i ett eller flere team, prosjekter eller enheter, tilknyttet én lokasjon. Personen er merket som ansatt eller innleid, og som aktiv eller sluttet. Opplysningene hentes fra Digdirs autoritative kilde (jf. NF-07).
 
-- **Rolle** – funksjon en person har, inkludert navn og beskrivelse (f.eks. teamleder, produkteier, prosjektleder, prosjektdeltager)
+- **Rolle** – funksjon en person har, inkludert navn og beskrivelse (f.eks. teamleder, produkteier, prosjektleder, prosjektdeltager). Knyttes til teamtypene rollen er relevant for (jf. RO-03).
 
 - **Prosjekt** – definisjonen av et prosjekt med navn, mandat, start-/sluttdato etc. Kan ha et eller flere team tilknyttet.
 
@@ -496,9 +500,11 @@ erDiagram
     Enhet }o--o| Enhet : "hører til"
     Lokasjon ||--|{ Person : "hører til"
     Person }o--o{ Enhet : "er ansatt i"
-    Person }o--o{ Team : "hører til"
-    Person }o--o{ Rolle : "har"
-    Rolle }o--o{ Team : "hører til"
+    Person ||--o{ Teammedlemskap : "har"
+    Team ||--o{ Teammedlemskap : "har"
+    Teamtype ||--o{ Team : "har"
+    Rolle }o--o{ Teamtype : "er relevant for"
+    Teammedlemskap }o--|{ Rolle : "med"
     Rolle }o--o{ Prinsipp : "hører til"
     Prinsipp }o--o{ Enhet : "hører til"
     Prinsipp }o--o{ Team : "hører til"

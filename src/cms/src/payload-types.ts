@@ -72,6 +72,10 @@ export interface Config {
     personer: Person;
     lokasjoner: Location;
     enheter: Unit;
+    roller: Role;
+    teamtyper: TeamType;
+    team: Team;
+    teammedlemskap: TeamMembership;
     importkjoringer: ImportRun;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -80,12 +84,21 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    personer: {
+      teams: 'teammedlemskap';
+    };
     lokasjoner: {
       people: 'personer';
     };
     enheter: {
       children: 'enheter';
       people: 'personer';
+    };
+    teamtyper: {
+      roles: 'roller';
+    };
+    team: {
+      members: 'teammedlemskap';
     };
   };
   collectionsSelect: {
@@ -94,6 +107,10 @@ export interface Config {
     personer: PersonerSelect<false> | PersonerSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
+    roller: RollerSelect<false> | RollerSelect<true>;
+    teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -229,6 +246,11 @@ export interface Person {
   active: boolean;
   mobile?: string | null;
   photo?: (number | null) | Media;
+  teams?: {
+    docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -271,6 +293,67 @@ export interface Unit {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap".
+ */
+export interface TeamMembership {
+  id: number;
+  team: number | Team;
+  person: number | Person;
+  roles: (number | Role)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  description?: string | null;
+  teamType: number | TeamType;
+  active: boolean;
+  members?: {
+    docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper".
+ */
+export interface TeamType {
+  id: number;
+  name: string;
+  description?: string | null;
+  roles?: {
+    docs?: (number | Role)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roller".
+ */
+export interface Role {
+  id: number;
+  name: string;
+  role?: string | null;
+  responsibility?: string | null;
+  authority?: string | null;
+  tasks?: string | null;
+  teamTypes?: (number | TeamType)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -454,6 +537,22 @@ export interface PayloadLockedDocument {
         value: number | Unit;
       } | null)
     | ({
+        relationTo: 'roller';
+        value: number | Role;
+      } | null)
+    | ({
+        relationTo: 'teamtyper';
+        value: number | TeamType;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
+      } | null)
+    | ({
+        relationTo: 'teammedlemskap';
+        value: number | TeamMembership;
+      } | null)
+    | ({
         relationTo: 'importkjoringer';
         value: number | ImportRun;
       } | null);
@@ -576,6 +675,7 @@ export interface PersonerSelect<T extends boolean = true> {
   active?: T;
   mobile?: T;
   photo?: T;
+  teams?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -604,6 +704,55 @@ export interface EnheterSelect<T extends boolean = true> {
   active?: T;
   children?: T;
   people?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roller_select".
+ */
+export interface RollerSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  responsibility?: T;
+  authority?: T;
+  tasks?: T;
+  teamTypes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper_select".
+ */
+export interface TeamtyperSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  teamType?: T;
+  active?: T;
+  members?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap_select".
+ */
+export interface TeammedlemskapSelect<T extends boolean = true> {
+  team?: T;
+  person?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
 }

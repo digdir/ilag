@@ -116,11 +116,12 @@ CMS `:3000`, frontend `:4321`, PostgreSQL `:5432` (Docker).
 | --- | --- |
 | `pnpm setup` | Creates `.env` files. Safe to re-run. |
 | `pnpm db:up` | Starts PostgreSQL. `db:reset` destroys the volume and all data. |
+| `pnpm db:seed` | Test data: units and people from `src/cms/scripts/seed-files/*.csv` through the import, the rest from `seed-data.ts`, and the administrator `admin@example.com` with the password `ilag`. `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
 | `pnpm dev` | Both apps. `pnpm dev:stop` stops leftovers. |
 | `pnpm lint` | ESLint for the CMS. |
 | `pnpm test` | CMS integration + frontend tests. Needs the database up. |
 | `pnpm test:e2e` | Playwright. Needs `pnpm --filter cms exec playwright install chromium` once. |
-| `pnpm generate:types` | Run after every change to a collection — regenerates types and copies them into `src/shared`. |
+| `pnpm generate:types` | Run after every change to a collection — regenerates types and copies them into `src/shared`. Then update the seed data. |
 | `pnpm make-admin <email>` | Makes an existing user an administrator. |
 
 ## Database schema
@@ -130,6 +131,15 @@ configs are applied on startup, with no migration files. Adding fields is safe;
 removing a field or collection drops its column or table and the data in it.
 Once the content model settles, snapshot it with
 `pnpm --filter cms payload migrate:create`.
+
+Keep the test data in step with the collections. When a collection or field is
+added, renamed or removed, update `src/cms/scripts/seed-data.ts` (and `seed.ts`
+if needed) in the same change, and check it with `pnpm db:seed:reset`. A new
+collection gets test data there too, unless it is filled some other way. Units
+and people come from the CSV files in `src/cms/scripts/seed-files/`, in the
+format of the [import contracts](docs/integrations/), and go through the import:
+change the files, not the collections, and keep them in step with the contracts.
+`enheter.csv` is Ansattmottak's example org file; `personer.csv` is made up.
 
 ## Conventions
 
