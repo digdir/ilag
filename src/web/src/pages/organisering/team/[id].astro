@@ -27,12 +27,12 @@ const isOwner = (m: { roles: string[] }) => m.roles.includes('Teameier')
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">
-              <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
-              <MemberList members={team.members.filter((m) => !isOwner(m))} />
-            </section>
-            <section class="ds-card" data-color="neutral">
               <h2 class="ds-heading" data-size="sm">Teameier</h2>
               <TeamOwner owners={team.members.filter(isOwner)} />
+            </section>
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
+              <MemberList members={team.members.filter((m) => !isOwner(m))} />
             </section>
           </div>
         </>
@@ -62,9 +62,8 @@ const isOwner = (m: { roles: string[] }) => m.roles.includes('Teameier')
   }
 
   .sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--ds-size-6);
-    align-items: start;
   }
 </style>

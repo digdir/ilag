@@ -38,7 +38,7 @@ describe('team page', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
 
     const html = await (await render('7')).text()
-    const [members, owner] = html.split('Teameier</h2>')
+    const [owner, members] = html.split('Hvem er vi?</h2>')
 
     expect(members).not.toContain('Magnus Johansen')
     expect(owner).toContain('Magnus Johansen')
