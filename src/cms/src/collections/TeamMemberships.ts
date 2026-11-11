@@ -25,10 +25,6 @@ export const TeamMemberships: CollectionConfig = {
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),
   },
-  // Keeps every earlier version, so the admin panel shows who changed a
-  // member's roles and when. Payload deletes the versions with the membership,
-  // so this is a change log, not a record of who has been in the team.
-  versions: true,
   indexes: [{ fields: ['team', 'person'], unique: true }],
   fields: [
     {
