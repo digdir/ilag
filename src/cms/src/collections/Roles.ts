@@ -2,9 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 
-// Roles a person can have in a team (RO-01), such as teamleder or produkteier.
-// Administrators maintain them (RO-07). The RAMO description (RO-02) and which
-// team types a role is relevant for (RO-03) come later.
+// Roles a person can have in a team (RO-01), such as teamleder or produkteier,
+// described after RAMO: rolle, ansvar, myndighet og oppgaver (RO-02).
+// Administrators maintain them (RO-07). Which team types a role is relevant
+// for (RO-03) comes later.
 export const Roles: CollectionConfig = {
   slug: 'roller',
   dbName: 'roles',
@@ -17,7 +18,7 @@ export const Roles: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'description'],
+    defaultColumns: ['name'],
   },
   access: {
     read: ({ req }) => Boolean(req.user),
@@ -33,9 +34,26 @@ export const Roles: CollectionConfig = {
       required: true,
       unique: true,
     },
+    // RAMO. Not required, so a role can be created first and described later.
     {
-      name: 'description',
-      type: 'textarea',
+      name: 'role',
+      label: 'Rolle',
+      type: 'richText',
+    },
+    {
+      name: 'responsibility',
+      label: 'Ansvar',
+      type: 'richText',
+    },
+    {
+      name: 'authority',
+      label: 'Myndighet',
+      type: 'richText',
+    },
+    {
+      name: 'tasks',
+      label: 'Oppgaver',
+      type: 'richText',
     },
   ],
 }

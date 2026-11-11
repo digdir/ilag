@@ -302,23 +302,43 @@ export const people = [
   },
 ] as const
 
+// RAMO from Vedlegg 7 in the specification, as Markdown; the seed turns it
+// into rich text.
 export const roles = [
   {
     name: 'Teameier',
-    description:
-      'Sikrer at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    role: 'Formelt utpekt som teameier ved etablering av teamet. Teameiere bør ha personalansvar for flere av teammedlemmene og/eller et tyngre fagansvar og risikoeierskap rundt teamets leveranser.',
+    responsibility: 'Sikre at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
+    tasks:
+      'Definere mål og forventninger, godkjenne mandat og teamkontrakt, sikre linjeforankring og riktig bemanning (i dialog med andre linjeledere), evaluere teamets måloppnåelse og tilrettelegge for samspill med andre team. Tett dialog med teamleder.',
   },
   {
     name: 'Teamleder',
-    description: 'Leder teamets daglige arbeid og måloppnåelse innenfor mandatet.',
+    role: 'Formelt utpekt som teamleder ved etablering av teamet.',
+    responsibility: 'Lede teamets daglige arbeid og måloppnåelse innenfor mandatet.',
+    authority:
+      'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med teamets mandat og teamkontrakt.',
+    tasks:
+      'Planlegge, koordinere, følge opp fremdrift og leveranser, rapportere til teameier, tilrettelegge for faglig medarbeiderutvikling.',
   },
   {
     name: 'Teammedlem',
-    description: 'Leverer faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
+    role: 'Formelt utpekt som teammedlemmer ved etablering av teamet, eller evt. lagt til underveis ved behov.',
+    responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
+    authority:
+      'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
+    tasks:
+      'Bidra til felles planlegging og vurderinger samt utføre oppgaver og sikre faglig kvalitet/etterlevelse av krav innenfor med eget kompetanseområde (utvikler, designer, jurist, osv.).',
   },
   {
     name: 'Produkteier',
-    description: 'Sikrer at produktteamet jobber med de riktige behovene og prioriteringene.',
+    role: 'Produktteam bør ha produkteier, enten kombinert med teamlederrollen eller som egen rolle i tillegg. Rollen utøves i tråd med anbefaling for produktorganisering i offentlig sektor. Begrepet produktleder brukes ikke i Digdir.',
+    responsibility:
+      'Sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer, slik at produktet utvikles og forbedres over tid på en måte som gir verdi for brukerne og bidrar til ønskede nytteverdier for virksomheten og samfunnet.',
+    authority: 'Forvalte og prioritere produktkøen innenfor produktets mål, mandat og rammer.',
+    tasks:
+      'Forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
   },
 ]
 
