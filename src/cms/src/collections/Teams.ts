@@ -1,7 +1,7 @@
 import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-import { teamTypeField } from '../fields/teamType'
+import { isSignedIn } from '../access/isSignedIn'
 
 // A team's memberships mean nothing without the team, and point at it with a
 // required relationship, so they go first.
@@ -31,7 +31,7 @@ export const Teams: CollectionConfig = {
     defaultColumns: ['name', 'teamType', 'active'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),
@@ -51,8 +51,13 @@ export const Teams: CollectionConfig = {
       name: 'description',
       type: 'textarea',
     },
-    // TO-02.
-    teamTypeField({ required: true }),
+    {
+      // TO-02.
+      name: 'teamType',
+      type: 'relationship',
+      relationTo: 'teamtyper',
+      required: true,
+    },
     {
       // False once the team is closed. Kept rather than deleted, so its
       // history survives.

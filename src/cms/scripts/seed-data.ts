@@ -1,332 +1,181 @@
-// Test data for `pnpm db:seed`. Made up, and shaped like what the SAP import
-// will send (docs/integrations/people-import.md, unit-import.md). Email
-// addresses use example.com, so nobody can mistake a test person for a real
-// one. Each record has a key the seed finds it by: the location's code, the
-// unit's externalUnitId, the person's employeeNumber, the role's and the
-// team's name.
+// Test data for `pnpm db:seed`. Units and people come as the files from
+// Ansattmottak, in seed-files/, and go through the import
+// (docs/integrations/unit-import.md, people-import.md). enheter.csv is
+// Ansattmottak's example org file; personer.csv is made up, with email
+// addresses at example.com so nobody can mistake a test person for a real
+// one. What isn't in the files is here. Each record has a key the seed finds
+// it by: the location's code, the role's and the team's name.
 
+// The people file's 0001BTRTL refers to these codes.
 export const locations = [
-  { code: 'LEI', name: 'Leikanger' },
-  { code: 'OSL', name: 'Oslo' },
-  { code: 'BRY', name: 'Brønnøysund' },
+  { code: 'LEIK', name: 'Leikanger' },
+  { code: 'OSLO', name: 'Oslo' },
+  { code: 'BRØN', name: 'Brønnøysund' },
 ]
 
-// Parents before children.
-export const units = [
-  {
-    externalUnitId: '10000001',
-    name: 'Digitaliseringsdirektoratet',
-    level: 'directorate',
-    parent: null,
-    leader: '1001',
-  },
-  {
-    externalUnitId: '10000010',
-    name: 'Divisjon for fellesløsninger',
-    code: 'FEL',
-    level: 'division',
-    parent: '10000001',
-    leader: '1002',
-  },
-  {
-    externalUnitId: '10000020',
-    name: 'Divisjon for samordning',
-    code: 'SAM',
-    level: 'division',
-    parent: '10000001',
-    leader: '1003',
-  },
-  {
-    externalUnitId: '10000011',
-    name: 'Avdeling for innlogging og tilgang',
-    code: 'IOT',
-    level: 'department',
-    parent: '10000010',
-    leader: '1004',
-  },
-  {
-    externalUnitId: '10000012',
-    name: 'Avdeling for skjema og tjenester',
-    code: 'SOT',
-    level: 'department',
-    parent: '10000010',
-    leader: '1005',
-  },
-  {
-    externalUnitId: '10000021',
-    name: 'Avdeling for styring og strategi',
-    code: 'SOS',
-    level: 'department',
-    parent: '10000020',
-    leader: '1006',
-  },
-  {
-    externalUnitId: '10000111',
-    name: 'Seksjon for utvikling',
-    code: 'UTV',
-    level: 'section',
-    parent: '10000011',
-    leader: '1007',
-  },
-  {
-    externalUnitId: '10000121',
-    name: 'Seksjon for brukerinnsikt',
-    code: 'BIN',
-    level: 'section',
-    parent: '10000012',
-    leader: '1008',
-  },
-] as const
+// Unit leaders, which administrators set in ilag: the unit's orgEnhet and
+// the leader's employee number.
+export const leaders = [
+  { unit: '10008925', person: '1001' }, // Digitaliseringsdirektoratet
+  { unit: '10002031', person: '1002' }, // Fellesløsninger
+  { unit: '10008675', person: '1003' }, // Digital strategi og samordning
+  { unit: '10003276', person: '1004' }, // FEL - Utvikling
+  { unit: '10006700', person: '1005' }, // FEL - Strategi og forretningsutvikling
+  { unit: '10009528', person: '1006' }, // DSS1
+  { unit: '10014302', person: '1007' }, // FEL – Backend
+  { unit: '10014301', person: '1008' }, // FEL - Arkitektur og produktutvikling
+]
 
-// Managers before the people they lead, though the seed doesn't depend on it.
-export const people = [
-  {
-    employeeNumber: '1001',
-    externalId: 'IBERG',
-    firstName: 'Ingrid',
-    lastName: 'Berg',
-    title: 'Direktør',
-    locationCode: 'OSL',
-    unit: '10000001',
-    manager: null,
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1002',
-    externalId: 'KNORDMANN',
-    firstName: 'Kari',
-    lastName: 'Nordmann',
-    title: 'Divisjonsdirektør',
-    locationCode: 'LEI',
-    unit: '10000010',
-    manager: '1001',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1003',
-    externalId: 'OHANSEN',
-    firstName: 'Ola',
-    lastName: 'Hansen',
-    title: 'Divisjonsdirektør',
-    locationCode: 'OSL',
-    unit: '10000020',
-    manager: '1001',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1004',
-    externalId: 'SLARSEN',
-    firstName: 'Silje',
-    lastName: 'Larsen',
-    title: 'Avdelingsdirektør',
-    locationCode: 'LEI',
-    unit: '10000011',
-    manager: '1002',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1005',
-    externalId: 'MJOHANSEN',
-    firstName: 'Magnus',
-    lastName: 'Johansen',
-    title: 'Avdelingsdirektør',
-    locationCode: 'BRY',
-    unit: '10000012',
-    manager: '1002',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1006',
-    externalId: 'NPEDERSEN',
-    firstName: 'Nora',
-    lastName: 'Pedersen',
-    title: 'Avdelingsdirektør',
-    locationCode: 'OSL',
-    unit: '10000021',
-    manager: '1003',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1007',
-    externalId: 'ANILSEN',
-    firstName: 'Anders',
-    lastName: 'Nilsen',
-    title: 'Seksjonssjef',
-    locationCode: 'LEI',
-    unit: '10000111',
-    manager: '1004',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1008',
-    externalId: 'EKRISTIANSEN',
-    firstName: 'Emma',
-    lastName: 'Kristiansen',
-    title: 'Seksjonssjef',
-    locationCode: 'BRY',
-    unit: '10000121',
-    manager: '1005',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1009',
-    externalId: 'JOLSEN',
-    firstName: 'Jonas',
-    lastName: 'Olsen',
-    title: 'Seniorrådgiver',
-    locationCode: 'LEI',
-    unit: '10000111',
-    manager: '1007',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1010',
-    externalId: 'SANDERSEN',
-    firstName: 'Sara',
-    lastName: 'Andersen',
-    title: 'Seniorrådgiver',
-    locationCode: 'LEI',
-    unit: '10000111',
-    manager: '1007',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1011',
-    externalId: 'HSOLBERG',
-    firstName: 'Henrik',
-    lastName: 'Solberg',
-    title: 'Rådgiver',
-    locationCode: 'OSL',
-    unit: '10000111',
-    manager: '1007',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1012',
-    externalId: 'IHAUGEN',
-    firstName: 'Ida',
-    lastName: 'Haugen',
-    title: 'Seniorrådgiver',
-    locationCode: 'BRY',
-    unit: '10000121',
-    manager: '1008',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1013',
-    externalId: 'MBAKKE',
-    firstName: 'Martin',
-    lastName: 'Bakke',
-    title: 'Rådgiver',
-    locationCode: 'BRY',
-    unit: '10000121',
-    manager: '1008',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1014',
-    externalId: 'TMOEN',
-    firstName: 'Thea',
-    lastName: 'Moen',
-    title: 'Seniorrådgiver',
-    locationCode: 'OSL',
-    unit: '10000021',
-    manager: '1006',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1015',
-    externalId: 'EDAHL',
-    firstName: 'Erik',
-    lastName: 'Dahl',
-    title: 'Rådgiver',
-    locationCode: 'OSL',
-    unit: '10000021',
-    manager: '1006',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1016',
-    externalId: 'LRUUD',
-    firstName: 'Linnea',
-    lastName: 'Ruud',
-    title: 'Seniorrådgiver',
-    locationCode: 'LEI',
-    unit: '10000011',
-    manager: '1004',
-    isEmployee: true,
-  },
-  {
-    employeeNumber: '1017',
-    externalId: 'SLIE',
-    firstName: 'Sander',
-    lastName: 'Lie',
-    title: 'Utvikler',
-    locationCode: 'OSL',
-    unit: '10000111',
-    manager: '1007',
-    isEmployee: false,
-  },
-  {
-    employeeNumber: '1018',
-    externalId: 'VHALVORSEN',
-    firstName: 'Vilde',
-    lastName: 'Halvorsen',
-    title: 'Interaksjonsdesigner',
-    locationCode: 'OSL',
-    unit: '10000121',
-    manager: '1008',
-    isEmployee: false,
-  },
-  {
-    employeeNumber: '1019',
-    externalId: 'AODEGARD',
-    firstName: 'Åse',
-    lastName: 'Ødegård',
-    title: 'Utvikler',
-    locationCode: 'LEI',
-    unit: '10000111',
-    manager: '1007',
-    isEmployee: false,
-  },
-  {
-    employeeNumber: '1020',
-    externalId: 'PSTRAND',
-    firstName: 'Petter',
-    lastName: 'Strand',
-    title: 'Seniorrådgiver',
-    locationCode: 'BRY',
-    unit: '10000012',
-    manager: '1005',
-    isEmployee: true,
-  },
-] as const
-
+// The roles in the prototype, with RAMO as it shows them (ROLES, ROLE_EXTRA,
+// LINE_MANAGER, AREA_OWNER, EMPLOYEE and AI_AGENT in prototype/Saman.dc.html).
 export const roles = [
   {
     name: 'Teameier',
-    description:
-      'Sikrer at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    role: 'Formelt utpekt som teameier ved etablering av teamet. Teameiere bør ha personalansvar for flere av teammedlemmene og/eller et tyngre fagansvar og risikoeierskap rundt teamets leveranser. For team som hører til et innsatsområde vil teameieren fortsatt måtte sørge for at teamet har de nødvendige rammene til å kunne levere, men teameierens ansvar, myndighet og oppgaver vil være avgrenset til drift/linjeoppgaver som ligger i teamet, mens områdeansvarlig vil styre ny utvikling og samkjøringsaktiviteter som kommer via innsatsområdet. Teameier og områdeansvarlig må formelt avtale kapasitetsfordeling og evt. endringer i mandat seg i mellom når et team går inn i et innsatsområde.',
+    responsibility:
+      'Sikre at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
+    tasks:
+      'Definere mål og forventninger, godkjenne mandat og teamkontrakt, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere teamets måloppnåelse og tilrettelegge for samspill med andre team. Tett dialog med teamleder.',
   },
   {
     name: 'Teamleder',
-    description: 'Leder teamets daglige arbeid og måloppnåelse innenfor mandatet.',
+    role: 'Formelt utpekt som teamleder ved etablering av teamet.',
+    responsibility: 'Lede teamets daglige arbeid og måloppnåelse innenfor mandatet.',
+    authority:
+      'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med teamets mandat og teamkontrakt.',
+    tasks:
+      'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til teameier og tilrettelegge for faglig medarbeiderutvikling.',
   },
   {
     name: 'Teammedlem',
-    description: 'Leverer faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
+    role: 'Formelt utpekt som teammedlem ved etablering av teamet, eller lagt til underveis ved behov.',
+    responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
+    authority:
+      'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
+    tasks:
+      'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
   },
   {
     name: 'Produkteier',
-    description: 'Sikrer at produktteamet jobber med de riktige behovene og prioriteringene.',
+    role: 'Produktteam bør ha produkteier, enten kombinert med teamlederrollen eller som egen rolle i tillegg. Rollen utøves i tråd med anbefaling for produktorganisering i offentlig sektor. Begrepet produktleder brukes ikke i Digdir.',
+    responsibility:
+      'En produkteier har ansvar for å sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer. Rollen skal bidra til at produktet utvikles og forbedres over tid på en måte som gir verdi for brukerne og bidrar til ønskede nytteverdier for virksomheten og samfunnet.',
+    authority: 'Forvalter og prioriterer produktkøen innenfor produktets mål, mandat og rammer.',
+    tasks:
+      'Produkteieren har vanligvis ansvar for å forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
+  },
+  {
+    name: 'Fagkoordinator',
+    role: 'Utpekt som koordinator for fagnettverket. Et fagnettverk har ikke teamleder, siden det ikke svarer for en felles leveranse. Koordinatoren er registrert i teamoversikten.',
+    responsibility:
+      'Ansvar for at nettverket har et tydelig formål, relevant aktivitet og verdi for deltakerne.',
+    authority:
+      'Beslutter møteform, tema og hvordan kunnskap deles, innenfor formålet nettverket er opprettet for. Kan ikke pålegge deltakerne oppgaver eller leveranser.',
+    tasks:
+      'Legge til rette for aktivitet, kalle inn og fasilitere samlinger, avklare hvem nettverket er for og hvordan deltakelse fungerer, og sørge for at kunnskap, erfaringer og praksis deles videre.',
+  },
+  {
+    name: 'Prosjekteier',
+    role: 'Formelt utpekt som prosjekteier ved etablering av prosjektet.',
+    responsibility:
+      'Sikre at prosjektet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
+    authority: 'Fastsette mandat, mål/OKR, budsjett og prioriteringer på overordnet nivå.',
+    tasks:
+      'Definere mål og forventninger, godkjenne mandat, sikre linjeforankring og riktig bemanning i dialog med andre linjeledere, evaluere prosjektets måloppnåelse og tilrettelegge for samspill med andre prosjekter. Tett dialog med prosjektleder.',
+  },
+  {
+    name: 'Prosjektleder',
+    role: 'Formelt utpekt som prosjektleder ved etablering av prosjektet.',
+    responsibility: 'Lede prosjektets daglige arbeid og måloppnåelse innenfor mandatet.',
+    authority:
+      'Prioritere daglige aktiviteter, fordele arbeid og følge opp leveranser og kvalitet i tråd med prosjektets mandat.',
+    tasks:
+      'Planlegge, koordinere, følge opp framdrift og leveranser, rapportere til prosjekteier og tilrettelegge for faglig medarbeiderutvikling.',
+  },
+  {
+    name: 'Prosjektdeltaker',
+    role: 'Formelt utpekt som prosjektdeltaker ved etablering av prosjektet, eller lagt til underveis ved behov.',
+    responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med prosjektets mål og mandat.',
+    authority:
+      'Gi faglige anbefalinger og ta faglige avgjørelser innenfor delegert fagområde og avtalte rammer.',
+    tasks:
+      'Bidra til felles planlegging og vurderinger, utføre oppgaver og sikre faglig kvalitet innenfor eget kompetanseområde: utvikler, designer, jurist og så videre.',
+  },
+  {
+    name: 'Linjeleder',
+    role: 'Formelt ansatt som divisjonsdirektør, avdelingsleder eller seksjonsleder med personalansvar.',
+    responsibility:
+      'Er ressurseier, har arbeidsgiveransvaret og beslutningsmyndighet i arbeidsforholdet. Har fagansvar og budsjettansvar. Bygger og sikrer riktig kompetansekapasitet basert på behov i linja og i innsatsområdene, sørger for ressurstildeling (allokering). Setter retning og fart på det arbeidet som skal løses i linja. Ivaretar personalansvar og medarbeiderutvikling. Leder strategisk rekruttering og omstilling (kompetanseutvikling).',
+    authority:
+      'Godkjenner ansettelser og oppsigelser. Setter lønn, godkjenner ferie og fravær. Godkjenner kurs, sertifiseringer og opplæringsbudsjetter og rollebeskrivelser. Bestemmer endelig ressurstildeling ved konflikter.',
+    tasks:
+      'Gjennomfører medarbeidersamtaler og lønnssamtaler. Følger opp sykefravær og HR-prosesser. Planlegger langsiktige kompetanseløp og kurs. Kjører rekrutteringsprosesser. Matcher konsulenter/ansatte mot ressursforespørsler.',
+  },
+  {
+    name: 'Områdeansvarlig',
+    role: 'Oppnevnt av TLG for ett strategisk innsatsområde, for en tidsavgrenset mandatperiode (evalueres årlig). Rapporterer til Frode og er medlem av porteføljestyret. Hører personalmessig til VSU (Strategi og styring). Er ikke linjeleder og har ikke personalansvar.',
+    responsibility:
+      'Sikre at summen av det Digdir gjør innen innsatsområdet gir ønsket effekt, innenfor avtalt mandat, økonomiske rammer og ressursallokering. Leveranseansvaret ligger imidlertid hos de teamene som er knyttet til innsatsområdet.',
+    authority:
+      'Sette retning og prioritere mål, tiltak og behov innenfor sitt innsatsområde. Disponere dedikerte ressurser og midler tildelt området, og prioritere innenfor avtalte bidrag fra linjen. Kan ikke ensidig øke linjens bidrag eller styre teamenes daglige arbeid.',
+    tasks:
+      'Konkretisere effektmål/OKR for innsatsområdet, holde et samlet porteføljebilde for området, avtale bidrag med linjeledere, vurdere virkemiddelbruken, varsle når målene er truet og gi porteføljestyret beslutningsgrunnlag. Tett dialog med linjeledere/teameiere, produkteiere og teamledere.',
+  },
+  {
+    name: 'Medarbeider',
+    role: 'Formelt ansatt under en divisjonsdirektør, avdelingsleder eller seksjonsleder.',
+    responsibility:
+      'Utfører arbeidsoppgaver og leverer på avtalte mål. Utviser faglig skjønn innenfor eget ansvarsområde (fagområde). Melder fra om eventuelle risikoer og avvik, kapasitet og belastning og om kompetansen brukes på riktig måte. Tar et aktivt medansvar for egen kompetanseutvikling ved å identifisere egne læringsbehov, søke ny kunnskap og ta initiativ til å utvikle ferdigheter som bidrar til faglig vekst og bedre oppgaveløsning. Og samarbeider med andre til forbedring av leveranser og arbeidsmåter.',
+    authority:
+      'Tar beslutninger innenfor eget ansvarsområde (fagområde). Eskalerer til relevant leder ang. ev. risiko og avvik.',
+    tasks:
+      'Utfører avtalte arbeidsoppgaver. Oppfyller avtalte forpliktelser om kompetanseheving. Bidrar til forbedring av leveranser, og måten vi jobber på.',
+  },
+  {
+    name: 'KI-agent',
+    role: 'Kunstig intelligens som deltar i teamets arbeid som støtte, ikke som medlem. Rollen er aktuell for alle team.',
+    responsibility: 'Støtte kunnskapsarbeid og effektivisering',
+    authority: 'Ingen formell avgjerdsmynde',
+    tasks:
+      'Analyse, samanfatting, utkast til dokument, idéutvikling, informasjonsinnhenting og automatisert støtte',
   },
 ]
 
-// Members by employeeNumber, with their roles by name.
+// The team types in TK-01, described as in the prototype.
+export const teamTypes = [
+  {
+    name: 'Prosjektteam',
+    description:
+      'Et prosjektteam etableres for å løse en avgrenset oppgave med et definert mål og en tydelig avslutning. Når målet er nådd og oppgaven er løst, kan teamet oppløses.',
+  },
+  {
+    name: 'Støtteteam',
+    description:
+      'Et støtteteam har et varig ansvar for å skape verdi internt i Digdir, slik at medarbeidere, ledere og andre team kan løse sine oppgaver på en effektiv og god måte.',
+  },
+  {
+    name: 'Leveranseteam',
+    description:
+      'Et leveranseteam har et varig og helhetlig ansvar for en definert leveranse som skaper verdi utenfor Digdir. Teamet skal kjenne behovene til brukerne og bruke innsikten til å utvikle, levere og forbedre leveransen over tid.',
+  },
+  {
+    name: 'Produktteam',
+    description:
+      'Et produktteam er et leveranseteam med varig og helhetlig ansvar for ett eller flere produkter. Teamet skal ha tilstrekkelig kompetanse, myndighet og handlingsrom til å prioritere ut fra brukerbehov, mål og ønskede effekter.',
+  },
+  {
+    name: 'Fagnettverk',
+    description:
+      'Et fagnettverk samler personer som har et felles fagområde, kompetanse, interesse eller profesjonell bakgrunn, og som ønsker å dele kunnskap, lære av hverandre og utvikle fagområdet. Nettverket kan for eksempel organiseres som et fagforum, nettverk eller laug — eller med et helt annet navn.\n\nI motsetning til et team har et fagnettverk vanligvis ikke ansvar for en felles leveranse eller et felles resultat, og medlemmene har normalt sitt ansvar og sine oppgaver andre steder i organisasjonen.\n\nEt tydelig formål gjør det enklere å skape relevant aktivitet og verdi for deltakerne, samtidig som nettverket beholder den fleksible formen som skiller det fra et team.',
+  },
+]
+
+// Team types by name, and members by employeeNumber with their roles by name.
 export const teams = [
   {
     name: 'Team Skjemabygger',
-    teamType: 'product',
+    teamType: 'Produktteam',
     description: 'Utvikler og forvalter verktøyet for å lage digitale skjema.',
     members: [
       { person: '1005', roles: ['Teameier'] },
@@ -338,7 +187,7 @@ export const teams = [
   },
   {
     name: 'Team Innlogging',
-    teamType: 'delivery',
+    teamType: 'Leveranseteam',
     description: 'Leverer innloggingsløsningen til offentlige tjenester.',
     members: [
       { person: '1004', roles: ['Teameier'] },
@@ -351,7 +200,7 @@ export const teams = [
   },
   {
     name: 'Prosjekt Nytt intranett',
-    teamType: 'project',
+    teamType: 'Prosjektteam',
     description: 'Erstatter dagens intranett innen utgangen av 2027.',
     members: [
       { person: '1003', roles: ['Teameier'] },
@@ -363,7 +212,7 @@ export const teams = [
   },
   {
     name: 'Støtteteam Arbeidsflate',
-    teamType: 'support',
+    teamType: 'Støtteteam',
     description: 'Gir de andre teamene felles verktøy og arbeidsflater.',
     members: [
       { person: '1002', roles: ['Teameier'] },
@@ -373,7 +222,7 @@ export const teams = [
   },
   {
     name: 'Fagnettverk for universell utforming',
-    teamType: 'network',
+    teamType: 'Fagnettverk',
     description: 'Deler kunnskap om universell utforming på tvers av divisjonene.',
     members: [
       { person: '1006', roles: ['Teameier'] },

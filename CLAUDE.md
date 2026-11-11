@@ -116,7 +116,7 @@ CMS `:3000`, frontend `:4321`, PostgreSQL `:5432` (Docker).
 | --- | --- |
 | `pnpm setup` | Creates `.env` files. Safe to re-run. |
 | `pnpm db:up` | Starts PostgreSQL. `db:reset` destroys the volume and all data. |
-| `pnpm db:seed` | Made-up test data (`src/cms/scripts/seed-data.ts`). Skips what exists; `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
+| `pnpm db:seed` | Test data: units and people from `src/cms/scripts/seed-files/*.csv` through the import, the rest from `seed-data.ts`, and the administrator `admin@example.com` with the password `ilag`. `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
 | `pnpm dev` | Both apps. `pnpm dev:stop` stops leftovers. |
 | `pnpm lint` | ESLint for the CMS. |
 | `pnpm test` | CMS integration + frontend tests. Needs the database up. |
@@ -135,7 +135,11 @@ Once the content model settles, snapshot it with
 Keep the test data in step with the collections. When a collection or field is
 added, renamed or removed, update `src/cms/scripts/seed-data.ts` (and `seed.ts`
 if needed) in the same change, and check it with `pnpm db:seed:reset`. A new
-collection gets test data there too, unless it is filled some other way.
+collection gets test data there too, unless it is filled some other way. Units
+and people come from the CSV files in `src/cms/scripts/seed-files/`, in the
+format of the [import contracts](docs/integrations/), and go through the import:
+change the files, not the collections, and keep them in step with the contracts.
+`enheter.csv` is Ansattmottak's example org file; `personer.csv` is made up.
 
 ## Conventions
 

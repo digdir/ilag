@@ -462,7 +462,9 @@ Tilbakemeldinger skal gjøre det enkelt å melde fra om feil og mangler, og sikr
 ### 4.1 Entiteter
 Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplett, men understøtter kravene og funksjonaliteten diskutert så langt.
 
-- **Team** – jobber sammen om leveranser. Kan være produktteam, prosjektteam, støtteteam etc.
+- **Team** – jobber sammen om leveranser. Har én teamtype.
+
+- **Teamtype** – type team, med navn og kjennetegn (jf. TK-01): prosjektteam, støtteteam, leveranseteam, produktteam og fagnettverk. Teamtypene vedlikeholdes i ilag av en administrator.
 
 - **Teammedlemskap** – at en person er med i et team, og hvilke roller personen har i teamet. En person har høyst ett medlemskap per team, med én eller flere roller.
 
@@ -500,6 +502,7 @@ erDiagram
     Person }o--o{ Enhet : "er ansatt i"
     Person ||--o{ Teammedlemskap : "har"
     Team ||--o{ Teammedlemskap : "har"
+    Teamtype ||--o{ Team : "har"
     Teammedlemskap }o--|{ Rolle : "med"
     Rolle }o--o{ Prinsipp : "hører til"
     Prinsipp }o--o{ Enhet : "hører til"
