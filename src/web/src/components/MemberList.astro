@@ -1,0 +1,64 @@
+---
+import type { Member } from '../lib/teams'
+
+interface Props {
+  members: Member[]
+}
+
+const { members } = Astro.props
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .filter((_, i, all) => i === 0 || i === all.length - 1)
+    .join('')
+---
+
+{
+  members.length ? (
+    <ul class="members">
+      {members.map((member) => (
+        <li>
+          <span class="ds-avatar" data-size="sm" aria-hidden="true">
+            {initials(member.name)}
+          </span>
+          <span class="ds-paragraph name">{member.name}</span>
+          <span class="ds-paragraph roles" data-size="sm">
+            {member.roles.join(', ')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="ds-paragraph">Ingen medlemmer registrert ennå.</p>
+  )
+}
+
+<style>
+  .members {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-3);
+    padding-block: var(--ds-size-3);
+    border-top: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+  }
+
+  .name {
+    flex: 1;
+    margin: 0;
+  }
+
+  .roles {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+    text-align: end;
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import MemberList from '../../components/MemberList.astro'
+import TeamTypeTag from '../../components/TeamTypeTag.astro'
+import Layout from '../../layouts/Layout.astro'
+import { getTeam } from '../../lib/teams'
+
+const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
+if (!team) Astro.response.status = 404
+---
+
+<Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'}>
+  <p class="ds-paragraph"><a class="ds-link" href="/team">Tilbake til teamoversikten</a></p>
+  {
+    team ? (
+      <>
+        <TeamTypeTag type={team.teamType} />
+        <h1 class="ds-heading" data-size="lg">{team.name}</h1>
+        {team.description && <p class="ds-paragraph">{team.description}</p>}
+        <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
+        <MemberList members={team.members} />
+      </>
+    ) : (
+      <>
+        <h1 class="ds-heading" data-size="lg">Fant ikke teamet</h1>
+        <p class="ds-paragraph">Teamet finnes ikke, eller du har ikke tilgang til det.</p>
+      </>
+    )
+  }
+</Layout>

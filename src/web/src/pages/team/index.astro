@@ -1,0 +1,45 @@
+---
+import TeamCard from '../../components/TeamCard.astro'
+import Layout from '../../layouts/Layout.astro'
+import { getTeams } from '../../lib/teams'
+
+const teams = await getTeams(Astro.request.headers.get('cookie'))
+---
+
+<Layout title="Teamoversikt — ilag" wide>
+  <h1 class="ds-heading" data-size="lg">Teamoversikt</h1>
+  <p class="ds-paragraph">
+    Alle team og grupperinger i Digdir, hva de leverer og hvorfor de finnes.
+  </p>
+  {
+    teams.length ? (
+      <>
+        <p class="ds-paragraph" data-size="sm">{teams.length} team</p>
+        <ul class="teams">
+          {teams.map((team) => (
+            <li>
+              <TeamCard team={team} />
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p class="ds-paragraph">Ingen team er registrert ennå.</p>
+    )
+  }
+</Layout>
+
+<style>
+  .teams {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--ds-size-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .teams > li {
+    display: grid;
+  }
+</style>

@@ -6,5 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./payload-types": "./src/payload-types.ts"
+  },
+  "dependencies": {
+    "@payloadcms/sdk": "3.91.0"
   }
 }

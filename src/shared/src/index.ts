@@ -1,8 +1,23 @@
-import type { User } from './payload-types'
+import { PayloadSDK } from '@payloadcms/sdk'
+
+import type { Config, User } from './payload-types'
 
 export * from './payload-types'
+export { PayloadSDKError } from '@payloadcms/sdk'
 
 const CMS_URL = import.meta.env?.PUBLIC_CMS_URL ?? process.env.PUBLIC_CMS_URL ?? 'http://localhost:3000'
+
+/**
+ * Payload's typed REST client, e.g.
+ * sdk.find({ collection: 'team', depth: 2 }, { headers: authHeaders(cookie) }).
+ * Without authHeaders the request is anonymous and access control refuses it.
+ */
+export const sdk = new PayloadSDK<Config>({
+  baseURL: `${CMS_URL}/api`,
+  // Looks fetch up on every call. The SDK otherwise keeps the fetch it finds
+  // when it is created, and the tests' stubbed fetch would never be used.
+  fetch: (...args) => fetch(...args),
+})
 
 export type PaginatedDocs<T> = {
   docs: T[]

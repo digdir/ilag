@@ -6,7 +6,7 @@ Prototype of the ilag application. See README.md for the full setup.
 
 - `src/cms` — Payload 3 on Next.js, admin panel and REST/GraphQL API
 - `src/web` — Astro frontend, SSR, reads the CMS over REST
-- `src/shared` — generated Payload types + REST client, imported as `@ilag/shared`
+- `src/shared` — generated Payload types + REST client (`@payloadcms/sdk`), imported as `@ilag/shared`
 - `docs/specification/kravspesifikasjon.md` — the requirements specification
   (Norwegian). The intention and starting point for the implementation, not a
   fixed contract. See «Specification» below before changing it.
