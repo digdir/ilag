@@ -2,7 +2,7 @@
 import MemberList from '../../components/MemberList.astro'
 import TeamTypeTag from '../../components/TeamTypeTag.astro'
 import Layout from '../../layouts/Layout.astro'
-import { getTeam } from '../../lib/teams'
+import { getTeam } from '../../lib/cms/teams'
 
 const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!team) Astro.response.status = 404

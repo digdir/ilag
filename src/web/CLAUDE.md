@@ -3,12 +3,13 @@
 ## Conventions
 
 - **Pages** (`src/pages/`) have Norwegian URLs (`/team`, `/team/[id]`). A page
-  fetches its data through `src/lib/` and arranges components; markup that is
+  fetches its data through `src/lib/cms/` and arranges components; markup that is
   repeated or has a meaning of its own goes in a component.
-- **Queries** (`src/lib/`) read the CMS with `sdk` and `authHeaders` from
-  `@ilag/shared`, as the visitor:
+- **Queries** (`src/lib/cms/`, one file per subject, such as `teams.ts`) read
+  the CMS with `sdk` and `authHeaders` from `@ilag/shared`, as the visitor:
   `sdk.find({ collection: 'team' }, { headers: authHeaders(cookie) })`. They
-  return what the pages need, in the shape the components take.
+  return what the pages need, in the shape the components take. Other helpers
+  go elsewhere in `src/lib/`.
 - **Components** (`src/components/`) are one per file, named in PascalCase after
   what they show (`TeamCard.astro`). They take typed `Props` and never fetch, so
   they can be used anywhere. Look there before making a new one, and extend an
