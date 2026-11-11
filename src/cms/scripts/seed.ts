@@ -6,9 +6,10 @@ import * as data from './seed-data'
 // Fills the database with the test data in seed-data.ts: `pnpm db:seed`.
 // Records that already exist are left as they are, so it is safe to run again.
 // `pnpm db:seed:reset` first deletes what the seed creates, then creates it
-// again. It passes `reset` without dashes, since `payload run` only hands the
-// script arguments that aren't flags. Writes through the Local API, which
-// bypasses access control, the way the import will.
+// again, and `pnpm db:seed:clear` only deletes it. They pass `reset` and
+// `clear` without dashes, since `payload run` only hands the script arguments
+// that aren't flags. Writes through the Local API, which bypasses access
+// control, the way the import will.
 
 type Slug = 'lokasjoner' | 'enheter' | 'personer' | 'roller' | 'team' | 'teammedlemskap'
 
@@ -163,15 +164,19 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const payload = await getPayload({ config })
-if (process.argv.includes('reset')) await removeSeed(payload)
-const created = await seed(payload)
+const command = process.argv[2]
 
-const summary = Object.entries(created).map(([collection, n]) => `${n} ${collection}`)
-console.log(
-  summary.length
-    ? `Created ${summary.join(', ')}.`
-    : 'Nothing to create; the test data is already there.',
-)
+if (command === 'reset' || command === 'clear') await removeSeed(payload)
+
+if (command !== 'clear') {
+  const created = await seed(payload)
+  const summary = Object.entries(created).map(([collection, n]) => `${n} ${collection}`)
+  console.log(
+    summary.length
+      ? `Created ${summary.join(', ')}.`
+      : 'Nothing to create; the test data is already there.',
+  )
+}
 
 await payload.destroy()
 process.exit(0)
