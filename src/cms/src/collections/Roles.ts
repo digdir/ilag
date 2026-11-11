@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
 
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier.
 // Administrators maintain them (RO-07). The RAMO description (RO-02) and which
@@ -20,7 +21,7 @@ export const Roles: CollectionConfig = {
     defaultColumns: ['name', 'description'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),

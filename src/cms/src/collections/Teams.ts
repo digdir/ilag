@@ -1,6 +1,7 @@
 import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
 import { teamTypeField } from '../fields/teamType'
 
 // A team's memberships mean nothing without the team, and point at it with a
@@ -31,7 +32,7 @@ export const Teams: CollectionConfig = {
     defaultColumns: ['name', 'teamType', 'active'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),

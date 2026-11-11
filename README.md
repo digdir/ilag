@@ -62,8 +62,10 @@ the front page then verifies that the frontend can reach the CMS.
 
 `pnpm test` runs both non-browser suites:
 
-- `pnpm test:int` — CMS integration tests against the running database, using
-  Payload's Local API directly. No dev server needed, but the database must be up.
+- `pnpm test:int` — CMS integration tests using Payload's Local API directly. No
+  dev server needed, but the database must be up. They run in a database of
+  their own, `<your database>_test` (`ilag_dev_test`), which they drop and
+  create on every run, so they never touch your development data.
 - `pnpm test:web` — frontend tests that render `.astro` pages through Astro's
   container API with `fetch` stubbed, so they need neither a server nor a database.
   They cover the seam to the CMS: the URL that gets requested, the rendered
@@ -115,6 +117,34 @@ Pages that read from the CMS pass the visitor's session on, so Payload's access
 control applies: `find('personer', '', { headers: authHeaders(cookie) })` from
 `@ilag/shared`. Payload ignores its cookie on server-to-server requests, so
 `authHeaders` sends the token in the `Authorization` header instead.
+
+## Imports
+
+Units and people come from SAP through Ansattmottak, which posts a CSV file to
+`POST /api/enheter/import` or `POST /api/personer/import`. The design is in
+[ADR-0003](docs/adr/0003-imports-from-the-authoritative-source.md), and the
+files are described in the [unit](docs/integrations/unit-import.md) and
+[people](docs/integrations/people-import.md) contracts. The code is in
+`src/cms/src/imports/`.
+
+- **The integration user** sends the files. In the admin panel, create a user
+  under *Brukere* with a long random password, give it only the role
+  *Integrasjon*, tick *Enable API Key* and copy the key before you save. It can
+  call the import endpoints and nothing else, and cannot log in.
+- **Import runs** (*Importkjøringer*) show every file that arrived, what it
+  changed and any errors. A file with fewer than half as many units or people as
+  are active is held: set its status to *I kø* to apply it.
+- **Jobs** run in the CMS every 10 seconds, in the `imports` queue. People files
+  are removed from their runs after 90 days; unit files are kept.
+
+To try it locally, post a file with the key:
+
+```bash
+curl -X POST http://localhost:3000/api/enheter/import \
+  -H "Authorization: brukere API-Key <key>" \
+  -H "Content-Type: text/csv; charset=utf-8" \
+  --data-binary @enheter.csv
+```
 
 ## Database schema
 

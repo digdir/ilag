@@ -105,7 +105,8 @@ apply to both.
    - set `parent` from the codes in the file, once all units exist. The
      leader is set by an administrator, and the import leaves it alone
    - mark units missing from the file as inactive, never delete them
-   - link people's `units` again from their `externalUnitIds` (see 8)
+   - link people's `units` and `location` again from their `externalUnitIds`
+     and `locationCode` (see 8)
    - write the result to the import run: created, updated, deactivated and
      skipped
 
@@ -134,13 +135,15 @@ apply to both.
 
 ### Still to agree
 
-- [ ] **Protection against a truncated file.** Every row is checked, but a
+- [x] **Protection against a truncated file.** Every row is checked, but a
   file that is cut off or nearly empty is still valid row by row, and as a
-  full snapshot it would deactivate the units it lacks. Proposed: refuse a
-  file with fewer than half as many units as are active today, until an
-  administrator confirms it.
-- [ ] **How long files are kept.** Proposed: 90 days. It matters most for the
-  people file, which contains personal data.
+  full snapshot it would deactivate the units it lacks. Decided 2026-11-10: a
+  file with fewer than half as many units or people as are active is accepted
+  but held, and applied only when an administrator confirms it.
+- [x] **How long files are kept.** Decided 2026-11-10: people files, which
+  contain personal data, are removed from their runs after 90 days. Unit files
+  are kept, since they have no personal data and may come months apart, only
+  when the organisation changes.
 - [ ] **The network path** from Leikanger to the CMS, an open question in the
   architecture overview.
 

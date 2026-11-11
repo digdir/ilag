@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
 
 // A person in a team, with their roles there (TO-03, RO-05). One membership
 // per person and team; a person with several roles in the team has them all
@@ -19,7 +20,7 @@ export const TeamMemberships: CollectionConfig = {
     defaultColumns: ['team', 'person', 'roles'],
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),

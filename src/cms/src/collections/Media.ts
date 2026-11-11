@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isSignedIn } from '../access/isSignedIn'
 
 export const Media: CollectionConfig = {
   slug: 'medier',
@@ -16,7 +17,7 @@ export const Media: CollectionConfig = {
   // are only for signed-in users. Everyone who works in Digdir can log in, so
   // only administrators change them.
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
     delete: ({ req }) => isAdmin(req.user),
