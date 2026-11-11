@@ -68,6 +68,9 @@ export const Teams: CollectionConfig = {
       collection: 'teammedlemskap',
       on: 'team',
       defaultLimit: 0,
+      // Also fills in each membership's person and roles; a join stops at
+      // the membership by default.
+      maxDepth: 2,
     },
   ],
 }

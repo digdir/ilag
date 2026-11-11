@@ -2,7 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Teams from '../src/pages/team/index.astro'
-import { cms, cookie, json, memberships, nettverk, skjemabygger } from './teams'
+import { cookie, json, nettverk, skjemabygger } from './teams'
 
 const render = async () => {
   const container = await AstroContainer.create()
@@ -11,39 +11,26 @@ const render = async () => {
   })
 }
 
-const withTeams = () =>
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(
-      cms({
-        team: () => json({ docs: [skjemabygger, nettverk] }),
-        teammedlemskap: () => json({ docs: memberships }),
-      }),
-    ),
-  )
-
 describe('team overview', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
   })
 
-  it('TO-01: asks the CMS for the active teams and their memberships, as the visitor', async () => {
-    const fetchMock = vi.fn(cms({ team: () => json({ docs: [] }), teammedlemskap: () => json({ docs: [] }) }))
+  it('TO-01: asks the CMS for the active teams, as the visitor', async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => json({ docs: [] }))
     vi.stubGlobal('fetch', fetchMock)
 
     await render()
 
-    const requests = fetchMock.mock.calls.map(([url, init]) => ({ url: new URL(url), init }))
-    const teams = requests.find((r) => r.url.pathname === '/api/team')!
-    const members = requests.find((r) => r.url.pathname === '/api/teammedlemskap')!
-    expect(teams.url.searchParams.get('where[active][equals]')).toBe('true')
-    for (const { init } of [teams, members]) {
-      expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
-    }
+    const [url, init] = fetchMock.mock.calls[0]!
+    const { pathname, searchParams } = new URL(url)
+    expect(pathname).toBe('/api/team')
+    expect(searchParams.get('where[active][equals]')).toBe('true')
+    expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
   })
 
   it('TO-01, TO-02: lists each team with its type, linking to the team', async () => {
-    withTeams()
+    vi.stubGlobal('fetch', vi.fn(async () => json({ docs: [skjemabygger, nettverk] })))
 
     const html = await render()
 
@@ -55,7 +42,7 @@ describe('team overview', () => {
   })
 
   it('shows the number of members, the team lead and the owner', async () => {
-    withTeams()
+    vi.stubGlobal('fetch', vi.fn(async () => json({ docs: [skjemabygger, nettverk] })))
 
     const html = await render()
 
@@ -64,7 +51,7 @@ describe('team overview', () => {
   })
 
   it('says so when there are no teams', async () => {
-    vi.stubGlobal('fetch', vi.fn(cms({ team: () => json({ docs: [] }), teammedlemskap: () => json({ docs: [] }) })))
+    vi.stubGlobal('fetch', vi.fn(async () => json({ docs: [] })))
 
     expect(await render()).toContain('Ingen team er registrert ennå.')
   })
