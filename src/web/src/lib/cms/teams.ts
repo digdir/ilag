@@ -4,27 +4,13 @@ import {
   sdk,
   type Team,
   type TeamMembership,
-  type TeamType,
 } from '@ilag/shared'
+
+import type { Member, TeamWithMembers } from '../../types/team'
 
 // The team queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. The members join on Team brings each
 // membership with its person and roles (maxDepth in Teams.ts).
-
-/** A person in a team, with the names of their roles there. */
-export type Member = {
-  id: number
-  name: string
-  roles: string[]
-  /** Only filled in by getTeam, which asks for one level more. */
-  location: string | null
-  units: string[]
-}
-
-export type TeamWithMembers = Omit<Team, 'members' | 'teamType'> & {
-  teamType: TeamType | null
-  members: Member[]
-}
 
 /** All active teams by name, with their members (TO-01, TO-03). */
 export async function getTeams(cookie: string | null): Promise<TeamWithMembers[]> {

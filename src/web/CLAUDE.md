@@ -14,6 +14,9 @@
   `sdk.find({ collection: 'team' }, { headers: authHeaders(cookie) })`. They
   return what the pages need, in the shape the components take. Other helpers
   go elsewhere in `src/lib/`.
+- **Types** the frontend works with, such as `Member`, go in `src/types/`, one
+  file per subject (`types/team.ts`). Queries build them from the generated
+  Payload types in `@ilag/shared`; never copy a generated type there by hand.
 - **Components** (`src/components/`) are one per file, named in PascalCase after
   what they show (`TeamCard.astro`). Components for one subject go in a folder
   named like its pages folder (`components/team/` for `organisering/team/`);
