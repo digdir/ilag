@@ -40,6 +40,7 @@ exploit a weakness that hasn't been fixed yet.
 | [0001](0001-login-and-sessions.md) | Login and sessions | Accepted |
 | [0002](0002-password-login-only-for-break-glass-accounts.md) | Password login only for break-glass accounts | Proposed |
 | [0003](0003-imports-from-the-authoritative-source.md) | Imports from the authoritative source | Accepted |
+| [0004](0004-payload-sdk-for-cms-reads.md) | Payload's SDK for reading the CMS | Proposed |
 
 ## Template
 
