@@ -1,7 +1,7 @@
-# The ilag Agent's image: the agentctl base image (Ubuntu 26.04, systemd, Node 24, Claude Code, gh) plus what the
-# repository's own scripts need. Renovate keeps the digest current; it must be a base with the containers feature
-# (digdir/digdir-agents#266) and /tmp on the Sandbox disk (#329), as agentctl v0.1.0-preview.13 expects.
-FROM ghcr.io/digdir/agentctl-base:ubuntu-26.04@sha256:2ee51d4619a9e13b1d1e6037b48c76fcc6bbed46ef6203aadde1270c1a2fb790
+# The ilag Agent's image: the agentctl base image (Ubuntu 26.04, systemd, Node 24, Claude Code, Codex, gh) plus what
+# the repository's own scripts need. Pinned to the base image of agentctl v0.1.0-preview.14, the release this definition
+# is written for; move to a later release by changing the tag and its digest, as `agentctl update` does.
+FROM ghcr.io/digdir/agentctl-base:ubuntu-26.04-v0.1.0-preview.14@sha256:4de3acc36600c2fba8e7e73c0de0ca812cbd32ae2286f1d7750f5394d5e90e72
 
 # The base ends as the unprivileged Agent user; installing packages needs root again.
 USER root

@@ -30,23 +30,24 @@ spec:
   # CLAUDE.md is discovered by the harness inside the checkout.
   instructions:
     - source: instructions.md
+    - source: improving.md
   harnesses:
-    # Mediated: the Claude login stays on the host, and the Sandbox sees only a placeholder.
+    # Mediated: the Claude login stays on the host, and the Sandbox sees only a placeholder. `login: any` uses
+    # whichever login is stored with `agentctl claude login [NAME]`, however it is named.
     - type: claudeCode
       auth: mediated
       default: true
-  environment:
-    - name: GIT_USER_NAME
-    - name: GIT_USER_EMAIL
-  secrets:
-    # A fine-grained token on digdir/ilag with Contents and Pull requests read and write. It stays on the host; the
-    # Sandbox sees the placeholder, which carries the fine-grained prefix gh classifies tokens by.
-    - environment: GITHUB_TOKEN
-      placeholder: github_pat_AGENT_MEDIATED_GITHUB_TOKEN
-      allowedHosts:
-        - github.com
-        - api.github.com
-        - uploads.github.com
+      login: any
+    # Codex, when a login is stored with `agentctl codex login`; without one, the Agent starts without it.
+    - type: codex
+      login: any
+      optional: true
+  # The GitHub account the Agent acts as, stored on the host with `agentctl github login default`. The Sandbox gets a
+  # GITHUB_TOKEN placeholder for GitHub's hosts, and Git commits as the account. To keep the Agent to digdir/ilag, give
+  # the login a fine-grained token on it, with Contents and Pull requests read and write.
+  accounts:
+    - type: github
+      login: default
   access:
     - type: ssh
   # All traffic passes through the host's network mediator. Narrow `allow` once the traffic is known.
