@@ -119,6 +119,7 @@ CMS `:3000`, frontend `:4321`, PostgreSQL `:5432` (Docker).
 | `pnpm db:seed` | Test data: units and people from `src/cms/scripts/seed-files/*.csv` through the import, the rest from `seed-data.ts`, and the administrator `admin@example.com` with the password `ilag`. `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
 | `pnpm dev` | Both apps. `pnpm dev:stop` stops leftovers. |
 | `pnpm lint` | ESLint for the CMS. |
+| `pnpm check:web` | Type-checks the frontend (`astro check`). Dev and build don't. |
 | `pnpm test` | CMS integration + frontend tests. Needs the database up. |
 | `pnpm test:e2e` | Playwright. Needs `pnpm --filter cms exec playwright install chromium` once. |
 | `pnpm generate:types` | Run after every change to a collection — regenerates types and copies them into `src/shared`. Then update the seed data. |

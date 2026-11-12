@@ -45,6 +45,7 @@ the front page then verifies that the frontend can reach the CMS.
 | `pnpm generate:types` | Regenerate Payload types into `src/shared` |
 | `pnpm make-admin <email>` | Make an existing user an administrator |
 | `pnpm lint` | ESLint for the CMS |
+| `pnpm check:web` | Type-check the frontend (`astro check`); `astro dev` and `astro build` don't |
 | `pnpm test` | All non-browser tests (CMS + frontend) |
 | `pnpm test:int` | CMS integration tests (vitest, Payload Local API) |
 | `pnpm test:web` | Frontend render tests (vitest, Astro container API) |
@@ -82,7 +83,7 @@ The e2e tests seed and then delete a `dev@payloadcms.com` user in whatever
 database `DATABASE_URL` points at, so don't run them against anything but a
 local database.
 
-CI (`.github/workflows/ci.yml`) runs `pnpm lint`, `pnpm test` and `pnpm test:e2e`
+CI (`.github/workflows/ci.yml`) runs `pnpm lint`, `pnpm check:web`, `pnpm test` and `pnpm test:e2e`
 on every pull request to `main`, each against its own throwaway PostgreSQL.
 
 ## Login
