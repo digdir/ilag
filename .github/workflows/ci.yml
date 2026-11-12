@@ -1,4 +1,4 @@
-# Lint and tests for every pull request to main.
+# Lint, type checks and tests for every pull request to main.
 name: CI
 
 on:
@@ -27,6 +27,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+      - run: pnpm check:web
 
   test:
     runs-on: ubuntu-latest
