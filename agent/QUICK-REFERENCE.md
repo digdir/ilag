@@ -8,7 +8,7 @@ Setup is in [`README.md`](README.md).
 
 | Command | What it does |
 | --- | --- |
-| `agentctl apply --env-file ~/.agent/ilag.env --wait` | Create the Agent, or apply changes to `agent.yaml` or the `Dockerfile` |
+| `agentctl apply --wait` | Create the Agent, or apply changes to `agent.yaml`. A changed image needs `delete` first |
 | `agentctl get agents` | List Agents and whether they are ready |
 | `agentctl describe agent/ilag` | Detailed state, including why a Sandbox failed |
 | `agentctl stop agent/ilag` | Stop the VM, keeping its disk. Interrupts running work |
