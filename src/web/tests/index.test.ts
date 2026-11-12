@@ -20,7 +20,7 @@ describe('home page', () => {
   })
 
   it('queries the CMS health endpoint', async () => {
-    const fetchMock = vi.fn(async () => healthy())
+    const fetchMock = vi.fn<typeof fetch>(async () => healthy())
     vi.stubGlobal('fetch', fetchMock)
 
     await render()
