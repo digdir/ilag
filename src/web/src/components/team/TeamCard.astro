@@ -1,0 +1,43 @@
+---
+import { withRole } from '../../lib/cms/teams'
+import type { TeamWithMembers } from '../../types/team'
+import TeamTypeTag from './TeamTypeTag.astro'
+
+interface Props {
+  team: TeamWithMembers
+}
+
+const { team } = Astro.props
+const leaders = withRole(team.members, 'Teamleder')
+const owners = withRole(team.members, 'Teameier')
+
+// Like the prototype: «5 medlemmer · Emma Kristiansen · Eier: Magnus Johansen».
+const meta = team.members.length
+  ? [
+      `${team.members.length} ${team.members.length === 1 ? 'medlem' : 'medlemmer'}`,
+      leaders.join(', ') || 'leder ikke registrert',
+      ...(owners.length ? [`Eier: ${owners.join(', ')}`] : []),
+    ].join(' · ')
+  : 'Medlemmer ikke registrert'
+---
+
+<a class="ds-card" data-color="neutral" href={`/organisering/team/${team.id}`}>
+  {team.teamType && <TeamTypeTag type={team.teamType} />}
+  <h2 class="ds-heading" data-size="xs">{team.name}</h2>
+  {team.description && <p class="ds-paragraph" data-size="sm">{team.description}</p>}
+  <p class="ds-paragraph meta" data-size="xs">{meta}</p>
+</a>
+
+<style>
+  .ds-card {
+    text-decoration: none;
+  }
+
+  .ds-heading {
+    text-decoration-line: none;
+  }
+
+  .meta {
+    color: var(--ds-color-text-subtle);
+  }
+</style>

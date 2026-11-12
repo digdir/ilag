@@ -1,0 +1,72 @@
+---
+import type { Member } from '../../types/team'
+import Avatar from '../Avatar.astro'
+
+interface Props {
+  /** The members with the role Teameier; usually one. */
+  owners: Member[]
+}
+
+const { owners } = Astro.props
+---
+
+{
+  owners.length ? (
+    owners.map((owner) => (
+      <div class="owner">
+        <Avatar name={owner.name} size="lg" />
+        <div>
+          <p class="ds-paragraph name">{owner.name}</p>
+          <p class="ds-paragraph role" data-size="sm">Teameier</p>
+          <dl>
+            <dt class="ds-label" data-size="xs">Lokasjon</dt>
+            <dd class="ds-paragraph" data-size="sm">{owner.location ?? 'Ikke registrert'}</dd>
+            <dt class="ds-label" data-size="xs">Linjetilhørighet</dt>
+            <dd class="ds-paragraph" data-size="sm">
+              {owner.units.join(', ') || 'Ikke registrert'}
+            </dd>
+          </dl>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p class="ds-paragraph">Teameier ikke registrert.</p>
+  )
+}
+
+<style>
+  .owner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-size-4);
+  }
+
+  .owner + .owner {
+    margin-top: var(--ds-size-6);
+  }
+
+  .name {
+    margin: 0;
+    font-weight: var(--ds-font-weight-semibold);
+  }
+
+  .role {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+
+  dl {
+    margin: var(--ds-size-3) 0 0;
+  }
+
+  dt {
+    font-size: var(--ds-body-xs-font-size);
+    color: var(--ds-color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  dd {
+    margin: 0 0 var(--ds-size-2);
+  }
+</style>

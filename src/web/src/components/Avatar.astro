@@ -1,0 +1,18 @@
+---
+interface Props {
+  name: string
+  size?: 'sm' | 'md' | 'lg'
+}
+
+const { name, size = 'sm' } = Astro.props
+
+// First and last initial: «Emma Kristiansen» → «EK».
+const initials = name
+  .split(' ')
+  .filter(Boolean)
+  .map((part) => part[0])
+  .filter((_, i, all) => i === 0 || i === all.length - 1)
+  .join('')
+---
+
+<span class="ds-avatar" data-size={size} aria-hidden="true">{initials}</span>

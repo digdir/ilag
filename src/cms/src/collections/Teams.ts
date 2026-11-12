@@ -73,6 +73,10 @@ export const Teams: CollectionConfig = {
       collection: 'teammedlemskap',
       on: 'team',
       defaultLimit: 0,
+      // Lets the join fill in each membership's person and roles, and the
+      // person's location and units, when the request's depth asks for it; a
+      // join stops at the membership by default.
+      maxDepth: 3,
     },
   ],
 }
