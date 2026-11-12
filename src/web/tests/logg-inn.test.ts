@@ -44,7 +44,7 @@ describe('login page', () => {
   })
 
   it('passes the session cookie on after a password login', async () => {
-    const fetchMock = vi.fn(async () =>
+    const fetchMock = vi.fn<typeof fetch>(async () =>
       Response.json({}, { headers: { 'Set-Cookie': 'payload-token=abc; Path=/; HttpOnly' } }),
     )
     vi.stubGlobal('fetch', fetchMock)
