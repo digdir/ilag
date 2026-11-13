@@ -1,0 +1,67 @@
+---
+interface Props {
+  /** The current page's path, to mark its section as current. */
+  pathname: string
+}
+
+const { pathname } = Astro.props
+
+// The main menu groups from the prototype's NAV_GROUPS. A group is listed once
+// it has a page; `match` marks it current on every page in its folder.
+const NAV = [
+  // { label: 'Styring', href: '/styring', match: '/styring' },
+  // { label: 'Folk', href: '/folk', match: '/folk' },
+  { label: 'Organisering', href: '/organisering/team', match: '/organisering' },
+  // { label: 'Verktøy', href: '/verktoy', match: '/verktoy' },
+]
+
+const isCurrent = (match: string) => pathname === match || pathname.startsWith(`${match}/`)
+---
+
+<nav aria-label="Hovedmeny">
+  <ul>
+    {
+      NAV.map((item) => (
+        <li>
+          <a href={item.href} aria-current={isCurrent(item.match) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-1);
+    margin: 0;
+    padding: var(--ds-size-1) 0 var(--ds-size-2);
+    list-style: none;
+  }
+
+  a {
+    display: block;
+    padding: var(--ds-size-2) var(--ds-size-3);
+    border-radius: var(--ds-border-radius-md);
+    color: var(--ds-color-neutral-text-subtle);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  a:hover {
+    background: var(--ds-color-neutral-surface-hover);
+  }
+
+  a:focus-visible {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    outline-offset: 2px;
+  }
+
+  a[aria-current='page'] {
+    background: var(--ds-color-accent-surface-tinted);
+    color: var(--ds-color-accent-text-default);
+  }
+</style>

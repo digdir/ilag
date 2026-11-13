@@ -47,14 +47,15 @@ describe('home page', () => {
     expect(html).toContain('500')
   })
 
-  it('shows who is logged in, with a way to log out', async () => {
+  it('shows who is logged in, with a way to log out, in the site header', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => healthy()))
 
     const html = await render({
       user: { email: 'kari@digdir.no', firstName: 'Kari', lastName: 'Nordmann' } as App.Locals['user'],
     })
 
-    expect(html).toContain('Logget inn som Kari Nordmann')
+    expect(html).toContain('Kari Nordmann')
     expect(html).toContain('action="/logg-ut"')
+    expect(html).toContain('aria-label="Hovedmeny"')
   })
 })

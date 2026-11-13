@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css'
 
+import SiteHeader from '../components/SiteHeader.astro'
+
 interface Props {
   title: string
   /** Room for a grid of cards; text pages keep the narrow column. */
@@ -26,6 +28,7 @@ const { title, wide = false } = Astro.props
   </head>
   <body data-color-scheme="auto" data-size="md">
     <a class="ds-skip-link" href="#hovedinnhold">Hopp til hovedinnhold</a>
+    <SiteHeader user={Astro.locals.user} pathname={Astro.url.pathname} />
     <main id="hovedinnhold" tabindex="-1" class:list={{ wide }}>
       <slot />
     </main>
