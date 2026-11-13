@@ -1,0 +1,70 @@
+---
+import type { PersonRow as Person } from '../../types/person'
+import PersonRow from './PersonRow.astro'
+
+interface Props {
+  people: Person[]
+}
+
+const { people } = Astro.props
+---
+
+<!-- Marked data-people-list for PeopleSearch, which hides the rows that don't match. -->
+<table class="ds-table people" data-people-list>
+  <thead>
+    <tr>
+      <th scope="col">Navn og rolle</th>
+      <th scope="col">Tilhørighet i linjen</th>
+      <th scope="col">Team</th>
+    </tr>
+  </thead>
+  <tbody>
+    {people.map((person) => <PersonRow person={person} />)}
+  </tbody>
+</table>
+
+<style>
+  .people :global(td) {
+    vertical-align: middle;
+  }
+
+  .people :global(tr[hidden]) {
+    display: none;
+  }
+
+  /* On a narrow screen each person is a block, with the line and the teams
+     under the name and the column headings hidden but still read out. */
+  @media (max-width: 40rem) {
+    .people thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    .people,
+    .people tbody,
+    .people :global(td) {
+      display: block;
+    }
+
+    .people tbody :global(tr:not([hidden])) {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ds-size-2);
+      padding-block: var(--ds-size-3);
+      border-bottom: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+    }
+
+    .people :global(td) {
+      padding: 0;
+      border: none;
+    }
+
+    /* Lines the unit and teams up with the name, past the avatar. */
+    .people :global(td:not(:first-child)) {
+      padding-inline-start: calc(var(--ds-size-3) + var(--ds-size-12));
+    }
+  }
+</style>
