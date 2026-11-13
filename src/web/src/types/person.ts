@@ -7,7 +7,9 @@ export type PersonRow = {
   name: string
   /** The job title, such as «Seniorrådgiver». */
   title: string | null
-  /** Each unit in the line with the codes of the units above it: «KOM · Kommunikasjon». */
+  /** As it comes from the source, such as «+4791234567». */
+  mobile: string | null
+  /** The names of the person's units in the line. */
   units: string[]
   /** The active teams the person is a member of, by name. */
   teams: { id: number; name: string }[]

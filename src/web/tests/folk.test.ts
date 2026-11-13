@@ -11,17 +11,6 @@ const render = async () => {
   })
 }
 
-// FEL is a division, FUT a department under it and «FEL – Backend» a section
-// under that. The directorate has no code.
-const units = {
-  docs: [
-    { id: 1, name: 'Digitaliseringsdirektoratet', code: null, parent: null },
-    { id: 2, name: 'Fellesløsninger', code: 'FEL', parent: 1 },
-    { id: 3, name: 'FEL – Utvikling', code: 'FUT', parent: 2 },
-    { id: 4, name: 'FEL – Backend', code: 'FBA', parent: 3 },
-  ],
-}
-
 const membership = (id: number, team: { id: number; name: string; active: boolean }) => ({
   id,
   team,
@@ -32,6 +21,7 @@ const people = [
     id: 1,
     fullName: 'Åse Ødegård',
     title: 'Utvikler',
+    mobile: '+4790011223',
     units: [{ id: 4, name: 'FEL – Backend' }],
     teams: {
       docs: [
@@ -44,17 +34,22 @@ const people = [
     id: 2,
     fullName: 'Ingrid Berg',
     title: 'Direktør',
+    mobile: '+46701234567',
     units: [{ id: 1, name: 'Digitaliseringsdirektoratet' }],
     teams: { docs: [] },
   },
-  { id: 3, fullName: 'Emma Kristiansen', title: null, units: [], teams: { docs: [] } },
+  {
+    id: 3,
+    fullName: 'Emma Kristiansen',
+    title: null,
+    mobile: null,
+    units: [],
+    teams: { docs: [] },
+  },
 ]
 
-// The page asks for the people and the units.
 const cms = (found: unknown[]) =>
-  vi.fn(async (url: string, _init?: RequestInit) =>
-    json(new URL(url).pathname === '/api/enheter' ? units : { docs: found }),
-  )
+  vi.fn(async (_url: string, _init?: RequestInit) => json({ docs: found }))
 
 describe('Folk', () => {
   afterEach(() => {
@@ -71,6 +66,7 @@ describe('Folk', () => {
     const { searchParams } = new URL(url)
     expect(searchParams.get('where[active][equals]')).toBe('true')
     expect(searchParams.get('depth')).toBe('2')
+    expect(searchParams.get('select[mobile]')).toBe('true')
     expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
   })
 
@@ -86,14 +82,24 @@ describe('Folk', () => {
     expect(html).toMatch(/class="ds-avatar"[^>]*>ÅØ</)
   })
 
-  it('FO-02: shows the unit with the codes of the units above, and says when there is none', async () => {
+  it('FO-02: shows the name of the unit, and says when there is none', async () => {
     vi.stubGlobal('fetch', cms(people))
 
     const html = await render()
 
-    expect(html).toContain('FEL · FUT · FEL – Backend')
-    expect(html).toMatch(/>\s*Digitaliseringsdirektoratet\s*</)
+    expect(html).toMatch(/<li[^>]*>FEL – Backend<\/li>/)
+    expect(html).toMatch(/<li[^>]*>Digitaliseringsdirektoratet<\/li>/)
     expect(html).toContain('Ikke registrert')
+  })
+
+  it('shows the mobile number as a link, Norwegian numbers in pairs', async () => {
+    vi.stubGlobal('fetch', cms(people))
+
+    const html = await render()
+
+    expect(html).toMatch(/href="tel:\+4790011223"[^>]*>\s*90 01 12 23\s*</)
+    expect(html).toMatch(/href="tel:\+46701234567"[^>]*>\s*\+46701234567\s*</)
+    expect(html).toMatch(/<th scope="col"[^>]*>Mobil</)
   })
 
   it('FO-02: links to the active teams only, and says when there are none', async () => {
@@ -113,7 +119,7 @@ describe('Folk', () => {
 
     expect(html).toContain('type="search"')
     expect(html).toContain('placeholder="Søk etter navn, rolle, enhet eller team"')
-    expect(html).toContain('data-search="åse ødegård utvikler fel · fut · fel – backend team innlogging"')
+    expect(html).toContain('data-search="åse ødegård utvikler fel – backend team innlogging"')
     expect(html).toContain('Ingen treff.')
   })
 
