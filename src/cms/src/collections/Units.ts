@@ -90,6 +90,19 @@ export const Units: CollectionConfig = {
       relationTo: 'personer',
     },
     {
+      // The unit advises and supports all of Digdir, not just its own
+      // division (LO-06), such as a section for user experience that every
+      // division uses. Set by an administrator; the import never changes it.
+      name: 'advisesAllOfDigdir',
+      type: 'checkbox',
+      label: 'Bistår og rådgir hele Digdir',
+      required: true,
+      defaultValue: false,
+      admin: {
+        description: 'Enheten bistår og rådgir hele Digdir, ikke bare sin egen divisjon.',
+      },
+    },
+    {
       // False once the unit is closed. Kept rather than deleted, so what is
       // linked to it, such as teams and OKR, keeps its history.
       name: 'active',

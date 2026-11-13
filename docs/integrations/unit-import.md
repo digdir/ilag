@@ -91,6 +91,12 @@ The file has no leader. An administrator sets each unit's leader in ilag's
 admin panel, and the import never changes it. The leader may later come from
 the people file or a new column in this file.
 
+### Units that advise all of Digdir
+
+The file doesn't say which units advise and support all of Digdir rather
+than just their own division (LO-06). An administrator marks them in ilag's
+admin panel, and the import never changes the marking.
+
 ### Example
 
 From Ansattmottak's example file.

@@ -172,6 +172,34 @@ describe('Units', () => {
     expect(updated.active).toBe(true)
   })
 
+  it('LO-06: does not mark a new unit as advising all of Digdir', async () => {
+    const created = await payload.create({ collection: 'enheter', data: unit(18) })
+    expect(created.advisesAllOfDigdir).toBe(false)
+  })
+
+  it('LO-06: lets administrators mark a unit as advising all of Digdir, and nobody else', async () => {
+    const created = await payload.create({ collection: 'enheter', data: unit(19) })
+
+    const updated = await payload.update({
+      collection: 'enheter',
+      id: created.id,
+      data: { advisesAllOfDigdir: true },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.advisesAllOfDigdir).toBe(true)
+
+    await expect(
+      payload.update({
+        collection: 'enheter',
+        id: created.id,
+        data: { advisesAllOfDigdir: false },
+        overrideAccess: false,
+        user,
+      }),
+    ).rejects.toThrow()
+  })
+
   it('LO-02: lets administrators set the leader, and nobody else', async () => {
     const leader = await payload.create({ collection: 'personer', data: person(4) })
     const created = await payload.create({ collection: 'enheter', data: unit(17) })

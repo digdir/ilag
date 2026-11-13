@@ -282,6 +282,10 @@ export interface Unit {
   level: 'directorate' | 'division' | 'department' | 'section';
   parent?: (number | null) | Unit;
   leader?: (number | null) | Person;
+  /**
+   * Enheten bistår og rådgir hele Digdir, ikke bare sin egen divisjon.
+   */
+  advisesAllOfDigdir: boolean;
   active: boolean;
   children?: {
     docs?: (number | Unit)[];
@@ -701,6 +705,7 @@ export interface EnheterSelect<T extends boolean = true> {
   level?: T;
   parent?: T;
   leader?: T;
+  advisesAllOfDigdir?: T;
   active?: T;
   children?: T;
   people?: T;
