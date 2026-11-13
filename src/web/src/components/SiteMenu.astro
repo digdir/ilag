@@ -1,0 +1,53 @@
+---
+import { hasSubMenu, isWithin, mainMenu } from '../lib/navigation'
+import MainMenu from './MainMenu.astro'
+import SubMenu from './SubMenu.astro'
+
+interface Props {
+  pathname: string
+}
+
+const { pathname } = Astro.props
+const groups = mainMenu().filter(hasSubMenu)
+---
+
+{/* The main menu, with a submenu row for each group that has one. The current group's row shows. */}
+<div data-site-menu>
+  <MainMenu pathname={pathname} />
+  {groups.map((group) => <SubMenu group={group} pathname={pathname} hidden={!isWithin(pathname, group.path)} />)}
+</div>
+
+<script>
+  // A main menu item with a submenu shows that submenu instead of going to a
+  // page. Clicking it again goes back to the current group's submenu, if any.
+  for (const menu of document.querySelectorAll<HTMLElement>('[data-site-menu]')) {
+    const rows = [...menu.querySelectorAll<HTMLElement>(':scope > nav[id]')]
+    const current = rows.find((row) => !row.hidden)
+    const buttons: HTMLButtonElement[] = []
+
+    const show = (id: string | undefined) => {
+      for (const row of rows) row.hidden = row.id !== id
+      for (const button of buttons) {
+        button.setAttribute('aria-expanded', String(button.getAttribute('aria-controls') === id))
+      }
+    }
+
+    for (const link of menu.querySelectorAll<HTMLAnchorElement>('a[data-submenu]')) {
+      const id = link.dataset.submenu!
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = link.className
+      button.textContent = link.textContent
+      button.setAttribute('aria-controls', id)
+      if (link.hasAttribute('data-current')) button.dataset.current = ''
+      button.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') === 'true'
+        show(open ? current?.id : id)
+      })
+      link.replaceWith(button)
+      buttons.push(button)
+    }
+
+    show(current?.id)
+  }
+</script>

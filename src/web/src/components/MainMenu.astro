@@ -1,0 +1,81 @@
+---
+import { hasSubMenu, isWithin, mainMenu, subMenuId } from '../lib/navigation'
+
+interface Props {
+  /** The current page's path, to mark its group as current. */
+  pathname: string
+}
+
+const { pathname } = Astro.props
+---
+
+{/*
+  A group with a submenu links to its first built page. SiteMenu's script turns
+  that link into a button that shows the group's submenu row instead, so you
+  only leave the page when you pick one there. Without JavaScript the link
+  still works.
+*/}
+<nav aria-label="Hovedmeny">
+  <ul>
+    {
+      mainMenu().map((group) => {
+        const current = isWithin(pathname, group.path)
+        const href = group.pages.find((page) => page.built)!.href
+        return (
+          <li>
+            {hasSubMenu(group) ? (
+              <a class="item" href={href} data-submenu={subMenuId(group)} data-current={current || undefined}>
+                {group.label}
+              </a>
+            ) : (
+              <a class="item" href={href} aria-current={current ? 'page' : undefined}>
+                {group.label}
+              </a>
+            )}
+          </li>
+        )
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-1);
+    margin: 0;
+    padding: var(--ds-size-1) 0 var(--ds-size-2);
+    list-style: none;
+  }
+
+  /* :global, as SiteMenu's script swaps a link for a button it creates itself. */
+  ul :global(.item) {
+    display: block;
+    padding: var(--ds-size-2) var(--ds-size-3);
+    border: 0;
+    border-radius: var(--ds-border-radius-md);
+    background: none;
+    color: var(--ds-color-neutral-text-subtle);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  ul :global(.item:hover) {
+    background: var(--ds-color-neutral-surface-hover);
+  }
+
+  ul :global(.item:focus-visible) {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    outline-offset: 2px;
+  }
+
+  ul :global(.item[aria-current='page']),
+  ul :global(.item[aria-expanded='true']),
+  ul :global(.item[data-current]:not([aria-expanded='false'])) {
+    background: var(--ds-color-accent-surface-tinted);
+    color: var(--ds-color-accent-text-default);
+  }
+</style>
