@@ -99,6 +99,23 @@ describe('The unit file', () => {
     expect(file.skipped).toEqual(['10013301'])
   })
 
+  it('LO-01: gives KOM the level support and TUU the level authority, with their units under them as under a division', () => {
+    const file = readUnitFile(
+      csv([
+        ...UNITS,
+        '10004805,Tilsyn for universell utforming av IKT,1300,TUU,TUU,',
+        '10011800,TUU- seksjon for tilsyn,1310,TUU,TUS,',
+      ]),
+    )
+    if ('errors' in file) throw new Error(JSON.stringify(file.errors))
+    const byId = Object.fromEntries(file.units.map((u) => [u.externalUnitId, u]))
+
+    expect(byId['10003925']).toMatchObject({ level: 'support', code: 'KOM', parentId: '10008925' })
+    expect(byId['10014625']).toMatchObject({ level: 'department', parentId: '10003925' })
+    expect(byId['10004805']).toMatchObject({ level: 'authority', code: 'TUU', parentId: '10008925' })
+    expect(byId['10011800']).toMatchObject({ level: 'department', code: 'TUS', parentId: '10004805' })
+  })
+
   it('refuses a file with errors, listing all of them with their lines', () => {
     const file = readUnitFile(
       csv([
@@ -193,7 +210,7 @@ describe('The import endpoints and jobs', () => {
 
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { id: { exists: true } } })
-    for (const level of ['section', 'department', 'division', 'directorate'] as const) {
+    for (const level of ['section', 'department', 'support', 'authority', 'division', 'directorate'] as const) {
       await payload.delete({ collection: 'enheter', where: { level: { equals: level } } })
     }
     await payload.delete({ collection: 'lokasjoner', where: { code: { in: ['LEI', 'OSL'] } } })

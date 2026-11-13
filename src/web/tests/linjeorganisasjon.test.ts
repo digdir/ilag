@@ -93,7 +93,7 @@ describe('organisation chart', () => {
 
     const html = await render()
 
-    expect(html).toContain('aria-label="Divisjoner i Digitaliseringsdirektoratet"')
+    expect(html).toContain('aria-label="Enheter under direktøren"')
     expect(html).toMatch(/aria-label="Enheter i Fellesløsninger"[\s\S]*FEL – Utvikling/)
     expect(html).toMatch(/aria-label="Enheter i FEL – Utvikling"[\s\S]*FEL – Backend/)
   })

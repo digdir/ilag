@@ -22,7 +22,7 @@ const { directorate } = Astro.props
   </div>
   {
     directorate.children.length > 0 && (
-      <ul class="divisions" aria-label={`Divisjoner i ${directorate.name}`}>
+      <ul class="divisions" aria-label="Enheter under direktøren">
         {directorate.children.map((division) => (
           <li>
             <DivisionColumn division={division} />

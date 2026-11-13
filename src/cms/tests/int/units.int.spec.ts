@@ -56,7 +56,7 @@ describe('Units', () => {
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
     // Children before parents, so no unit is left pointing at a deleted one.
-    for (const level of ['section', 'department', 'division', 'directorate'] as const) {
+    for (const level of ['section', 'department', 'support', 'authority', 'division', 'directorate'] as const) {
       await payload.delete({
         collection: 'enheter',
         where: { externalUnitId: { like: prefix }, level: { equals: level } },

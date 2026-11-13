@@ -78,6 +78,15 @@ parent from the three code columns:
 The directorate is recognised by its ID, because its `Avdeling` and `Seksjon`
 hold its name instead of a code.
 
+Two units directly under the directorate aren't divisions, and the file can't
+tell them apart from one. ilag gives them their level by ID, a setting in
+ilag, and finds their departments and sections as under a division:
+
+| `orgEnhet` | Unit | Level |
+| --- | --- | --- |
+| `10003925` | Kommunikasjon (KOM) | Støtteenhet |
+| `10004805` | Tilsyn for universell utforming av IKT (TUU) | Myndighet |
+
 ### Lines ilag skips
 
 `10013301` (BOD-ekstern) groups contractors in SAP. It is not a unit in

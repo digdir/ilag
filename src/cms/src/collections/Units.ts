@@ -63,13 +63,17 @@ export const Units: CollectionConfig = {
     },
     {
       // The levels of the organisation chart (LO-01), with the directorate
-      // at the top.
+      // at the top. A support unit and an authority sit directly under the
+      // directorate like a division; the import sets them from UNIT_LEVELS
+      // in imports/settings.ts, since the file can't tell them apart.
       name: 'level',
       type: 'select',
       required: true,
       options: [
         { label: 'Direktorat', value: 'directorate' },
         { label: 'Divisjon', value: 'division' },
+        { label: 'Støtteenhet', value: 'support' },
+        { label: 'Myndighet', value: 'authority' },
         { label: 'Avdeling', value: 'department' },
         { label: 'Seksjon', value: 'section' },
       ],

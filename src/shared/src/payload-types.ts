@@ -279,7 +279,7 @@ export interface Unit {
   externalUnitId: string;
   name: string;
   code?: string | null;
-  level: 'directorate' | 'division' | 'department' | 'section';
+  level: 'directorate' | 'division' | 'support' | 'authority' | 'department' | 'section';
   parent?: (number | null) | Unit;
   leader?: (number | null) | Person;
   /**

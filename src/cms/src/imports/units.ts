@@ -2,7 +2,7 @@ import type { PayloadRequest } from 'payload'
 
 import type { Unit } from '../payload-types'
 import { columns, parseCsv, type ImportError } from './csv'
-import { DIRECTORATE_UNIT_ID, SKIPPED_UNIT_IDS } from './settings'
+import { DIRECTORATE_UNIT_ID, SKIPPED_UNIT_IDS, UNIT_LEVELS } from './settings'
 
 // The unit file from SAP (docs/integrations/unit-import.md). Its Avdeling,
 // Seksjon and gruppe are what ilag calls divisjon, avdeling and seksjon.
@@ -34,7 +34,7 @@ const COLUMNS = {
 } as const
 
 // The order the levels are created in, so a parent always exists first.
-const LEVELS: Unit['level'][] = ['directorate', 'division', 'department', 'section']
+const LEVELS: Unit['level'][] = ['directorate', 'division', 'support', 'authority', 'department', 'section']
 
 export const readUnitFile = (text: string): { errors: ImportError[] } | UnitFile => {
   const file = parseCsv(text)
@@ -139,7 +139,9 @@ export const readUnitFile = (text: string): { errors: ImportError[] } | UnitFile
       externalUnitId,
       name,
       code,
-      level,
+      // The structure above uses the level from the file; support units and
+      // authorities only get theirs here.
+      level: level === 'division' ? (UNIT_LEVELS[externalUnitId] ?? level) : level,
       parentId,
     })),
     skipped,
