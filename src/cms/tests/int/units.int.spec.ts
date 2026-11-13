@@ -56,7 +56,7 @@ describe('Units', () => {
   afterAll(async () => {
     await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
     // Children before parents, so no unit is left pointing at a deleted one.
-    for (const level of ['section', 'department', 'division', 'directorate'] as const) {
+    for (const level of ['section', 'department', 'support', 'authority', 'division', 'directorate'] as const) {
       await payload.delete({
         collection: 'enheter',
         where: { externalUnitId: { like: prefix }, level: { equals: level } },
@@ -170,6 +170,34 @@ describe('Units', () => {
     expect(updated.name).toBe('Enhet 14')
     expect(updated.level).toBe('division')
     expect(updated.active).toBe(true)
+  })
+
+  it('LO-06: does not mark a new unit as advising all of Digdir', async () => {
+    const created = await payload.create({ collection: 'enheter', data: unit(18) })
+    expect(created.advisesAllOfDigdir).toBe(false)
+  })
+
+  it('LO-06: lets administrators mark a unit as advising all of Digdir, and nobody else', async () => {
+    const created = await payload.create({ collection: 'enheter', data: unit(19) })
+
+    const updated = await payload.update({
+      collection: 'enheter',
+      id: created.id,
+      data: { advisesAllOfDigdir: true },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.advisesAllOfDigdir).toBe(true)
+
+    await expect(
+      payload.update({
+        collection: 'enheter',
+        id: created.id,
+        data: { advisesAllOfDigdir: false },
+        overrideAccess: false,
+        user,
+      }),
+    ).rejects.toThrow()
   })
 
   it('LO-02: lets administrators set the leader, and nobody else', async () => {

@@ -9,6 +9,16 @@ export const DIRECTORATE_UNIT_ID = '10008925'
 // contractors. The unit import skips them, and people in them get no unit.
 export const SKIPPED_UNIT_IDS: readonly string[] = ['10013301']
 
+// Units directly under the directorate that aren't divisions, which the file
+// can't tell apart: a staff unit (stab) such as Kommunikasjon, and a
+// supervisory authority (tilsyn) such as Tilsyn for universell utforming av IKT. The unit
+// import gives them this level instead of «division»; their departments and
+// sections are found as under a division.
+export const UNIT_LEVELS: Readonly<Record<string, 'support' | 'authority'>> = {
+  '10003925': 'support', // Kommunikasjon (KOM)
+  '10004805': 'authority', // Tilsyn for universell utforming av IKT (TUU)
+}
+
 // The largest file the import endpoints accept.
 export const MAX_FILE_BYTES = 5 * 1024 * 1024
 

@@ -26,6 +26,14 @@ export const leaders = [
   { unit: '10014301', person: '1008' }, // FEL - Arkitektur og produktutvikling
 ]
 
+// Units that advise all of Digdir (LO-06), which administrators set in ilag:
+// the units' orgEnhet. Like the prototype's Brukeropplevelse og design and
+// Marked og utbredelse.
+export const advisesAllOfDigdir = [
+  '10014090', // BOD – Interaksjonsdesign
+  '10014306', // FEL – Marked
+]
+
 // The roles in the prototype, with RAMO as it shows them (ROLES, ROLE_EXTRA,
 // LINE_MANAGER, AREA_OWNER, EMPLOYEE and AI_AGENT in prototype/Saman.dc.html),
 // and the team types they are relevant for by name (RO-03, Vedlegg 7): the

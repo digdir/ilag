@@ -1,0 +1,44 @@
+---
+import OrgChart from '../../../components/linjeorganisasjon/OrgChart.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getOrgChart } from '../../../lib/cms/units'
+
+const directorate = await getOrgChart(Astro.request.headers.get('cookie'))
+---
+
+<Layout title="Linjeorganisasjon — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Linjeorganisasjon</h1>
+      <p class="ds-paragraph">
+        Bestemme hvilke fagmiljøer og ressurser Digdir trenger, og hvordan vi skal utvikle og
+        forvalte dem.
+      </p>
+    </header>
+    <section aria-labelledby="organisasjonskart">
+      <h2 class="ds-heading" data-size="xs" id="organisasjonskart">Organisasjonskart</h2>
+      {
+        directorate ? (
+          <OrgChart directorate={directorate} />
+        ) : (
+          <p class="ds-paragraph">Ingen enheter er registrert ennå.</p>
+        )
+      }
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-8);
+  }
+
+  header,
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+</style>
