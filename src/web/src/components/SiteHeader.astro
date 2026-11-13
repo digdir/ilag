@@ -2,7 +2,9 @@
 import type { User } from '@ilag/shared'
 
 import Avatar from './Avatar.astro'
+import { subMenuFor } from '../lib/navigation'
 import MainMenu from './MainMenu.astro'
+import SubMenu from './SubMenu.astro'
 
 interface Props {
   /** Who is logged in. Without one (the login page) only the logo shows. */
@@ -13,6 +15,7 @@ interface Props {
 const { user, pathname } = Astro.props
 const userName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || ''
 const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
+const subMenu = subMenuFor(pathname)
 ---
 
 <header>
@@ -42,6 +45,7 @@ const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
       }
     </div>
     {user && <MainMenu pathname={pathname} />}
+    {user && subMenu && <SubMenu group={subMenu} pathname={pathname} />}
   </div>
 </header>
 

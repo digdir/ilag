@@ -1,0 +1,91 @@
+---
+import type { NavGroup } from '../lib/navigation'
+import { isWithin } from '../lib/navigation'
+
+interface Props {
+  /** The group the current page belongs to. */
+  group: NavGroup
+  pathname: string
+}
+
+const { group, pathname } = Astro.props
+---
+
+{/* Looks like Designsystemet's tabs, but these are links between pages, not tabs. */}
+<nav aria-label={group.label}>
+  <ul>
+    {
+      group.pages.map((page) => (
+        <li>
+          {page.built ? (
+            <a href={page.href} aria-current={isWithin(pathname, page.href) ? 'page' : undefined}>
+              {page.label}
+            </a>
+          ) : (
+            <span title="Kommer snart">{page.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  a,
+  span {
+    display: block;
+    position: relative;
+    padding: var(--ds-size-2) var(--ds-size-4);
+    white-space: nowrap;
+  }
+
+  a {
+    color: var(--ds-color-neutral-text-subtle);
+    text-decoration: none;
+  }
+
+  /* The tab's underline. */
+  a::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 0.15em;
+  }
+
+  a:hover {
+    color: var(--ds-color-neutral-text-default);
+  }
+
+  a:hover:not([aria-current])::after {
+    background: var(--ds-color-neutral-border-subtle);
+  }
+
+  a:focus-visible {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    outline-offset: calc(-1 * var(--ds-border-width-focus));
+  }
+
+  a[aria-current='page'] {
+    color: var(--ds-color-accent-text-subtle);
+  }
+
+  a[aria-current='page']::after {
+    background: var(--ds-color-accent-text-subtle);
+  }
+
+  /* Pages that are not built yet. */
+  span {
+    color: var(--ds-color-neutral-text-subtle);
+    opacity: 0.55;
+    cursor: default;
+  }
+</style>

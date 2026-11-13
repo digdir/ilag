@@ -52,6 +52,21 @@ describe('site header', () => {
     expect(html).not.toContain('aria-current')
   })
 
+  it('shows the submenu of the current section, linking only pages that are built', async () => {
+    const html = await render({ user: kari, pathname: '/organisering/team/42' })
+
+    expect(html).toContain('aria-label="Organisering"')
+    expect(menuLink(html, 'Team')).toMatch(/href="\/organisering\/team"[^>]*aria-current="page"/)
+    expect(html).toMatch(/<span [^>]*>\s*Linjeorganisasjon\s*<\/span>/)
+    expect(menuLink(html, 'Linjeorganisasjon')).toBeUndefined()
+  })
+
+  it('shows no submenu outside a section', async () => {
+    const html = await render({ user: kari, pathname: '/' })
+
+    expect(html).not.toContain('aria-label="Organisering"')
+  })
+
   it('shows only the logo when nobody is logged in', async () => {
     const html = await render({ pathname: '/logg-inn' })
 

@@ -1,29 +1,20 @@
 ---
+import { isWithin, mainMenu } from '../lib/navigation'
+
 interface Props {
-  /** The current page's path, to mark its section as current. */
+  /** The current page's path, to mark its group as current. */
   pathname: string
 }
 
 const { pathname } = Astro.props
-
-// The main menu groups from the prototype's NAV_GROUPS. A group is listed once
-// it has a page; `match` marks it current on every page in its folder.
-const NAV = [
-  // { label: 'Styring', href: '/styring', match: '/styring' },
-  // { label: 'Folk', href: '/folk', match: '/folk' },
-  { label: 'Organisering', href: '/organisering/team', match: '/organisering' },
-  // { label: 'Verktøy', href: '/verktoy', match: '/verktoy' },
-]
-
-const isCurrent = (match: string) => pathname === match || pathname.startsWith(`${match}/`)
 ---
 
 <nav aria-label="Hovedmeny">
   <ul>
     {
-      NAV.map((item) => (
+      mainMenu().map((item) => (
         <li>
-          <a href={item.href} aria-current={isCurrent(item.match) ? 'page' : undefined}>
+          <a href={item.href} aria-current={isWithin(pathname, item.path) ? 'page' : undefined}>
             {item.label}
           </a>
         </li>
