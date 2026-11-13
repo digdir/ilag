@@ -1,0 +1,98 @@
+---
+import type { PersonRow } from '../../types/person'
+import Avatar from '../Avatar.astro'
+
+interface Props {
+  person: PersonRow
+}
+
+const { person } = Astro.props
+
+// What the search matches: name, title, units and teams (FO-03).
+const searchText = [person.name, person.title, ...person.units, ...person.teams.map((t) => t.name)]
+  .filter(Boolean)
+  .join(' ')
+  .toLowerCase()
+---
+
+<tr data-search={searchText}>
+  <td>
+    <div class="person">
+      <Avatar name={person.name} />
+      <div>
+        <p class="ds-paragraph name">{person.name}</p>
+        {
+          person.title && (
+            <p class="ds-paragraph title" data-size="sm">
+              {person.title}
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </td>
+  <td>
+    {
+      person.units.length ? (
+        <ul class="plain">
+          {person.units.map((unit) => (
+            <li>{unit}</li>
+          ))}
+        </ul>
+      ) : (
+        <span class="none">Ikke registrert</span>
+      )
+    }
+  </td>
+  <td>
+    {
+      person.teams.length ? (
+        <ul class="plain teams">
+          {person.teams.map((team) => (
+            <li>
+              <a class="ds-link" href={`/organisering/team/${team.id}`}>
+                {team.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <span class="none">Ingen team</span>
+      )
+    }
+  </td>
+</tr>
+
+<style>
+  .person {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-3);
+  }
+
+  .name,
+  .title {
+    margin: 0;
+  }
+
+  .name {
+    font-weight: var(--ds-font-weight-medium);
+  }
+
+  .title,
+  .none {
+    color: var(--ds-color-text-subtle);
+  }
+
+  .plain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .teams {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-1) var(--ds-size-3);
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+interface Props {
+  /** How many people there are before searching. */
+  count: number
+}
+
+const { count } = Astro.props
+const countLabel = (n: number) => (n === 1 ? '1 person' : `${n} personer`)
+---
+
+<!--
+  Search by name, title, unit or team (FO-03). The page has everyone already,
+  so the script below only hides the rows that don't match, in the list marked
+  data-people-list. Without JavaScript, everyone shows.
+-->
+<div class="people-search" data-people-search>
+  <ds-field class="ds-field">
+    <label class="ds-label" for="people-search">Søk blant ansatte</label>
+    <input
+      class="ds-input"
+      id="people-search"
+      type="search"
+      placeholder="Søk etter navn, rolle, enhet eller team"
+    />
+  </ds-field>
+  <p class="ds-paragraph count" data-size="sm" aria-live="polite" data-people-count>
+    {countLabel(count)}
+  </p>
+</div>
+
+<script>
+  const search = document.querySelector<HTMLInputElement>('[data-people-search] input')!
+  const count = document.querySelector<HTMLElement>('[data-people-count]')!
+  const empty = document.querySelector<HTMLElement>('[data-people-empty]')!
+  const people = [...document.querySelectorAll<HTMLElement>('[data-people-list] [data-search]')]
+
+  search.addEventListener('input', () => {
+    const words = search.value.trim().toLowerCase().split(/\s+/)
+    let shown = 0
+    for (const person of people) {
+      person.hidden = !words.every((word) => person.dataset.search!.includes(word))
+      if (!person.hidden) shown++
+    }
+    count.textContent = shown === 1 ? '1 person' : `${shown} personer`
+    empty.hidden = shown > 0
+  })
+</script>
+
+<style>
+  .people-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--ds-size-4);
+  }
+
+  ds-field {
+    flex: 1 1 18rem;
+    max-width: 28rem;
+  }
+
+  .count {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>
