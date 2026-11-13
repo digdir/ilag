@@ -56,15 +56,12 @@ export const NAV: NavGroup[] = [
 export const isWithin = (pathname: string, path: string) =>
   pathname === path || pathname.startsWith(`${path}/`)
 
-/** The groups in the main menu: those with at least one built page, linking to the first. */
+/** The groups in the main menu: those with at least one built page. */
 export const mainMenu = (nav: NavGroup[] = NAV) =>
-  nav.flatMap((group) => {
-    const first = group.pages.find((page) => page.built)
-    return first ? [{ label: group.label, href: first.href, path: group.path }] : []
-  })
+  nav.filter((group) => group.pages.some((page) => page.built))
 
-/** The group the current page belongs to, if it has more than one page to choose between. */
-export const subMenuFor = (pathname: string, nav: NavGroup[] = NAV) => {
-  const group = nav.find((g) => isWithin(pathname, g.path))
-  return group && group.pages.length > 1 ? group : undefined
-}
+/** Whether the group gets a submenu: it has more than one page to choose between. */
+export const hasSubMenu = (group: NavGroup) => group.pages.length > 1
+
+/** The id of the group's submenu row, which its main menu item shows. */
+export const subMenuId = (group: NavGroup) => `undermeny-${group.path.slice(1)}`

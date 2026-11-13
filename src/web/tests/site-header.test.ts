@@ -33,22 +33,34 @@ describe('site header', () => {
     expect(html).toMatch(/<a [^>]*href="\/"[^>]*>\s*<img [^>]*alt="Digdir"/)
   })
 
-  it('marks the section of the current page as current', async () => {
-    const html = await render({ user: kari, pathname: '/organisering/team/42' })
-
-    expect(menuLink(html, 'Organisering')).toContain('aria-current="page"')
-  })
-
-  it('marks no section as current outside the menu', async () => {
+  it('has a hidden submenu for a section outside it, which the section item points to', async () => {
     const html = await render({ user: kari, pathname: '/' })
 
-    expect(menuLink(html, 'Organisering')).toBeDefined()
+    const item = menuLink(html, 'Organisering')
+    expect(item).toContain('href="/organisering/team"')
+    const id = item!.match(/data-submenu="([^"]+)"/)![1]
+    expect(html).toMatch(new RegExp(`<nav [^>]*id="${id}"[^>]*aria-label="Organisering"[^>]*hidden`))
+  })
+
+  it('marks the section of the current page as current and shows its submenu', async () => {
+    const html = await render({ user: kari, pathname: '/organisering/team/42' })
+
+    expect(menuLink(html, 'Organisering')).toContain('data-current')
+    const submenu = html.match(/<nav [^>]*aria-label="Organisering"[^>]*>/)![0]
+    expect(submenu).not.toContain('hidden')
+  })
+
+  it('marks no section or page as current outside the menu', async () => {
+    const html = await render({ user: kari, pathname: '/' })
+
+    expect(html).not.toContain('data-current')
     expect(html).not.toContain('aria-current')
   })
 
   it('does not take a path that only starts with the same letters as the section', async () => {
     const html = await render({ user: kari, pathname: '/organiseringer' })
 
+    expect(html).not.toContain('data-current')
     expect(html).not.toContain('aria-current')
   })
 
@@ -59,12 +71,6 @@ describe('site header', () => {
     expect(menuLink(html, 'Team')).toMatch(/href="\/organisering\/team"[^>]*aria-current="page"/)
     expect(html).toMatch(/<span [^>]*>\s*Linjeorganisasjon\s*<\/span>/)
     expect(menuLink(html, 'Linjeorganisasjon')).toBeUndefined()
-  })
-
-  it('shows no submenu outside a section', async () => {
-    const html = await render({ user: kari, pathname: '/' })
-
-    expect(html).not.toContain('aria-label="Organisering"')
   })
 
   it('shows only the logo when nobody is logged in', async () => {

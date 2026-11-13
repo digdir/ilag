@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isWithin, mainMenu, type NavGroup, subMenuFor } from '../src/lib/navigation'
+import { hasSubMenu, isWithin, mainMenu, type NavGroup } from '../src/lib/navigation'
 
 const nav: NavGroup[] = [
   {
@@ -22,19 +22,11 @@ describe('navigation', () => {
     expect(isWithin('/organiseringer', '/organisering')).toBe(false)
   })
 
-  it('lists groups with a built page in the main menu, linking to the first built page', () => {
-    expect(mainMenu(nav)).toEqual([
-      { label: 'Organisering', href: '/organisering/team', path: '/organisering' },
-      { label: 'Folk', href: '/folk', path: '/folk' },
-    ])
+  it('lists the groups that have a built page in the main menu', () => {
+    expect(mainMenu(nav).map((group) => group.label)).toEqual(['Organisering', 'Folk'])
   })
 
-  it('gives the submenu of the current group', () => {
-    expect(subMenuFor('/organisering/team/42', nav)?.label).toBe('Organisering')
-  })
-
-  it('gives no submenu outside the groups, or for a group with a single page', () => {
-    expect(subMenuFor('/', nav)).toBeUndefined()
-    expect(subMenuFor('/folk', nav)).toBeUndefined()
+  it('gives a submenu only to groups with more than one page', () => {
+    expect(nav.filter(hasSubMenu).map((group) => group.label)).toEqual(['Organisering'])
   })
 })
