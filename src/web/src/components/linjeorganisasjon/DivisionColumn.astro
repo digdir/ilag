@@ -1,0 +1,123 @@
+---
+import type { OrgUnit } from '../../types/unit'
+
+interface Props {
+  division: OrgUnit
+}
+
+const { division } = Astro.props
+const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
+---
+
+<!-- A division with its departments, and their sections under them (LO-01). -->
+<div class="division">
+  <div class="head">
+    <span class="top">
+      {division.code && <span class="code">{division.code}</span>}
+      <span class="size">{size(division.size)}</span>
+    </span>
+    <span class="name">{division.name}</span>
+    {division.leader && <span class="leader">{division.leader}</span>}
+  </div>
+  {
+    division.children.length > 0 && (
+      <ul class="departments" aria-label={`Enheter i ${division.name}`}>
+        {division.children.map((department) => (
+          <li>
+            <span class="department">{department.name}</span>
+            {department.children.length > 0 && (
+              <ul class="sections" aria-label={`Enheter i ${department.name}`}>
+                {department.children.map((section) => (
+                  <li class="section">{section.name}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>
+
+<style>
+  .division {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-1);
+    padding: var(--ds-size-3) var(--ds-size-4);
+    border-radius: var(--ds-border-radius-md);
+    background: var(--ds-color-neutral-base-default);
+    color: var(--ds-color-neutral-base-contrast-default);
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--ds-size-2);
+    font-size: var(--ds-body-sm-font-size);
+  }
+
+  .code {
+    font-weight: var(--ds-font-weight-semibold);
+    letter-spacing: 0.08em;
+  }
+
+  .size {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .name {
+    font-weight: var(--ds-font-weight-semibold);
+    line-height: var(--ds-line-height-sm);
+  }
+
+  .leader {
+    font-size: var(--ds-body-sm-font-size);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .departments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+
+  .department {
+    display: block;
+    padding: var(--ds-size-2) var(--ds-size-3);
+    border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+    background: var(--ds-color-neutral-surface-default);
+    font-size: var(--ds-body-sm-font-size);
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-1);
+    margin-block-start: var(--ds-size-1);
+    margin-inline-start: var(--ds-size-2);
+    padding-inline-start: var(--ds-size-2);
+    border-inline-start: calc(2 * var(--ds-border-width-default)) solid var(--ds-color-border-subtle);
+  }
+
+  .section {
+    padding: var(--ds-size-1) var(--ds-size-2);
+    border-radius: var(--ds-border-radius-sm);
+    background: var(--ds-color-neutral-background-tinted);
+    color: var(--ds-color-text-subtle);
+    font-size: var(--ds-body-sm-font-size);
+  }
+</style>

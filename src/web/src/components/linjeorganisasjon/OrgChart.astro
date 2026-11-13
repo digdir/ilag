@@ -1,0 +1,99 @@
+---
+import type { OrgUnit } from '../../types/unit'
+import DivisionColumn from './DivisionColumn.astro'
+
+interface Props {
+  /** The directorate, with the divisions under it. */
+  directorate: OrgUnit
+}
+
+const { directorate } = Astro.props
+---
+
+<!--
+  The organisation chart (LO-01): the director at the top and the divisions in
+  a row under, each with its departments and sections. Nested lists, so it
+  reads as a tree without the lines.
+-->
+<div class="chart">
+  <div class="director">
+    <span class="label">Direktør</span>
+    <span class="name">{directorate.leader ?? 'Ikke registrert'}</span>
+  </div>
+  {
+    directorate.children.length > 0 && (
+      <ul class="divisions" aria-label={`Divisjoner i ${directorate.name}`}>
+        {directorate.children.map((division) => (
+          <li>
+            <DivisionColumn division={division} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</div>
+
+<style>
+  .chart {
+    --line: calc(2 * var(--ds-border-width-default)) solid var(--ds-color-border-subtle);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .director {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--ds-size-1);
+    padding: var(--ds-size-3) var(--ds-size-6);
+    border-radius: var(--ds-border-radius-md);
+    background: var(--ds-color-accent-base-default);
+    color: var(--ds-color-accent-base-contrast-default);
+    text-align: center;
+  }
+
+  .label {
+    font-size: var(--ds-body-sm-font-size);
+    font-weight: var(--ds-font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .name {
+    font-weight: var(--ds-font-weight-medium);
+  }
+
+  /* The line down from the director, and the line along the divisions. */
+  .divisions {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: var(--ds-size-2);
+    margin: 0;
+    margin-block-start: var(--ds-size-4);
+    padding: 0;
+    padding-block-start: var(--ds-size-4);
+    border-block-start: var(--line);
+    list-style: none;
+    position: relative;
+  }
+
+  .divisions::before {
+    content: '';
+    position: absolute;
+    inset-block-start: calc(-1 * var(--ds-size-4));
+    inset-inline-start: 50%;
+    block-size: var(--ds-size-4);
+    border-inline-start: var(--line);
+  }
+
+  /* On a narrow screen the divisions are a column under the director, without
+     the line along them. */
+  @media (max-width: 40rem) {
+    .divisions {
+      border-block-start: none;
+      gap: var(--ds-size-6);
+    }
+  }
+</style>
