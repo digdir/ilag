@@ -2,27 +2,30 @@
 import type { OrgUnit } from '../../types/unit'
 
 interface Props {
-  division: OrgUnit
+  /** A division, or a staff unit or supervisory authority beside the director. */
+  unit: OrgUnit
+  /** Light for the staff, like the prototype; dark for the rest. */
+  variant?: 'dark' | 'light'
 }
 
-const { division } = Astro.props
+const { unit, variant = 'dark' } = Astro.props
 const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
 ---
 
-<!-- A division with its departments, and their sections under them (LO-01). -->
-<div class="division">
-  <div class="head">
+<!-- A unit under the director with its departments, and their sections under them (LO-01). -->
+<div class="unit">
+  <div class="head" data-variant={variant}>
     <span class="top">
-      {division.code && <span class="code">{division.code}</span>}
-      <span class="size">{size(division.size)}</span>
+      {unit.code && <span class="code">{unit.code}</span>}
+      <span class="size">{size(unit.size)}</span>
     </span>
-    <span class="name">{division.name}</span>
-    {division.leader && <span class="leader">{division.leader}</span>}
+    <span class="name">{unit.name}</span>
+    {unit.leader && <span class="leader">{unit.leader}</span>}
   </div>
   {
-    division.children.length > 0 && (
-      <ul class="departments" aria-label={`Enheter i ${division.name}`}>
-        {division.children.map((department) => (
+    unit.children.length > 0 && (
+      <ul class="departments" aria-label={`Enheter i ${unit.name}`}>
+        {unit.children.map((department) => (
           <li>
             <span class="department">{department.name}</span>
             {department.children.length > 0 && (
@@ -40,7 +43,7 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
 </div>
 
 <style>
-  .division {
+  .unit {
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-2);
@@ -54,6 +57,12 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
     border-radius: var(--ds-border-radius-md);
     background: var(--ds-color-neutral-base-default);
     color: var(--ds-color-neutral-base-contrast-default);
+  }
+
+  .head[data-variant='light'] {
+    border: var(--ds-border-width-default) solid var(--ds-color-border-default);
+    background: var(--ds-color-neutral-surface-default);
+    color: var(--ds-color-text-default);
   }
 
   .top {

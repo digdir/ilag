@@ -1,31 +1,68 @@
 ---
 import type { OrgUnit } from '../../types/unit'
-import DivisionColumn from './DivisionColumn.astro'
+import UnitColumn from './UnitColumn.astro'
 
 interface Props {
-  /** The directorate, with the divisions under it. */
+  /** The directorate, with the units under it. */
   directorate: OrgUnit
 }
 
 const { directorate } = Astro.props
+const authorities = directorate.children.filter((u) => u.level === 'authority')
+const staff = directorate.children.filter((u) => u.level === 'support')
+const divisions = directorate.children.filter((u) => u.level !== 'authority' && u.level !== 'support')
 ---
 
 <!--
-  The organisation chart (LO-01): the director at the top and the divisions in
-  a row under, each with its departments and sections. Nested lists, so it
+  The organisation chart (LO-01), laid out as in the prototype: the director in
+  the middle, the supervisory authority (tilsyn) to the left with a dashed line,
+  since it is independent, and the staff (stab) to the right. The divisions are
+  in a row under, each with its departments and sections. Nested lists, so it
   reads as a tree without the lines.
 -->
 <div class="chart">
-  <div class="director">
-    <span class="label">Direktør</span>
-    <span class="name">{directorate.leader ?? 'Ikke registrert'}</span>
+  <div class="top">
+    <div class="spine">
+      <div class="director">
+        <span class="label">Direktør</span>
+        <span class="name">{directorate.leader ?? 'Ikke registrert'}</span>
+      </div>
+    </div>
+    {
+      authorities.length > 0 && (
+        <div class="side authority">
+          <ul aria-label="Tilsyn">
+            {authorities.map((unit) => (
+              <li>
+                <UnitColumn unit={unit} />
+              </li>
+            ))}
+          </ul>
+          <span class="link" aria-hidden="true" />
+        </div>
+      )
+    }
+    {
+      staff.length > 0 && (
+        <div class="side staff">
+          <span class="link" aria-hidden="true" />
+          <ul aria-label="Stab">
+            {staff.map((unit) => (
+              <li>
+                <UnitColumn unit={unit} variant="light" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   </div>
   {
-    directorate.children.length > 0 && (
-      <ul class="divisions" aria-label="Enheter under direktøren">
-        {directorate.children.map((division) => (
+    divisions.length > 0 && (
+      <ul class="divisions" aria-label="Divisjoner">
+        {divisions.map((division) => (
           <li>
-            <DivisionColumn division={division} />
+            <UnitColumn unit={division} />
           </li>
         ))}
       </ul>
@@ -35,10 +72,40 @@ const { directorate } = Astro.props
 
 <style>
   .chart {
-    --line: calc(2 * var(--ds-border-width-default)) solid var(--ds-color-border-subtle);
+    --line-width: calc(2 * var(--ds-border-width-default));
+    --line: var(--line-width) solid var(--ds-color-border-subtle);
+    /* Where the lines to the sides meet the director's line. */
+    --link-top: var(--ds-size-10);
+    display: flex;
+    flex-direction: column;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Tilsyn, director and stab in three columns, with the director's line
+     running down the middle to the divisions. */
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: 'authority spine staff';
+  }
+
+  .spine {
+    grid-area: spine;
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .spine::after {
+    content: '';
+    flex: 1;
+    min-block-size: var(--ds-size-6);
+    border-inline-start: var(--line);
   }
 
   .director {
@@ -64,36 +131,77 @@ const { directorate } = Astro.props
     font-weight: var(--ds-font-weight-medium);
   }
 
-  /* The line down from the director, and the line along the divisions. */
+  .side {
+    display: flex;
+    align-items: flex-start;
+    padding-block: var(--ds-size-6);
+  }
+
+  .side ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+    inline-size: min(100%, 15rem);
+  }
+
+  .authority {
+    grid-area: authority;
+    justify-content: flex-end;
+  }
+
+  .staff {
+    grid-area: staff;
+  }
+
+  .link {
+    flex: 1 0 var(--ds-size-6);
+    margin-block-start: calc(var(--link-top) - var(--ds-size-6));
+  }
+
+  /* Dashed to the tilsyn, which is independent of the line. */
+  .authority .link {
+    border-block-start: var(--line-width) dashed var(--ds-color-border-default);
+  }
+
+  .staff .link {
+    border-block-start: var(--line);
+  }
+
   .divisions {
-    align-self: stretch;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
     gap: var(--ds-size-2);
-    margin: 0;
-    margin-block-start: var(--ds-size-4);
-    padding: 0;
     padding-block-start: var(--ds-size-4);
     border-block-start: var(--line);
-    list-style: none;
-    position: relative;
   }
 
-  .divisions::before {
-    content: '';
-    position: absolute;
-    inset-block-start: calc(-1 * var(--ds-size-4));
-    inset-inline-start: 50%;
-    block-size: var(--ds-size-4);
-    border-inline-start: var(--line);
-  }
-
-  /* On a narrow screen the divisions are a column under the director, without
-     the line along them. */
+  /* On a narrow screen everything is one column under the director, without
+     the lines. */
   @media (max-width: 40rem) {
-    .divisions {
-      border-block-start: none;
+    .top {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'spine' 'authority' 'staff';
       gap: var(--ds-size-6);
+    }
+
+    .spine::after,
+    .link {
+      display: none;
+    }
+
+    .side {
+      padding-block: 0;
+    }
+
+    .side ul {
+      inline-size: 100%;
+    }
+
+    .divisions {
+      gap: var(--ds-size-6);
+      margin-block-start: var(--ds-size-6);
+      padding-block-start: 0;
+      border-block-start: none;
     }
   }
 </style>

@@ -84,8 +84,8 @@ ilag, and finds their departments and sections as under a division:
 
 | `orgEnhet` | Unit | Level |
 | --- | --- | --- |
-| `10003925` | Kommunikasjon (KOM) | Støtteenhet |
-| `10004805` | Tilsyn for universell utforming av IKT (TUU) | Myndighet |
+| `10003925` | Kommunikasjon (KOM) | Stab |
+| `10004805` | Tilsyn for universell utforming av IKT (TUU) | Tilsyn |
 
 ### Lines ilag skips
 

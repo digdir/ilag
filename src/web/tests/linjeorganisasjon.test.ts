@@ -14,7 +14,7 @@ const render = async () => {
   })
 }
 
-type Level = 'directorate' | 'division' | 'department' | 'section'
+type Level = 'directorate' | 'division' | 'support' | 'authority' | 'department' | 'section'
 const unit = (id: number, name: string, level: Level, parent: number | null, extra = {}) => ({
   id,
   name,
@@ -37,6 +37,8 @@ const units = [
     code: 'FEL',
     leader: { id: 2, fullName: 'Kari Nordmann' },
   }),
+  unit(6, 'Kommunikasjon', 'support', 1, { code: 'KOM' }),
+  unit(7, 'Tilsyn for universell utforming av IKT', 'authority', 1, { code: 'TUU' }),
 ]
 
 // Kari leads FEL, Silje is in FUT, Åse in the section under it, and Erik in
@@ -93,9 +95,42 @@ describe('organisation chart', () => {
 
     const html = await render()
 
-    expect(html).toContain('aria-label="Enheter under direktøren"')
+    expect(html).toContain('aria-label="Divisjoner"')
     expect(html).toMatch(/aria-label="Enheter i Fellesløsninger"[\s\S]*FEL – Utvikling/)
     expect(html).toMatch(/aria-label="Enheter i FEL – Utvikling"[\s\S]*FEL – Backend/)
+  })
+
+  it('LO-01: places the tilsyn to the left of the director and the stab to the right, as in the prototype', async () => {
+    vi.stubGlobal('fetch', cms({ units, people }))
+
+    const html = await render()
+
+    const tilsyn = html.indexOf('aria-label="Tilsyn"')
+    const director = html.indexOf('Ingrid Berg')
+    const stab = html.indexOf('aria-label="Stab"')
+    const divisions = html.indexOf('aria-label="Divisjoner"')
+    expect(tilsyn).toBeGreaterThan(-1)
+    expect(stab).toBeGreaterThan(-1)
+    // In the markup the director comes first, then the sides, then the
+    // divisions; CSS puts the tilsyn to the left.
+    expect(director).toBeLessThan(tilsyn)
+    expect(tilsyn).toBeLessThan(stab)
+    expect(stab).toBeLessThan(divisions)
+    expect(html.slice(tilsyn, stab)).toContain('Tilsyn for universell utforming av IKT')
+    expect(html.slice(stab, divisions)).toContain('Kommunikasjon')
+    expect(html.slice(stab, divisions)).toContain('data-variant="light"')
+    expect(html.slice(divisions)).not.toContain('Kommunikasjon')
+    expect(html.slice(divisions)).not.toContain('Tilsyn for universell')
+  })
+
+  it('leaves out the sides when there is no tilsyn or stab', async () => {
+    vi.stubGlobal('fetch', cms({ units: units.slice(0, 5), people }))
+
+    const html = await render()
+
+    expect(html).not.toContain('aria-label="Tilsyn"')
+    expect(html).not.toContain('aria-label="Stab"')
+    expect(html).toContain('aria-label="Divisjoner"')
   })
 
   it('says so when there are no units', async () => {
