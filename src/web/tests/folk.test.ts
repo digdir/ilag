@@ -21,7 +21,6 @@ const people = [
     id: 1,
     fullName: 'Åse Ødegård',
     title: 'Utvikler',
-    mobile: '+4790011223',
     units: [{ id: 4, name: 'FEL – Backend' }],
     teams: {
       docs: [
@@ -34,7 +33,6 @@ const people = [
     id: 2,
     fullName: 'Ingrid Berg',
     title: 'Direktør',
-    mobile: '+46701234567',
     units: [{ id: 1, name: 'Digitaliseringsdirektoratet' }],
     teams: { docs: [] },
   },
@@ -42,7 +40,6 @@ const people = [
     id: 3,
     fullName: 'Emma Kristiansen',
     title: null,
-    mobile: null,
     units: [],
     teams: { docs: [] },
   },
@@ -66,7 +63,6 @@ describe('Folk', () => {
     const { searchParams } = new URL(url)
     expect(searchParams.get('where[active][equals]')).toBe('true')
     expect(searchParams.get('depth')).toBe('2')
-    expect(searchParams.get('select[mobile]')).toBe('true')
     expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
   })
 
@@ -90,16 +86,6 @@ describe('Folk', () => {
     expect(html).toMatch(/<li[^>]*>FEL – Backend<\/li>/)
     expect(html).toMatch(/<li[^>]*>Digitaliseringsdirektoratet<\/li>/)
     expect(html).toContain('Ikke registrert')
-  })
-
-  it('shows the mobile number as a link, Norwegian numbers in pairs', async () => {
-    vi.stubGlobal('fetch', cms(people))
-
-    const html = await render()
-
-    expect(html).toMatch(/href="tel:\+4790011223"[^>]*>\s*90 01 12 23\s*</)
-    expect(html).toMatch(/href="tel:\+46701234567"[^>]*>\s*\+46701234567\s*</)
-    expect(html).toMatch(/<th scope="col"[^>]*>Mobil</)
   })
 
   it('FO-02: links to the active teams only, and says when there are none', async () => {

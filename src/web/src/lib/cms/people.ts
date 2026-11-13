@@ -14,7 +14,7 @@ export async function getPeople(cookie: string | null): Promise<PersonRow[]> {
     {
       collection: 'personer',
       where: { active: { equals: true } },
-      select: { fullName: true, title: true, mobile: true, units: true, teams: true },
+      select: { fullName: true, title: true, units: true, teams: true },
       populate: {
         enheter: { name: true },
         teammedlemskap: { team: true },
@@ -29,13 +29,12 @@ export async function getPeople(cookie: string | null): Promise<PersonRow[]> {
 }
 
 // The fields the query above selects.
-type SelectedPerson = Pick<Person, 'id' | 'fullName' | 'title' | 'mobile' | 'units' | 'teams'>
+type SelectedPerson = Pick<Person, 'id' | 'fullName' | 'title' | 'units' | 'teams'>
 
-const toRow = ({ id, fullName, title, mobile, units, teams }: SelectedPerson): PersonRow => ({
+const toRow = ({ id, fullName, title, units, teams }: SelectedPerson): PersonRow => ({
   id,
   name: fullName ?? '',
   title: title || null,
-  mobile: mobile || null,
   units: (units ?? []).flatMap((u) => (typeof u === 'object' ? [u.name] : [])),
   teams: (teams?.docs ?? [])
     .flatMap((m) => (typeof m === 'object' && typeof m.team === 'object' ? [m.team] : []))

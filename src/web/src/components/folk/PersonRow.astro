@@ -1,5 +1,4 @@
 ---
-import { formatPhone, telHref } from '../../lib/phone'
 import type { PersonRow } from '../../types/person'
 import Avatar from '../Avatar.astro'
 
@@ -40,17 +39,6 @@ const searchText = [person.name, person.title, ...person.units, ...person.teams.
             <li>{unit}</li>
           ))}
         </ul>
-      ) : (
-        <span class="none">Ikke registrert</span>
-      )
-    }
-  </td>
-  <td class:list={{ 'no-mobile': !person.mobile }}>
-    {
-      person.mobile ? (
-        <a class="ds-link" href={telHref(person.mobile)}>
-          {formatPhone(person.mobile)}
-        </a>
       ) : (
         <span class="none">Ikke registrert</span>
       )
@@ -106,13 +94,5 @@ const searchText = [person.name, person.title, ...person.units, ...person.teams.
     display: flex;
     flex-wrap: wrap;
     gap: var(--ds-size-1) var(--ds-size-3);
-  }
-
-  /* Without the column headings on a narrow screen, an empty mobile cell
-     would read like a second «Ikke registrert» for the unit. */
-  @media (max-width: 40rem) {
-    .no-mobile {
-      display: none;
-    }
   }
 </style>
