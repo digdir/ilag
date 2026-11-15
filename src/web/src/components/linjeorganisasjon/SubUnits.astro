@@ -1,0 +1,60 @@
+---
+import { levelLabels } from '../../lib/cms/units'
+import type { SubUnit } from '../../types/unit'
+
+interface Props {
+  units: SubUnit[]
+}
+
+const { units } = Astro.props
+---
+
+<!-- The units directly under a unit, each a link to its page (LO-02, LO-05). -->
+<ul class="units">
+  {
+    units.map((unit) => (
+      <li>
+        <a class="ds-card" data-color="neutral" href={`/organisering/linjeorganisasjon/${unit.id}`}>
+          <span class="ds-paragraph meta" data-size="sm">
+            {[unit.code, levelLabels[unit.level]].filter(Boolean).join(' · ')}
+          </span>
+          <h3 class="ds-heading" data-size="xs">
+            {unit.name}
+          </h3>
+          <span class="ds-paragraph meta" data-size="sm">
+            {unit.leader ?? 'Leder ikke registrert'}
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .units {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: var(--ds-size-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ds-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-1);
+    block-size: 100%;
+    text-decoration: none;
+  }
+
+  /* As on the team cards. */
+  .ds-heading {
+    text-decoration-line: none;
+  }
+
+  .meta {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>

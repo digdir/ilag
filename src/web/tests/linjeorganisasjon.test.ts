@@ -123,6 +123,16 @@ describe('organisation chart', () => {
     expect(html.slice(divisions)).not.toContain('Tilsyn for universell')
   })
 
+  it('LO-05: links each division, department and section to its unit page', async () => {
+    vi.stubGlobal('fetch', cms({ units, people }))
+
+    const html = await render()
+
+    for (const id of [2, 3, 5, 6, 7]) {
+      expect(html).toContain(`href="/organisering/linjeorganisasjon/${id}"`)
+    }
+  })
+
   it('leaves out the sides when there is no tilsyn or stab', async () => {
     vi.stubGlobal('fetch', cms({ units: units.slice(0, 5), people }))
 

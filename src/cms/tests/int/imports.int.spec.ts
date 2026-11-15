@@ -366,6 +366,18 @@ describe('The import endpoints and jobs', () => {
     expect((await unitByExternalId('10014302'))!.advisesAllOfDigdir).toBe(true)
   })
 
+  it('LO-02: keeps a unit\'s description when the units are imported again', async () => {
+    const backend = (await unitByExternalId('10014302'))!
+    await payload.update({ collection: 'enheter', id: backend.id, data: { description: 'Backend for fellesløsningene.' } })
+
+    const res = await receiveUnits!.handler(request(csv(UNITS), integration))
+    const { importRunId } = await res.json()
+    await runJobs()
+
+    expect((await findRun(importRunId)).status).toBe('succeeded')
+    expect((await unitByExternalId('10014302'))!.description).toBe('Backend for fellesløsningene.')
+  })
+
   it('ADR-0003: holds a file with under half the active units until an administrator confirms it', async () => {
     const res = await receiveUnits!.handler(request(csv(UNITS.slice(0, 3)), integration))
     const held = await res.json()

@@ -113,6 +113,20 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Unit descriptions, which the file doesn't have either. Descriptions set by
+  // hand are kept.
+  for (const { unit, description } of data.unitDescriptions) {
+    const { docs } = await payload.find({
+      collection: 'enheter',
+      where: { externalUnitId: { equals: unit } },
+      limit: 1,
+      depth: 0,
+    })
+    if (docs[0] && !docs[0].description) {
+      await payload.update({ collection: 'enheter', id: docs[0].id, data: { description } })
+    }
+  }
+
   // Units that advise all of Digdir, which the file doesn't have either.
   await payload.update({
     collection: 'enheter',

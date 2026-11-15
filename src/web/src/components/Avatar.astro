@@ -15,4 +15,5 @@ const initials = name
   .join('')
 ---
 
-<span class="ds-avatar" data-size={size} aria-hidden="true">{initials}</span>
+<!-- Always in the accent colour, so avatars look the same everywhere, also in neutral cards. -->
+<span class="ds-avatar" data-size={size} data-color="accent" aria-hidden="true">{initials}</span>

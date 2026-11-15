@@ -1,0 +1,84 @@
+---
+import type { UnitPerson } from '../../types/unit'
+import Avatar from '../Avatar.astro'
+
+interface Props {
+  /** Null until an administrator has set a leader. */
+  leader: UnitPerson | null
+}
+
+const { leader } = Astro.props
+---
+
+<!--
+  The unit's leader with contact information (LO-02), compact: the name,
+  email and mobile on one line, which wraps on a narrow screen, and the title
+  under it. A card like the employees' below, so the avatars line up.
+-->
+{
+  leader ? (
+    <div class="leader">
+      <Avatar name={leader.name} size="md" />
+      <div class="details">
+        <p class="ds-paragraph line">
+          <span class="name">{leader.name}</span>
+          <a class="ds-link" href={`mailto:${leader.email}`}>
+            {leader.email}
+          </a>
+          {leader.mobile && (
+            <a
+              class="ds-link"
+              href={`tel:${leader.mobile.replace(/\s/g, '')}`}
+              aria-label={`Mobil ${leader.mobile}`}
+            >
+              {leader.mobile}
+            </a>
+          )}
+        </p>
+        {leader.title && (
+          <p class="ds-paragraph title" data-size="sm">
+            {leader.title}
+          </p>
+        )}
+      </div>
+    </div>
+  ) : (
+    <p class="ds-paragraph">Leder er ikke registrert.</p>
+  )
+}
+
+<style>
+  .leader {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+    padding: var(--ds-size-4);
+    border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+  }
+
+  .details {
+    min-inline-size: 0;
+  }
+
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--ds-size-4);
+    margin: 0;
+  }
+
+  .line > * {
+    overflow-wrap: anywhere;
+  }
+
+  .name {
+    font-weight: var(--ds-font-weight-semibold);
+  }
+
+  .title {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>
