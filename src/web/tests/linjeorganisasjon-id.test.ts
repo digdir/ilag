@@ -124,6 +124,18 @@ describe('unit page', () => {
     expect(employees).not.toContain('Kari Nordmann')
   })
 
+  it('shows the leader compactly, with name, email and mobile on one line', async () => {
+    vi.stubGlobal('fetch', cms(fel))
+
+    const html = await (await render('2')).text()
+    const line = html.match(/<p[^>]*class="[^"]*line[^"]*"[^>]*>([\s\S]*?)<\/p>/)![1]!
+
+    expect(line).toContain('Kari Nordmann')
+    expect(line).toContain('href="mailto:kari@example.com"')
+    expect(line).toContain('aria-label="Mobil 900 00 000"')
+    expect(line).not.toContain('Divisjonsdirektør')
+  })
+
   it('LO-02: lists the employees by name, without the leader, with their contact information', async () => {
     vi.stubGlobal('fetch', cms(fel))
 
