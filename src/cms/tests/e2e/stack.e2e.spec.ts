@@ -39,7 +39,8 @@ test.describe('Full stack', () => {
 
     await expect(page).toHaveURL('http://localhost:4321/')
     await expect(page.locator('body')).toContainText('Connected — the CMS reached its database.')
-    await expect(page.locator('body')).toContainText(`Logget inn som ${testUser.email}`)
+    // The site header shows who is logged in, by name or else email.
+    await expect(page.getByRole('banner')).toContainText(testUser.email)
 
     await page.getByRole('button', { name: 'Logg ut' }).click()
 
