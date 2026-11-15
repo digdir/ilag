@@ -40,4 +40,16 @@ export type UnitDetail = {
   leader: UnitPerson | null
   /** The active people in the unit itself, by name, without the leader. */
   employees: UnitPerson[]
+  /** The active units directly under it, by name. */
+  children: SubUnit[]
+}
+
+/** A unit under the one the page shows (LO-02). */
+export type SubUnit = {
+  id: number
+  name: string
+  code: string | null
+  level: Unit['level']
+  /** The leader's name, when an administrator has set an active one. */
+  leader: string | null
 }

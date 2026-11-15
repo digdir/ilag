@@ -44,12 +44,30 @@ const people = [
   person(3, 'Erik Hansen', { mobile: '911 11 111' }),
 ]
 
-const cms = (unit: unknown, found: unknown[] = people) =>
-  vi.fn(async (url: string, _init?: RequestInit) =>
-    new URL(url).pathname.startsWith('/api/enheter/')
-      ? json(unit)
-      : json({ docs: found }),
-  )
+// The units under FEL, sorted by name as the query asks for.
+const children = [
+  {
+    id: 3,
+    name: 'FEL - Utvikling',
+    code: 'FUT',
+    level: 'department',
+    leader: { id: 5, fullName: 'Silje Larsen', active: true },
+  },
+  {
+    id: 6,
+    name: 'FEL – Marked',
+    code: null,
+    level: 'department',
+    leader: { id: 7, fullName: 'Ola Sluttet', active: false },
+  },
+]
+
+const cms = (unit: unknown, found: unknown[] = people, under: unknown[] = children) =>
+  vi.fn(async (url: string, _init?: RequestInit) => {
+    const { pathname } = new URL(url)
+    if (pathname.startsWith('/api/enheter/')) return json(unit)
+    return json({ docs: pathname === '/api/enheter' ? under : found })
+  })
 
 describe('unit page', () => {
   afterEach(() => {
@@ -73,6 +91,10 @@ describe('unit page', () => {
     expect(unit.url.searchParams.get('populate[personer][email]')).toBe('true')
     expect(found.url.searchParams.get('where[units][in][0]')).toBe('2')
     expect(found.url.searchParams.get('where[active][equals]')).toBe('true')
+    const under = calls.find((c) => c.url.pathname === '/api/enheter')!
+    expect(under.auth).toBe('JWT visitor-token')
+    expect(under.url.searchParams.get('where[parent][equals]')).toBe('2')
+    expect(under.url.searchParams.get('where[active][equals]')).toBe('true')
   })
 
   it('LO-02: shows the unit with its code, level and the way back', async () => {
@@ -124,6 +146,24 @@ describe('unit page', () => {
     vi.stubGlobal('fetch', cms({ ...fel, leader: { ...kari, active: false } }))
     html = await (await render('2')).text()
     expect(html).toContain('Leder er ikke registrert.')
+  })
+
+  it('LO-02, LO-05: lists the units under it with level and leader, each linking to its page', async () => {
+    vi.stubGlobal('fetch', cms(fel))
+
+    const html = await (await render('2')).text()
+    const under = html.split('id="enheter-under"')[1]!
+
+    expect(under).toMatch(/href="\/organisering\/linjeorganisasjon\/3"[\s\S]*FUT · Avdeling[\s\S]*FEL - Utvikling[\s\S]*Silje Larsen/)
+    expect(under).toMatch(/href="\/organisering\/linjeorganisasjon\/6"[\s\S]*>\s*Avdeling\s*<[\s\S]*FEL – Marked/)
+    expect(under).not.toContain('Ola Sluttet')
+    expect(under).toContain('Leder ikke registrert')
+  })
+
+  it('leaves out «Enheter under» when there are none', async () => {
+    vi.stubGlobal('fetch', cms(fel, people, []))
+
+    expect(await (await render('2')).text()).not.toContain('Enheter under')
   })
 
   it('LO-06: marks a unit that advises all of Digdir', async () => {

@@ -1,4 +1,5 @@
 ---
+import SubUnits from '../../../components/linjeorganisasjon/SubUnits.astro'
 import UnitEmployees from '../../../components/linjeorganisasjon/UnitEmployees.astro'
 import UnitLeader from '../../../components/linjeorganisasjon/UnitLeader.astro'
 import Layout from '../../../layouts/Layout.astro'
@@ -11,8 +12,8 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
 ---
 
 <!--
-  The unit page (LO-02): the leader with contact information and the people
-  who work in the unit. Mandate and OKR come later.
+  The unit page (LO-02): the leader with contact information, the people who
+  work in the unit and the units under it. Mandate and OKR come later.
 -->
 <Layout title={unit ? `${unit.name} — ilag` : 'Fant ikke enheten — ilag'} wide>
   <div class="page">
@@ -72,6 +73,14 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
             </div>
             <UnitEmployees employees={unit.employees} />
           </section>
+          {unit.children.length > 0 && (
+            <section aria-labelledby="enheter-under" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm" id="enheter-under">
+                Enheter under
+              </h2>
+              <SubUnits units={unit.children} />
+            </section>
+          )}
         </>
       ) : (
         <>
