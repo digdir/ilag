@@ -72,6 +72,7 @@ describe('Folk', () => {
     const html = await render()
 
     expect(html).toContain('3 personer')
+    expect(html).toMatch(/<th scope="col"[^>]*>Navn og tittel<\/th>/)
     const names = [...html.matchAll(/class="ds-paragraph name"[^>]*>([^<]*)</g)].map((m) => m[1])
     expect(names).toEqual(['Emma Kristiansen', 'Ingrid Berg', 'Åse Ødegård'])
     expect(html).toContain('Utvikler')
