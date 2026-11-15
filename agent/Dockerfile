@@ -36,6 +36,11 @@ RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
        npx --yes "playwright@${PLAYWRIGHT_VERSION}" install-deps chromium \
     && rm -rf "${scratch}" /tmp/node-compile-cache /var/lib/apt/lists/*
 
+# `pnpm dev:stop` (scripts/dev-stop.sh) finds the CMS by its port with lsof. Without it, the CMS keeps running.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends lsof \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 
 # The repositories agent-workspace-init clones into /home/agent/code at boot.
