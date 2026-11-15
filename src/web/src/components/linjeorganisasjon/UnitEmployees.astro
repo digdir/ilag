@@ -15,7 +15,7 @@ const { employees } = Astro.props
     <ul class="employees">
       {employees.map((person) => (
         <li>
-          <Avatar name={person.name} size="md" />
+          <Avatar name={person.name} size="md" color="accent" />
           <div class="details">
             <p class="ds-paragraph name">{person.name}</p>
             {person.title && (

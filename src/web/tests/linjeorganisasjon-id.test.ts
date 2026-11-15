@@ -136,6 +136,16 @@ describe('unit page', () => {
     expect(line).not.toContain('Divisjonsdirektør')
   })
 
+  it('shows the avatars in the accent colour, as in Folk', async () => {
+    vi.stubGlobal('fetch', cms(fel))
+
+    const html = await (await render('2')).text()
+    const avatars = html.match(/<span[^>]*class="ds-avatar"[^>]*>/g)!
+
+    expect(avatars).toHaveLength(3)
+    for (const avatar of avatars) expect(avatar).toContain('data-color="accent"')
+  })
+
   it('LO-02: lists the employees by name, without the leader, with their contact information', async () => {
     vi.stubGlobal('fetch', cms(fel))
 

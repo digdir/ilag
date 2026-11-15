@@ -2,9 +2,11 @@
 interface Props {
   name: string
   size?: 'sm' | 'md' | 'lg'
+  /** Without it, the colour of the nearest parent with data-color, as in Folk. */
+  color?: 'accent' | 'neutral'
 }
 
-const { name, size = 'sm' } = Astro.props
+const { name, size = 'sm', color } = Astro.props
 
 // First and last initial: «Emma Kristiansen» → «EK».
 const initials = name
@@ -15,4 +17,4 @@ const initials = name
   .join('')
 ---
 
-<span class="ds-avatar" data-size={size} aria-hidden="true">{initials}</span>
+<span class="ds-avatar" data-size={size} data-color={color} aria-hidden="true">{initials}</span>
