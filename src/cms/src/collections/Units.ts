@@ -63,13 +63,17 @@ export const Units: CollectionConfig = {
     },
     {
       // The levels of the organisation chart (LO-01), with the directorate
-      // at the top.
+      // at the top. A staff unit (stab) and a supervisory authority (tilsyn) sit
+      // directly under the directorate like a division; the import sets them from UNIT_LEVELS
+      // in imports/settings.ts, since the file can't tell them apart.
       name: 'level',
       type: 'select',
       required: true,
       options: [
         { label: 'Direktorat', value: 'directorate' },
         { label: 'Divisjon', value: 'division' },
+        { label: 'Stab', value: 'support' },
+        { label: 'Tilsyn', value: 'authority' },
         { label: 'Avdeling', value: 'department' },
         { label: 'Seksjon', value: 'section' },
       ],
@@ -88,6 +92,19 @@ export const Units: CollectionConfig = {
       name: 'leader',
       type: 'relationship',
       relationTo: 'personer',
+    },
+    {
+      // The unit advises and supports all of Digdir, not just its own
+      // division (LO-06), such as a section for user experience that every
+      // division uses. Set by an administrator; the import never changes it.
+      name: 'advisesAllOfDigdir',
+      type: 'checkbox',
+      label: 'Bistår og rådgir hele Digdir',
+      required: true,
+      defaultValue: false,
+      admin: {
+        description: 'Enheten bistår og rådgir hele Digdir, ikke bare sin egen divisjon.',
+      },
     },
     {
       // False once the unit is closed. Kept rather than deleted, so what is

@@ -113,6 +113,14 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Units that advise all of Digdir, which the file doesn't have either.
+  await payload.update({
+    collection: 'enheter',
+    where: { externalUnitId: { in: data.advisesAllOfDigdir } },
+    data: { advisesAllOfDigdir: true },
+    depth: 0,
+  })
+
   const teamTypeIds = new Map<string, number>()
   for (const teamType of data.teamTypes) {
     let id = await findId(payload, 'teamtyper', { name: { equals: teamType.name } })
@@ -187,7 +195,7 @@ const removeSeed = async (payload: Payload) => {
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.
-    ...(['section', 'department', 'division', 'directorate'] as const).map(
+    ...(['section', 'department', 'support', 'authority', 'division', 'directorate'] as const).map(
       (level): [Slug, Where] => ['enheter', { externalUnitId: { in: unitIds }, level: { equals: level } }],
     ),
     ['lokasjoner', { code: { in: data.locations.map((l) => l.code) } }],

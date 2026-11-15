@@ -468,7 +468,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Teammedlemskap** – at en person er med i et team, og hvilke roller personen har i teamet. En person har høyst ett medlemskap per team, med én eller flere roller.
 
-- **Enhet** – gruppe i linjeorganisasjonen (direktorat/divisjon/avdeling/seksjon). Øverst er direktoratet selv. En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå og overordnet enhet hentes fra Digdirs autoritative kilde (jf. NF-07). Lederen registreres foreløpig i ilag av en administrator.
+- **Enhet** – gruppe i linjeorganisasjonen (direktorat/divisjon/stab/tilsyn/avdeling/seksjon). Øverst er direktoratet selv. Rett under direktoratet ligger divisjonene, staben (f.eks. Kommunikasjon) og tilsynene (f.eks. Tilsynet for universell utforming av IKT), med avdelinger og seksjoner under seg. En enhet hører til høyst én overordnet enhet og kan ha ingen, én eller flere underenheter. Navn, nivå og overordnet enhet hentes fra Digdirs autoritative kilde (jf. NF-07). Kilden skiller ikke stab og tilsyn fra divisjoner, så hvilke enheter det gjelder, er en innstilling i ilag. Lederen registreres foreløpig i ilag av en administrator, og det samme gjør markeringen av enheter som bistår og rådgir hele Digdir (jf. LO-06).
 
 - **Person** – ansatt eller innleid i Digdir som inngår i ett eller flere team, prosjekter eller enheter, tilknyttet én lokasjon. Personen er merket som ansatt eller innleid, og som aktiv eller sluttet. Opplysningene hentes fra Digdirs autoritative kilde (jf. NF-07).
 
