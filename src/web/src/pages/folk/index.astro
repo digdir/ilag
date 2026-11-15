@@ -1,0 +1,57 @@
+---
+import PeopleSearch from '../../components/folk/PeopleSearch.astro'
+import PeopleTable from '../../components/folk/PeopleTable.astro'
+import Layout from '../../layouts/Layout.astro'
+import { getPeople } from '../../lib/cms/people'
+
+// Folk: everyone in Digdir with their units in the line and their teams
+// (FO-01, FO-02), searchable (FO-03). Allocation (AL-01) is not shown here.
+const people = await getPeople(Astro.request.headers.get('cookie'))
+---
+
+<Layout title="Folk — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Folk</h1>
+      <p class="ds-paragraph">Alle ansatte i Digdir, med enhet i linjen og teamene de er med i.</p>
+    </header>
+    {
+      people.length ? (
+        <>
+          <PeopleSearch count={people.length} />
+          <PeopleTable people={people} />
+          <p class="ds-paragraph empty" data-people-empty hidden>
+            Ingen treff. Prøv et annet ord.
+          </p>
+        </>
+      ) : (
+        <p class="ds-paragraph">Ingen ansatte er registrert ennå.</p>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .empty {
+    padding: var(--ds-size-8);
+    border: var(--ds-border-width-default) dashed var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+    text-align: center;
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+</style>
