@@ -124,6 +124,7 @@ export async function getUnit(id: string, cookie: string | null): Promise<UnitDe
             name: true,
             code: true,
             level: true,
+            description: true,
             parent: true,
             leader: true,
             advisesAllOfDigdir: true,
@@ -169,7 +170,15 @@ type SelectedContact = Pick<Person, 'id' | 'fullName' | 'title' | 'email' | 'mob
 type SelectedChild = Pick<Unit, 'id' | 'name' | 'code' | 'level' | 'leader'>
 type SelectedDetail = Pick<
   Unit,
-  'id' | 'name' | 'code' | 'level' | 'parent' | 'leader' | 'advisesAllOfDigdir' | 'active'
+  | 'id'
+  | 'name'
+  | 'code'
+  | 'level'
+  | 'description'
+  | 'parent'
+  | 'leader'
+  | 'advisesAllOfDigdir'
+  | 'active'
 >
 
 const toPerson = ({ id, fullName, title, email, mobile }: SelectedContact): UnitPerson => ({
@@ -197,6 +206,11 @@ export function toDetail(
     name: unit.name,
     code: unit.code || null,
     level: unit.level,
+    // A blank line in the admin panel's text field starts a new paragraph.
+    description: (unit.description ?? '')
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter(Boolean),
     parent,
     advisesAllOfDigdir: unit.advisesAllOfDigdir,
     leader,

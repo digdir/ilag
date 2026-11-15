@@ -33,6 +33,8 @@ export type UnitDetail = {
   name: string
   code: string | null
   level: Unit['level']
+  /** What the unit does, in paragraphs; empty until an administrator writes one. */
+  description: string[]
   /** The unit above, for the way back; null for the directorate. */
   parent: { id: number; name: string } | null
   advisesAllOfDigdir: boolean

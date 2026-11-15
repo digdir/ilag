@@ -50,6 +50,9 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
             <h1 class="ds-heading" data-size="lg">
               {unit.name}
             </h1>
+            {unit.description.map((paragraph) => (
+              <p class="ds-paragraph description">{paragraph}</p>
+            ))}
             {unit.advisesAllOfDigdir && (
               <span class="ds-tag" data-color="info" data-size="sm">
                 Bistår og rådgir hele Digdir
@@ -121,6 +124,10 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
     align-items: baseline;
     justify-content: space-between;
     gap: var(--ds-size-4);
+  }
+
+  .description {
+    margin: 0;
   }
 
   .meta {

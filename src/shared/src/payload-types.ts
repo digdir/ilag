@@ -280,6 +280,10 @@ export interface Unit {
   name: string;
   code?: string | null;
   level: 'directorate' | 'division' | 'support' | 'authority' | 'department' | 'section';
+  /**
+   * Kort om hva enheten gjør. Vises under navnet på enhetssiden.
+   */
+  description?: string | null;
   parent?: (number | null) | Unit;
   leader?: (number | null) | Person;
   /**
@@ -703,6 +707,7 @@ export interface EnheterSelect<T extends boolean = true> {
   name?: T;
   code?: T;
   level?: T;
+  description?: T;
   parent?: T;
   leader?: T;
   advisesAllOfDigdir?: T;

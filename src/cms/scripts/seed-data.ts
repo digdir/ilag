@@ -26,6 +26,29 @@ export const leaders = [
   { unit: '10014301', person: '1008' }, // FEL - Arkitektur og produktutvikling
 ]
 
+// Unit descriptions, which administrators set in ilag: the unit's orgEnhet
+// and a few sentences on what it does. Made up, like the prototype's.
+export const unitDescriptions = [
+  {
+    unit: '10008925', // Digitaliseringsdirektoratet
+    description:
+      'Digitaliseringsdirektoratet er regjeringens fagorgan for digitalisering og samordning av offentlig sektor.',
+  },
+  {
+    unit: '10002031', // Fellesløsninger
+    description:
+      'Utvikler, drifter og forvalter de nasjonale fellesløsningene som offentlige virksomheter bruker for å levere digitale tjenester.',
+  },
+  {
+    unit: '10003276', // FEL - Utvikling
+    description: 'Utvikler og videreutvikler fellesløsningene, fra arkitektur til drift.',
+  },
+  {
+    unit: '10014302', // FEL – Backend
+    description: 'Lager og vedlikeholder tjenestene bak fellesløsningene.',
+  },
+]
+
 // Units that advise all of Digdir (LO-06), which administrators set in ilag:
 // the units' orgEnhet. Like the prototype's Brukeropplevelse og design and
 // Marked og utbredelse.

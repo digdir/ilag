@@ -31,6 +31,9 @@ const fel = {
   name: 'Fellesløsninger',
   code: 'FEL',
   level: 'division',
+  description: 'Utvikler og forvalter fellesløsningene.\n\nSamarbeider med hele offentlig sektor.' as
+    | string
+    | null,
   parent: { id: 1, name: 'Digitaliseringsdirektoratet' },
   leader: kari as unknown,
   advisesAllOfDigdir: false,
@@ -109,6 +112,27 @@ describe('unit page', () => {
     expect(html).toContain('href="/organisering/linjeorganisasjon"')
     expect(html).toMatch(/href="\/organisering\/linjeorganisasjon\/1"[^>]*>\s*Digitaliseringsdirektoratet/)
     expect(html).not.toContain('Bistår og rådgir hele Digdir')
+  })
+
+  it('LO-02: shows the description under the name, a paragraph for each blank line', async () => {
+    const fetchMock = cms(fel)
+    vi.stubGlobal('fetch', fetchMock)
+
+    const html = await (await render('2')).text()
+
+    const [url] = fetchMock.mock.calls.find(([url]) => url.includes('/api/enheter/2'))!
+    expect(new URL(url).searchParams.get('select[description]')).toBe('true')
+    expect(html).toMatch(
+      /Fellesløsninger\s*<\/h1>\s*<p[^>]*>Utvikler og forvalter fellesløsningene.<\/p>\s*<p[^>]*>Samarbeider med hele offentlig sektor.<\/p>/,
+    )
+  })
+
+  it('leaves out the description when there is none', async () => {
+    vi.stubGlobal('fetch', cms({ ...fel, description: null }))
+
+    const html = await (await render('2')).text()
+
+    expect(html).toMatch(/Fellesløsninger\s*<\/h1>\s*<\/header>/)
   })
 
   it('LO-02: shows the leader with title, email and mobile', async () => {

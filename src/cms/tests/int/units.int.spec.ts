@@ -223,4 +223,28 @@ describe('Units', () => {
       }),
     ).rejects.toThrow()
   })
+
+  it('LO-02: lets administrators set the description, and nobody else', async () => {
+    const created = await payload.create({ collection: 'enheter', data: unit(20) })
+    expect(created.description ?? null).toBeNull()
+
+    const updated = await payload.update({
+      collection: 'enheter',
+      id: created.id,
+      data: { description: 'Utvikler og forvalter fellesløsningene.' },
+      overrideAccess: false,
+      user: admin,
+    })
+    expect(updated.description).toBe('Utvikler og forvalter fellesløsningene.')
+
+    await expect(
+      payload.update({
+        collection: 'enheter',
+        id: created.id,
+        data: { description: 'Noe annet.' },
+        overrideAccess: false,
+        user,
+      }),
+    ).rejects.toThrow()
+  })
 })
