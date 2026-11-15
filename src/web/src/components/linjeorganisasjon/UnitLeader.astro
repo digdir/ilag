@@ -13,7 +13,7 @@ const { leader } = Astro.props
 <!--
   The unit's leader with contact information (LO-02), compact: the name,
   email and mobile on one line, which wraps on a narrow screen, and the title
-  under it.
+  under it. A card like the employees' below, so the avatars line up.
 -->
 {
   leader ? (
@@ -50,8 +50,11 @@ const { leader } = Astro.props
 <style>
   .leader {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--ds-size-3);
+    padding: var(--ds-size-4);
+    border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
   }
 
   .details {

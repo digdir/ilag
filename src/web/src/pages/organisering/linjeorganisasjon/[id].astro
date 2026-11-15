@@ -56,7 +56,7 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
               </span>
             )}
           </header>
-          <section class="ds-card leader-card" data-color="neutral" aria-labelledby="leder">
+          <section aria-labelledby="leder" data-color="neutral">
             <h2 class="ds-heading" data-size="sm" id="leder">
               Leder
             </h2>
@@ -113,11 +113,6 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-4);
-  }
-
-  /* The employee cards' padding, so the leader's avatar lines up with theirs. */
-  .leader-card {
-    --dsc-card-padding: var(--ds-size-4);
   }
 
   .section-head {
