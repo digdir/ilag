@@ -73,10 +73,19 @@ describe('Folk', () => {
 
     expect(html).toContain('3 personer')
     expect(html).toMatch(/<th scope="col"[^>]*>Navn og tittel<\/th>/)
-    const names = [...html.matchAll(/class="ds-paragraph name"[^>]*>([^<]*)</g)].map((m) => m[1])
+    const names = [...html.matchAll(/href="\/folk\/\d+"[^>]*>\s*([^<]*?)\s*</g)].map((m) => m[1])
     expect(names).toEqual(['Emma Kristiansen', 'Ingrid Berg', 'Åse Ødegård'])
     expect(html).toContain('Utvikler')
     expect(html).toMatch(/class="ds-avatar"[^>]*>ÅØ</)
+  })
+
+  it('FO-02: links each name to the person\'s page', async () => {
+    vi.stubGlobal('fetch', cms(people))
+
+    const html = await render()
+
+    expect(html).toMatch(/href="\/folk\/1"[^>]*>\s*Åse Ødegård/)
+    expect(html).toMatch(/href="\/folk\/3"[^>]*>\s*Emma Kristiansen/)
   })
 
   it('FO-02: shows the name of the unit, and says when there is none', async () => {

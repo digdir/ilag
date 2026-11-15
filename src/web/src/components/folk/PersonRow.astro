@@ -20,7 +20,11 @@ const searchText = [person.name, person.title, ...person.units, ...person.teams.
     <div class="person">
       <Avatar name={person.name} />
       <div>
-        <p class="ds-paragraph name">{person.name}</p>
+        <p class="ds-paragraph name">
+          <a class="ds-link" href={`/folk/${person.id}`}>
+            {person.name}
+          </a>
+        </p>
         {
           person.title && (
             <p class="ds-paragraph title" data-size="sm">
