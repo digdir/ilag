@@ -1,0 +1,85 @@
+---
+import type { UnitPerson } from '../../types/unit'
+import Avatar from '../Avatar.astro'
+
+interface Props {
+  /** Null until an administrator has set a leader. */
+  leader: UnitPerson | null
+}
+
+const { leader } = Astro.props
+---
+
+<!-- The unit's leader with contact information (LO-02). -->
+{
+  leader ? (
+    <div class="leader">
+      <Avatar name={leader.name} size="lg" />
+      <div class="details">
+        <p class="ds-paragraph name">{leader.name}</p>
+        {leader.title && (
+          <p class="ds-paragraph subtle" data-size="sm">
+            {leader.title}
+          </p>
+        )}
+        <dl>
+          <dt class="ds-label" data-size="xs">E-post</dt>
+          <dd class="ds-paragraph" data-size="sm">
+            <a class="ds-link" href={`mailto:${leader.email}`}>
+              {leader.email}
+            </a>
+          </dd>
+          <dt class="ds-label" data-size="xs">Mobil</dt>
+          <dd class="ds-paragraph" data-size="sm">
+            {leader.mobile ? (
+              <a class="ds-link" href={`tel:${leader.mobile.replace(/\s/g, '')}`}>
+                {leader.mobile}
+              </a>
+            ) : (
+              'Ikke registrert'
+            )}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  ) : (
+    <p class="ds-paragraph">Leder er ikke registrert.</p>
+  )
+}
+
+<style>
+  .leader {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ds-size-4);
+  }
+
+  .details {
+    min-inline-size: 0;
+  }
+
+  .name {
+    margin: 0;
+    font-weight: var(--ds-font-weight-semibold);
+  }
+
+  .subtle {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+
+  dl {
+    margin: var(--ds-size-3) 0 0;
+  }
+
+  dt {
+    color: var(--ds-color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  dd {
+    margin: 0 0 var(--ds-size-2);
+    overflow-wrap: anywhere;
+  }
+</style>

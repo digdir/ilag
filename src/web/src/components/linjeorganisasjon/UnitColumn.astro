@@ -10,6 +10,8 @@ interface Props {
 
 const { unit, variant = 'dark' } = Astro.props
 const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
+// Each unit links to its page (LO-05).
+const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
 ---
 
 <!-- A unit under the director with its departments, and their sections under them (LO-01). -->
@@ -19,7 +21,7 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
       {unit.code && <span class="code">{unit.code}</span>}
       <span class="size">{size(unit.size)}</span>
     </span>
-    <span class="name">{unit.name}</span>
+    <a class="name" href={href(unit)}>{unit.name}</a>
     {unit.leader && <span class="leader">{unit.leader}</span>}
   </div>
   {
@@ -27,11 +29,17 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
       <ul class="departments" aria-label={`Enheter i ${unit.name}`}>
         {unit.children.map((department) => (
           <li>
-            <span class="department">{department.name}</span>
+            <a class="department" href={href(department)}>
+              {department.name}
+            </a>
             {department.children.length > 0 && (
               <ul class="sections" aria-label={`Enheter i ${department.name}`}>
                 {department.children.map((section) => (
-                  <li class="section">{section.name}</li>
+                  <li>
+                    <a class="section" href={href(section)}>
+                      {section.name}
+                    </a>
+                  </li>
                 ))}
               </ul>
             )}
@@ -82,6 +90,22 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
     font-variant-numeric: tabular-nums;
   }
 
+  /* The boxes are the links; underlined on hover, like a card. */
+  a {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 0.2em;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  a:focus-visible {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    outline-offset: 2px;
+  }
+
   .name {
     font-weight: var(--ds-font-weight-semibold);
     line-height: var(--ds-line-height-sm);
@@ -123,6 +147,7 @@ const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
   }
 
   .section {
+    display: block;
     padding: var(--ds-size-1) var(--ds-size-2);
     border-radius: var(--ds-border-radius-sm);
     background: var(--ds-color-neutral-background-tinted);
