@@ -182,6 +182,17 @@ describe('unit page', () => {
     expect(employees).toContain('911 11 111')
   })
 
+  it('links the leader and the employees to their pages in Folk', async () => {
+    vi.stubGlobal('fetch', cms(fel))
+
+    const html = await (await render('2')).text()
+    const [, leader, employees] = html.split(/id="leder"|id="ansatte"/)
+
+    expect(leader).toMatch(/href="\/folk\/2"[^>]*>Kari Nordmann</)
+    expect(employees).toMatch(/href="\/folk\/3"[^>]*>Erik Hansen</)
+    expect(employees).toMatch(/href="\/folk\/4"[^>]*>Åse Vik</)
+  })
+
   it('says when there is no leader, the leader has left, or there are no employees', async () => {
     vi.stubGlobal('fetch', cms({ ...fel, leader: null }, []))
     let html = await (await render('2')).text()

@@ -1,0 +1,12 @@
+---
+interface Props {
+  /** The person's ID in the CMS (`personer`). */
+  id: number
+  name: string
+}
+
+const { id, name } = Astro.props
+---
+
+<!-- A person's name, linking to their page in Folk. Used wherever people are listed. -->
+<a class="ds-link" href={`/folk/${id}`}>{name}</a>
