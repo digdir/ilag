@@ -1,6 +1,7 @@
 ---
 import type { Member } from '../../types/team'
 import Avatar from '../Avatar.astro'
+import PersonLink from '../PersonLink.astro'
 
 interface Props {
   members: Member[]
@@ -15,7 +16,9 @@ const { members } = Astro.props
       {members.map((member) => (
         <li>
           <Avatar name={member.name} />
-          <span class="ds-paragraph name">{member.name}</span>
+          <span class="ds-paragraph name">
+            {member.personId ? <PersonLink id={member.personId} name={member.name} /> : member.name}
+          </span>
           <span class="ds-paragraph roles" data-size="sm">
             {member.roles.join(', ')}
           </span>

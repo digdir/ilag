@@ -1,6 +1,7 @@
 ---
 import type { PersonRow } from '../../types/person'
 import Avatar from '../Avatar.astro'
+import PersonLink from '../PersonLink.astro'
 
 interface Props {
   person: PersonRow
@@ -20,7 +21,9 @@ const searchText = [person.name, person.title, ...person.units, ...person.teams.
     <div class="person">
       <Avatar name={person.name} />
       <div>
-        <p class="ds-paragraph name">{person.name}</p>
+        <p class="ds-paragraph name">
+          <PersonLink id={person.id} name={person.name} />
+        </p>
         {
           person.title && (
             <p class="ds-paragraph title" data-size="sm">

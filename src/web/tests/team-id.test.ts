@@ -74,6 +74,17 @@ describe('team page', () => {
     for (const avatar of avatars) expect(avatar).toContain('data-color="accent"')
   })
 
+  it('links the owner and the members to their pages in Folk, except those who have left', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
+
+    const html = await (await render('7')).text()
+
+    expect(html).toMatch(/href="\/folk\/101"[^>]*>Magnus Johansen</)
+    expect(html).toMatch(/href="\/folk\/102"[^>]*>Emma Kristiansen</)
+    expect(html).toContain('Ida Haugen')
+    expect(html).not.toContain('href="/folk/103"')
+  })
+
   it('lists the members by name', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
 

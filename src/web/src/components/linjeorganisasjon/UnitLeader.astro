@@ -1,6 +1,7 @@
 ---
 import type { UnitPerson } from '../../types/unit'
 import Avatar from '../Avatar.astro'
+import PersonLink from '../PersonLink.astro'
 
 interface Props {
   /** Null until an administrator has set a leader. */
@@ -21,7 +22,9 @@ const { leader } = Astro.props
       <Avatar name={leader.name} size="md" />
       <div class="details">
         <p class="ds-paragraph line">
-          <span class="name">{leader.name}</span>
+          <span class="name">
+            <PersonLink id={leader.id} name={leader.name} />
+          </span>
           <a class="ds-link" href={`mailto:${leader.email}`}>
             {leader.email}
           </a>

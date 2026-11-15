@@ -1,6 +1,7 @@
 ---
 import type { UnitPerson } from '../../types/unit'
 import Avatar from '../Avatar.astro'
+import PersonLink from '../PersonLink.astro'
 
 interface Props {
   employees: UnitPerson[]
@@ -17,7 +18,9 @@ const { employees } = Astro.props
         <li>
           <Avatar name={person.name} size="md" />
           <div class="details">
-            <p class="ds-paragraph name">{person.name}</p>
+            <p class="ds-paragraph name">
+              <PersonLink id={person.id} name={person.name} />
+            </p>
             {person.title && (
               <p class="ds-paragraph subtle" data-size="sm">
                 {person.title}
