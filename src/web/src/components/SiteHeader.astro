@@ -1,0 +1,107 @@
+---
+import type { User } from '@ilag/shared'
+
+import Avatar from './Avatar.astro'
+import SiteMenu from './SiteMenu.astro'
+
+interface Props {
+  /** Who is logged in. Without one (the login page) only the logo shows. */
+  user?: User
+  pathname: string
+}
+
+const { user, pathname } = Astro.props
+const userName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || ''
+const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
+---
+
+<header>
+  <div class="inner">
+    <div class="top">
+      <a class="brand" href="/">
+        <img src="/digdir-logo.svg" alt="Digdir" width="30" height="30" />
+        <span>ilag</span>
+      </a>
+      {
+        user && (
+          <div class="actions">
+            <span class="user">
+              <Avatar name={userName} />
+              <span>{userName}</span>
+            </span>
+            <a class="ds-button" data-variant="tertiary" data-size="sm" href={cmsAdminURL}>
+              CMS
+            </a>
+            <form method="post" action="/logg-ut">
+              <button class="ds-button" data-variant="secondary" data-size="sm" type="submit">
+                Logg ut
+              </button>
+            </form>
+          </div>
+        )
+      }
+    </div>
+    {user && <SiteMenu pathname={pathname} />}
+  </div>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--ds-color-neutral-background-default);
+    border-block-end: 1px solid var(--ds-color-neutral-border-subtle);
+  }
+
+  .inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: var(--ds-size-4);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--ds-size-4);
+    padding-block: var(--ds-size-3) var(--ds-size-1);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-3);
+    color: var(--ds-color-neutral-text-default);
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  .brand img {
+    display: block;
+  }
+
+  .actions,
+  .user {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ds-size-2);
+  }
+
+  .actions {
+    gap: var(--ds-size-3);
+  }
+
+  .user {
+    color: var(--ds-color-neutral-text-subtle);
+    font-size: 0.875rem;
+  }
+
+  form {
+    margin: 0;
+  }
+</style>
