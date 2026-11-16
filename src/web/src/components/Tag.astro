@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** Designsystemet colour: `info` for categories such as a team type, `neutral` for the rest. */
+  color?: 'info' | 'neutral' | 'success' | 'warning' | 'danger'
+}
+
+const { color = 'info' } = Astro.props
+---
+
+<!--
+  A label that puts something in a category or tells its status, such as a
+  team's type: Designsystemet's Tag, not interactive. For something to click,
+  such as a filter, use a chip. One size and shape throughout ilag.
+-->
+<span class="ds-tag" data-color={color} data-size="sm"><slot /></span>
+
+<style>
+  .ds-tag {
+    --dsc-tag-border-radius: var(--ds-border-radius-full);
+  }
+</style>

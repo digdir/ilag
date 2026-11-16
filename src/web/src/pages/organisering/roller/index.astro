@@ -1,0 +1,100 @@
+---
+import ListFilter from '../../../components/ListFilter.astro'
+import RoleCard from '../../../components/roller/RoleCard.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getRoles } from '../../../lib/cms/roles'
+import { getTeamTypes } from '../../../lib/cms/teamTypes'
+
+const cookie = Astro.request.headers.get('cookie')
+const [roles, types] = await Promise.all([getRoles(cookie), getTeamTypes(cookie)])
+
+// A chip per team type (RO-04), and one for the roles teams work with that
+// belong to no team type, such as linjeleder.
+const chips = {
+  legend: 'Teamtype',
+  options: [
+    ...types.map((type) => ({ value: String(type.id), label: type.name })),
+    { value: 'none', label: 'Andre roller' },
+  ],
+}
+const filterValues = (role: (typeof roles)[number]) =>
+  role.teamTypes.length ? role.teamTypes.map((t) => t.id).join(' ') : 'none'
+---
+
+<Layout title="Roller og ansvar — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Roller og ansvar</h1>
+      <p class="ds-paragraph">
+        Rollene er beskrevet etter RAMO: rolle, ansvar, myndighet og oppgaver. Når rammene er klare,
+        blir det lettere å samarbeide og enklere å ta gode beslutninger.
+      </p>
+    </header>
+    {
+      roles.length ? (
+        <>
+          <ListFilter
+            list="roller"
+            empty="roller-tom"
+            label="Søk i roller"
+            placeholder="Søk etter rollenavn"
+            count={roles.length}
+            noun={{ one: 'rolle', other: 'roller' }}
+            chips={chips}
+          />
+          <ul class="roles" id="roller">
+            {roles.map((role) => (
+              <li data-search={role.name.toLowerCase()} data-filter={filterValues(role)}>
+                <RoleCard role={role} />
+              </li>
+            ))}
+          </ul>
+          <p class="ds-paragraph empty" id="roller-tom" hidden>
+            Ingen roller passer søket. Prøv et annet ord eller fjern filteret.
+          </p>
+        </>
+      ) : (
+        <p class="ds-paragraph">Ingen roller er registrert ennå.</p>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+    max-width: 45rem;
+  }
+
+  .roles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .roles > li[hidden] {
+    display: none;
+  }
+
+  .empty {
+    padding: var(--ds-size-8);
+    border: var(--ds-border-width-default) dashed var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+    text-align: center;
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+</style>

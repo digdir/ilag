@@ -1,0 +1,82 @@
+---
+import { ramo } from '../../lib/roles'
+import type { RoleWithTypes } from '../../types/role'
+import RoleTeamTypes from './RoleTeamTypes.astro'
+
+interface Props {
+  role: RoleWithTypes
+}
+
+// A role in the list (RO-01) with its RAMO description (RO-02), each part cut
+// to a few lines; the role's page has the whole of it.
+const { role } = Astro.props
+---
+
+<section class="ds-card" data-color="neutral">
+  <header>
+    <h2 class="ds-heading" data-size="sm">{role.name}</h2>
+    <RoleTeamTypes role={role} />
+  </header>
+  <dl>
+    {
+      ramo(role).map((field) => (
+        <div>
+          <dt class="ds-label" data-size="xs">{field.label}</dt>
+          <dd class="ds-paragraph" data-size="sm">{field.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+  <p class="ds-paragraph">
+    <a class="ds-link" href={`/organisering/roller/${role.id}`}>
+      Se hele rollebeskrivelsen<span class="ds-sr-only"> for {role.name.toLowerCase()}</span>
+    </a>
+  </p>
+</section>
+
+<style>
+  /* Designsystemet's card isn't a flex container, so it is made one here
+     for even space between the name, the RAMO description and the link. */
+  .ds-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  /* The name, then the team types it is for under it, left-aligned. */
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--ds-size-6) var(--ds-size-8);
+    margin: 0;
+  }
+
+  dl > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+
+  dt {
+    color: var(--ds-color-accent-text-subtle);
+    font-size: var(--ds-font-size-1);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    margin: 0;
+  }
+</style>

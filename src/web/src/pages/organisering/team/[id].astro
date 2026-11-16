@@ -1,7 +1,7 @@
 ---
+import Tag from '../../../components/Tag.astro'
 import MemberList from '../../../components/team/MemberList.astro'
 import TeamOwner from '../../../components/team/TeamOwner.astro'
-import TeamTypeTag from '../../../components/team/TeamTypeTag.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getTeam } from '../../../lib/cms/teams'
 
@@ -21,7 +21,7 @@ const isOwner = (m: { roles: string[] }) => m.roles.includes('Teameier')
       team ? (
         <>
           <header>
-            {team.teamType && <TeamTypeTag type={team.teamType} />}
+            {team.teamType && <Tag>{team.teamType.name}</Tag>}
             <h1 class="ds-heading" data-size="lg">{team.name}</h1>
             {team.description && <p class="ds-paragraph">{team.description}</p>}
           </header>

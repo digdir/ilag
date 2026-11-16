@@ -1,0 +1,40 @@
+---
+import type { RoleWithTypes } from '../../types/role'
+import Tag from '../Tag.astro'
+
+interface Props {
+  role: Pick<RoleWithTypes, 'teamTypes'>
+}
+
+// The team types the role is relevant for (RO-03), as tags. A role without
+// team types is one teams work with, such as linjeleder.
+const { teamTypes } = Astro.props.role
+---
+
+{
+  teamTypes.length ? (
+    <div>
+      <span class="ds-sr-only">Aktuell for</span>
+      <ul>
+        {teamTypes.map((type) => (
+          <li>
+            <Tag>{type.name}</Tag>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <Tag color="neutral">Samspiller med team</Tag>
+  )
+}
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

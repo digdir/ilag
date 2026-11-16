@@ -38,7 +38,7 @@ export const NAV: NavGroup[] = [
       { label: 'Team', href: '/organisering/team', built: true },
       { label: 'Linjeorganisasjon', href: '/organisering/linjeorganisasjon', built: true },
       { label: 'Innsatsområde', href: '/organisering/innsatsomrade', built: false },
-      { label: 'Roller', href: '/organisering/roller', built: false },
+      { label: 'Roller', href: '/organisering/roller', built: true },
     ],
   },
   {

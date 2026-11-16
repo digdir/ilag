@@ -1,7 +1,7 @@
 ---
 import { withRole } from '../../lib/cms/teams'
 import type { TeamWithMembers } from '../../types/team'
-import TeamTypeTag from './TeamTypeTag.astro'
+import Tag from '../Tag.astro'
 
 interface Props {
   team: TeamWithMembers
@@ -22,7 +22,7 @@ const meta = team.members.length
 ---
 
 <a class="ds-card" data-color="neutral" href={`/organisering/team/${team.id}`}>
-  {team.teamType && <TeamTypeTag type={team.teamType} />}
+  {team.teamType && <Tag>{team.teamType.name}</Tag>}
   <h2 class="ds-heading" data-size="xs">{team.name}</h2>
   {team.description && <p class="ds-paragraph" data-size="sm">{team.description}</p>}
   <p class="ds-paragraph meta" data-size="xs">{meta}</p>
