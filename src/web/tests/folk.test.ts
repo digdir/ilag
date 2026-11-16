@@ -113,10 +113,14 @@ describe('Folk', () => {
 
     const html = await render()
 
-    expect(html).toContain('type="search"')
+    expect(html).toMatch(/<label[^>]*for="folk-search"[^>]*>Søk blant ansatte<\/label>/)
     expect(html).toContain('placeholder="Søk etter navn, rolle, enhet eller team"')
+    expect(html).toContain('data-list="folk"')
+    expect(html).toMatch(/<table[^>]*id="folk"/)
     expect(html).toContain('data-search="åse ødegård utvikler fel – backend team innlogging"')
-    expect(html).toContain('Ingen treff.')
+    expect(html).toMatch(/data-filter-count[^>]*>\s*\d+ personer/)
+    expect(html).not.toContain('type="radio"')
+    expect(html).toMatch(/id="folk-tom" hidden[^>]*>\s*Ingen treff\./)
   })
 
   it('AL-01: shows no allocation', async () => {

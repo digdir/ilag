@@ -1,12 +1,20 @@
 ---
+import ListFilter from '../../../components/ListFilter.astro'
 import TeamCard from '../../../components/team/TeamCard.astro'
-import TeamFilter from '../../../components/team/TeamFilter.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getTeams } from '../../../lib/cms/teams'
 import { getTeamTypes } from '../../../lib/cms/teamTypes'
 
 const cookie = Astro.request.headers.get('cookie')
 const [teams, types] = await Promise.all([getTeams(cookie), getTeamTypes(cookie)])
+
+// Search by name and filter by type (TO-05), like the prototype's
+// «2 team av typen produktteam».
+const chips = {
+  legend: 'Teamtype',
+  options: types.map((type) => ({ value: String(type.id), label: type.name })),
+  countSuffix: 'av typen',
+}
 ---
 
 <Layout title="Teamoversikt — ilag" wide>
@@ -20,15 +28,23 @@ const [teams, types] = await Promise.all([getTeams(cookie), getTeamTypes(cookie)
     {
       teams.length ? (
         <>
-          <TeamFilter types={types} count={teams.length} />
-          <ul class="teams" data-team-list>
+          <ListFilter
+            list="team"
+            empty="team-tom"
+            label="Søk i team"
+            placeholder="Søk etter teamnavn"
+            count={teams.length}
+            noun={{ one: 'team', other: 'team' }}
+            chips={chips}
+          />
+          <ul class="teams" id="team">
             {teams.map((team) => (
-              <li data-name={team.name.toLowerCase()} data-type={team.teamType?.id}>
+              <li data-search={team.name.toLowerCase()} data-filter={team.teamType?.id}>
                 <TeamCard team={team} />
               </li>
             ))}
           </ul>
-          <p class="ds-paragraph empty" data-team-empty hidden>
+          <p class="ds-paragraph empty" id="team-tom" hidden>
             Ingen team passer søket. Prøv et annet ord eller fjern filteret.
           </p>
         </>

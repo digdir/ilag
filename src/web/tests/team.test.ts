@@ -62,11 +62,15 @@ describe('team overview', () => {
 
     const html = await render()
 
-    expect(html).toContain('type="search"')
-    expect(html).toMatch(/name="teamtype" value="5"[^>]*>\s*Fagnettverk/)
-    expect(html).toMatch(/name="teamtype" value="1"[^>]*>\s*Produktteam/)
-    expect(html).toContain('data-name="team skjemabygger" data-type="1"')
-    expect(html).toContain('Ingen team passer søket.')
+    expect(html).toMatch(/<label[^>]*for="team-search"[^>]*>Søk i team<\/label>/)
+    expect(html).toContain('data-list="team"')
+    expect(html).toContain('data-count-suffix="av typen"')
+    expect(html).toContain('Teamtype</legend>')
+    expect(html).toMatch(/name="team-chip" value="5"[^>]*>\s*Fagnettverk/)
+    expect(html).toMatch(/name="team-chip" value="1"[^>]*>\s*Produktteam/)
+    expect(html).toContain('data-search="team skjemabygger" data-filter="1"')
+    expect(html).toMatch(/data-filter-count[^>]*>\s*2 team\s*</)
+    expect(html).toMatch(/id="team-tom" hidden[^>]*>\s*Ingen team passer søket\./)
   })
 
   it('says so when there are no teams', async () => {

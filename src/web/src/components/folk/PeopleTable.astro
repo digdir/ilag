@@ -3,14 +3,15 @@ import type { PersonRow as Person } from '../../types/person'
 import PersonRow from './PersonRow.astro'
 
 interface Props {
+  /** The id for a ListFilter to find the rows by; each row carries `data-search`. */
+  id?: string
   people: Person[]
 }
 
-const { people } = Astro.props
+const { id, people } = Astro.props
 ---
 
-<!-- Marked data-people-list for PeopleSearch, which hides the rows that don't match. -->
-<table class="ds-table people" data-people-list>
+<table class="ds-table people" id={id}>
   <thead>
     <tr>
       <th scope="col">Navn og tittel</th>
