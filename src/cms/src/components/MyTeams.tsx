@@ -1,13 +1,14 @@
-import type { ServerProps } from 'payload'
+import type { WidgetServerProps } from 'payload'
 import React from 'react'
 
 import { isAdmin } from '@/access/isAdmin'
 import { teamsEditedBy } from '@/access/teamEditor'
 
-// The top of the admin panel's dashboard for teameiere and teamledere (TO-08,
-// RO-06): the teams they edit, with a link to each team and to its members.
-// Administrators see the dashboard as before.
-export async function MyTeams({ i18n, payload, user }: ServerProps) {
+// The dashboard widget for teameiere and teamledere (TO-08, RO-06): the teams
+// they edit, with a link to each team and to its members. It is all they see
+// on the dashboard (see `dashboard` in payload.config.ts).
+export async function MyTeams({ req, user }: WidgetServerProps) {
+  const { i18n, payload } = req
   if (!user || isAdmin(user)) return null
   const ids = await teamsEditedBy(payload, user)
   if (!ids.length) return null

@@ -130,6 +130,7 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'my-teams': MyTeamsWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -892,6 +893,16 @@ export interface PayloadJobsStatsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "my-teams_widget".
+ */
+export interface MyTeamsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
