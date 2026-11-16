@@ -1,0 +1,45 @@
+import { experimental_AstroContainer as AstroContainer } from 'astro/container'
+import { describe, expect, it } from 'vitest'
+
+import ListFilter from '../src/components/ListFilter.astro'
+
+const props = {
+  list: 'ting',
+  empty: 'ting-tom',
+  label: 'Søk i ting',
+  placeholder: 'Søk etter navn',
+  noun: { one: 'ting', other: 'tinger' },
+}
+
+const render = async (extra: Record<string, unknown>) => {
+  const container = await AstroContainer.create()
+  return container.renderToString(ListFilter, { props: { ...props, ...extra } })
+}
+
+describe('list filter', () => {
+  it('has a labelled search field tied to the list it filters', async () => {
+    const html = await render({ count: 3 })
+
+    expect(html).toContain('data-list="ting"')
+    expect(html).toContain('data-empty="ting-tom"')
+    expect(html).toMatch(/<label[^>]*for="ting-search"[^>]*>Søk i ting<\/label>/)
+    expect(html).toMatch(/<input[^>]*id="ting-search"[^>]*type="search"/)
+    expect(html).not.toContain('type="radio"')
+  })
+
+  it('counts with the singular or plural noun', async () => {
+    expect(await render({ count: 1 })).toContain('1 ting<')
+    expect(await render({ count: 4 })).toContain('4 tinger')
+  })
+
+  it('adds the chips after «Alle», which is chosen', async () => {
+    const html = await render({
+      count: 2,
+      chips: { legend: 'Type', options: [{ value: '7', label: 'Sju' }] },
+    })
+
+    expect(html).toContain('<legend')
+    expect(html).toMatch(/name="ting-chip" value checked[^>]*>\s*Alle/)
+    expect(html).toMatch(/name="ting-chip" value="7"[^>]*>\s*Sju/)
+  })
+})

@@ -1,0 +1,133 @@
+---
+interface Chip {
+  value: string
+  label: string
+}
+
+interface Props {
+  /** The id of the list to filter. Its items to filter carry `data-search`. */
+  list: string
+  /** The id of the message to show when nothing matches, if there is one. */
+  empty?: string
+  label: string
+  placeholder: string
+  /** How many items there are before filtering. */
+  count: number
+  /** The word for what is counted, such as `{ one: 'rolle', other: 'roller' }`. */
+  noun: { one: string; other: string }
+  /** Optional chips to filter by, with «Alle» first. Items carry their values in `data-filter`. */
+  chips?: { legend: string; options: Chip[] }
+}
+
+const { list, empty, label, placeholder, count, noun, chips } = Astro.props
+const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
+---
+
+<!--
+  Search and filter a list the page has already rendered. The script hides the
+  items in the list that don't match: an item shows when every word searched
+  for is in its data-search and, with a chip chosen, the chip's value is one of
+  the space-separated values in its data-filter. Without JavaScript, all show.
+-->
+<div
+  class="list-filter"
+  data-list-filter
+  data-list={list}
+  data-empty={empty}
+  data-one={noun.one}
+  data-other={noun.other}
+>
+  <ds-field class="ds-field">
+    <label class="ds-label" for={`${list}-search`}>{label}</label>
+    <input class="ds-input" id={`${list}-search`} type="search" placeholder={placeholder} />
+  </ds-field>
+  {
+    chips && (
+      <fieldset class="ds-fieldset">
+        <legend class="ds-label" data-weight="regular">
+          {chips.legend}
+        </legend>
+        <div class="chips" data-size="sm">
+          {[{ value: '', label: 'Alle' }, ...chips.options].map((chip) => (
+            <label class="ds-chip">
+              <input
+                class="ds-input"
+                type="radio"
+                name={`${list}-chip`}
+                value={chip.value}
+                checked={chip.value === ''}
+              />
+              {chip.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    )
+  }
+  <p
+    class="ds-paragraph count"
+    data-size="sm"
+    data-color="neutral"
+    aria-live="polite"
+    data-filter-count
+  >
+    {countLabel(count)}
+  </p>
+</div>
+
+<script>
+  for (const filter of document.querySelectorAll<HTMLElement>('[data-list-filter]')) {
+    const { list, empty, one, other } = filter.dataset
+    const search = filter.querySelector<HTMLInputElement>('input[type=search]')!
+    const count = filter.querySelector<HTMLElement>('[data-filter-count]')!
+    const message = empty ? document.getElementById(empty) : null
+    const items = [...document.getElementById(list!)!.querySelectorAll<HTMLElement>('[data-search]')]
+
+    filter.addEventListener('input', () => {
+      const words = search.value.trim().toLowerCase().split(/\s+/)
+      const chip = filter.querySelector<HTMLInputElement>('input[type=radio]:checked')?.value ?? ''
+      let shown = 0
+      for (const item of items) {
+        const matches = words.every((word) => item.dataset.search!.includes(word))
+        const inChip = !chip || (item.dataset.filter ?? '').split(' ').includes(chip)
+        item.hidden = !(matches && inChip)
+        if (!item.hidden) shown++
+      }
+      count.textContent = `${shown} ${shown === 1 ? one : other}`
+      if (message) message.hidden = shown > 0
+    })
+  }
+</script>
+
+<style>
+  .list-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+
+  ds-field {
+    max-width: 28rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+
+  /* Chips without the radio circle: the chosen one still has its colour. The
+     input stays for the keyboard and screen readers, just out of sight. */
+  .ds-chip:has(input) {
+    padding-inline-start: var(--dsc-chip-padding-inline);
+  }
+
+  .ds-chip > input {
+    opacity: 0;
+  }
+
+  .count {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>

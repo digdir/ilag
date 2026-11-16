@@ -2,10 +2,18 @@
 import type { TeamType } from '@ilag/shared'
 
 interface Props {
-  type: TeamType
+  type: Pick<TeamType, 'name'>
+  /** Fully rounded ends, as on the role pages. */
+  rounded?: boolean
 }
 
-const { name } = Astro.props.type
+const { type, rounded = false } = Astro.props
 ---
 
-<span class="ds-tag" data-color="info" data-size="sm">{name}</span>
+<span class:list={['ds-tag', { rounded }]} data-color="info" data-size="sm">{type.name}</span>
+
+<style>
+  .rounded {
+    --dsc-tag-border-radius: var(--ds-border-radius-full);
+  }
+</style>

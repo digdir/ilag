@@ -1,0 +1,64 @@
+---
+import RoleTeamTypes from '../../../components/roller/RoleTeamTypes.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getRole } from '../../../lib/cms/roles'
+import { ramo } from '../../../lib/roles'
+
+const role = await getRole(Astro.params.id!, Astro.request.headers.get('cookie'))
+if (!role) Astro.response.status = 404
+---
+
+<Layout title={role ? `${role.name} — ilag` : 'Fant ikke rollen — ilag'}>
+  <div class="page">
+    <p class="ds-paragraph">
+      <a class="ds-link" href="/organisering/roller">Tilbake til roller</a>
+    </p>
+    {
+      role ? (
+        <>
+          <header>
+            <h1 class="ds-heading" data-size="lg">
+              {role.name}
+            </h1>
+            <RoleTeamTypes role={role} />
+          </header>
+          {ramo(role).map((field) => (
+            <section>
+              <h2 class="ds-heading" data-size="xs">
+                {field.label}
+              </h2>
+              <p class="ds-paragraph">{field.value}</p>
+            </section>
+          ))}
+          {!ramo(role).length && <p class="ds-paragraph">Rollen er ikke beskrevet ennå.</p>}
+        </>
+      ) : (
+        <>
+          <h1 class="ds-heading" data-size="lg">Fant ikke rollen</h1>
+          <p class="ds-paragraph">Rollen finnes ikke, eller du har ikke tilgang til den.</p>
+        </>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-7);
+    max-width: 52rem;
+  }
+
+  header,
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+
+  section .ds-paragraph {
+    white-space: pre-line;
+    text-wrap: pretty;
+  }
+</style>
