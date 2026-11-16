@@ -1,4 +1,5 @@
 ---
+import Tag from '../../../components/Tag.astro'
 import SubUnits from '../../../components/linjeorganisasjon/SubUnits.astro'
 import UnitEmployees from '../../../components/linjeorganisasjon/UnitEmployees.astro'
 import UnitLeader from '../../../components/linjeorganisasjon/UnitLeader.astro'
@@ -54,9 +55,7 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
               <p class="ds-paragraph description">{paragraph}</p>
             ))}
             {unit.advisesAllOfDigdir && (
-              <span class="ds-tag" data-color="info" data-size="sm">
-                Bistår og rådgir hele Digdir
-              </span>
+              <Tag>Bistår og rådgir hele Digdir</Tag>
             )}
           </header>
           <section aria-labelledby="leder" data-color="neutral">
