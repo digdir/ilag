@@ -16,4 +16,8 @@ against `main`.
 - In a fresh checkout or worktree, run `pnpm install` and `pnpm setup` before anything else. `pnpm setup` generates
   this Sandbox's own `PAYLOAD_SECRET`; never copy one from elsewhere.
 - Run `pnpm test`, with the database up, before reporting completion.
+- The image has the system libraries Playwright's Chromium needs, but not the browser. Before `pnpm test:e2e` or a
+  Playwright screenshot, run `pnpm --filter cms exec playwright install chromium` once; never use `--with-deps` or
+  `install-deps`, which change the system with `sudo` and are lost when the Agent is created again. If the browser
+  still fails to start over a missing library, report it rather than installing it.
 - The developer reaches the dev servers on ports 3000 and 4321 with `agentctl port-forward` from the host.

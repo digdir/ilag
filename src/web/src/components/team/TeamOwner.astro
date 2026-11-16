@@ -1,6 +1,7 @@
 ---
 import type { Member } from '../../types/team'
 import Avatar from '../Avatar.astro'
+import PersonLink from '../PersonLink.astro'
 
 interface Props {
   /** The members with the role Teameier; usually one. */
@@ -16,7 +17,9 @@ const { owners } = Astro.props
       <div class="owner">
         <Avatar name={owner.name} size="lg" />
         <div>
-          <p class="ds-paragraph name">{owner.name}</p>
+          <p class="ds-paragraph name">
+            {owner.personId ? <PersonLink id={owner.personId} name={owner.name} /> : owner.name}
+          </p>
           <p class="ds-paragraph role" data-size="sm">Teameier</p>
           <dl>
             <dt class="ds-label" data-size="xs">Lokasjon</dt>

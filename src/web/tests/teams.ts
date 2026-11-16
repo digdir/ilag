@@ -2,7 +2,7 @@
 
 const membership = (id: number, fullName: string, roles: string[], person = {}) => ({
   id,
-  person: { id: 100 + id, fullName, ...person },
+  person: { id: 100 + id, fullName, active: true, ...person },
   roles: roles.map((name, i) => ({ id: i + 1, name })),
 })
 
@@ -18,7 +18,8 @@ export const skjemabygger = {
         units: [{ id: 1, name: 'Organisasjonslæring' }],
       }),
       membership(2, 'Emma Kristiansen', ['Teamleder', 'Produkteier']),
-      membership(3, 'Ida Haugen', ['Teammedlem']),
+      // Has left Digdir, but is still registered in the team.
+      membership(3, 'Ida Haugen', ['Teammedlem'], { active: false }),
     ],
   },
 }

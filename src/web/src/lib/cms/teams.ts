@@ -37,7 +37,7 @@ export async function getTeam(id: string, cookie: string | null): Promise<TeamWi
         populate: {
           team: { name: true },
           teamtyper: { name: true },
-          personer: { fullName: true, location: true, units: true },
+          personer: { fullName: true, active: true, location: true, units: true },
           roller: { name: true },
           lokasjoner: { name: true },
           enheter: { name: true },
@@ -69,6 +69,8 @@ const withMembers = ({ members, teamType, ...team }: Team): TeamWithMembers => (
 
 const toMember = ({ id, person, roles }: TeamMembership): Member => ({
   id,
+  // Only a person who still works in Digdir has a page to link to.
+  personId: typeof person === 'object' && person.active ? person.id : null,
   name: typeof person === 'object' ? (person.fullName ?? '') : '',
   roles: roles.flatMap((r) => (typeof r === 'object' ? [r.name] : [])),
   location:

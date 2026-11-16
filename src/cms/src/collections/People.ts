@@ -164,6 +164,9 @@ export const People: CollectionConfig = {
       collection: 'teammedlemskap',
       on: 'person',
       defaultLimit: 0,
+      // Lets the join fill in each membership's team when the request's depth
+      // asks for it, for Folk; a join stops at the membership by default.
+      maxDepth: 2,
     },
   ],
 }

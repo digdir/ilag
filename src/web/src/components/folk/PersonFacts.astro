@@ -1,0 +1,90 @@
+---
+import type { PersonDetail } from '../../types/person'
+
+interface Props {
+  person: PersonDetail
+}
+
+const { person } = Astro.props
+---
+
+<!--
+  How to reach the person and where they belong in the line (FO-02): email,
+  mobile, location and units, each unit linking to its page.
+-->
+<dl>
+  <div>
+    <dt class="ds-label" data-size="xs">E-post</dt>
+    <dd class="ds-paragraph">
+      <a class="ds-link" href={`mailto:${person.email}`}>{person.email}</a>
+    </dd>
+  </div>
+  <div>
+    <dt class="ds-label" data-size="xs">Mobil</dt>
+    <dd class="ds-paragraph">
+      {
+        person.mobile ? (
+          <a class="ds-link" href={`tel:${person.mobile.replace(/\s/g, '')}`}>
+            {person.mobile}
+          </a>
+        ) : (
+          <span class="none">Ikke registrert</span>
+        )
+      }
+    </dd>
+  </div>
+  <div>
+    <dt class="ds-label" data-size="xs">Lokasjon</dt>
+    <dd class="ds-paragraph">
+      {person.location ?? <span class="none">Ikke registrert</span>}
+    </dd>
+  </div>
+  <div>
+    <dt class="ds-label" data-size="xs">Enhet i linjen</dt>
+    <dd class="ds-paragraph">
+      {
+        person.units.length ? (
+          <ul class="plain">
+            {person.units.map((unit) => (
+              <li>
+                <a class="ds-link" href={`/organisering/linjeorganisasjon/${unit.id}`}>
+                  {unit.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <span class="none">Ikke registrert</span>
+        )
+      }
+    </dd>
+  </div>
+</dl>
+
+<style>
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: var(--ds-size-4) var(--ds-size-6);
+    margin: 0;
+  }
+
+  dt {
+    color: var(--ds-color-text-subtle);
+  }
+
+  dd {
+    margin: var(--ds-size-1) 0 0;
+    overflow-wrap: anywhere;
+  }
+
+  .none {
+    color: var(--ds-color-text-subtle);
+  }
+
+  .plain {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

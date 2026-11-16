@@ -78,6 +78,15 @@ parent from the three code columns:
 The directorate is recognised by its ID, because its `Avdeling` and `Seksjon`
 hold its name instead of a code.
 
+Two units directly under the directorate aren't divisions, and the file can't
+tell them apart from one. ilag gives them their level by ID, a setting in
+ilag, and finds their departments and sections as under a division:
+
+| `orgEnhet` | Unit | Level |
+| --- | --- | --- |
+| `10003925` | Kommunikasjon (KOM) | Stab |
+| `10004805` | Tilsyn for universell utforming av IKT (TUU) | Tilsyn |
+
 ### Lines ilag skips
 
 `10013301` (BOD-ekstern) groups contractors in SAP. It is not a unit in
@@ -90,6 +99,12 @@ should later be shown as a unit, an administrator handles it in ilag.
 The file has no leader. An administrator sets each unit's leader in ilag's
 admin panel, and the import never changes it. The leader may later come from
 the people file or a new column in this file.
+
+### Units that advise all of Digdir
+
+The file doesn't say which units advise and support all of Digdir rather
+than just their own division (LO-06). An administrator marks them in ilag's
+admin panel, and the import never changes the marking.
 
 ### Example
 

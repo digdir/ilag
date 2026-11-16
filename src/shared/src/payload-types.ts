@@ -279,9 +279,17 @@ export interface Unit {
   externalUnitId: string;
   name: string;
   code?: string | null;
-  level: 'directorate' | 'division' | 'department' | 'section';
+  level: 'directorate' | 'division' | 'support' | 'authority' | 'department' | 'section';
+  /**
+   * Kort om hva enheten gjør. Vises under navnet på enhetssiden.
+   */
+  description?: string | null;
   parent?: (number | null) | Unit;
   leader?: (number | null) | Person;
+  /**
+   * Enheten bistår og rådgir hele Digdir, ikke bare sin egen divisjon.
+   */
+  advisesAllOfDigdir: boolean;
   active: boolean;
   children?: {
     docs?: (number | Unit)[];
@@ -699,8 +707,10 @@ export interface EnheterSelect<T extends boolean = true> {
   name?: T;
   code?: T;
   level?: T;
+  description?: T;
   parent?: T;
   leader?: T;
+  advisesAllOfDigdir?: T;
   active?: T;
   children?: T;
   people?: T;

@@ -1,0 +1,98 @@
+---
+import PersonFacts from '../../components/folk/PersonFacts.astro'
+import PersonTeams from '../../components/folk/PersonTeams.astro'
+import Avatar from '../../components/Avatar.astro'
+import Layout from '../../layouts/Layout.astro'
+import { getPerson } from '../../lib/cms/people'
+
+const person = await getPerson(Astro.params.id!, Astro.request.headers.get('cookie'))
+if (!person) Astro.response.status = 404
+---
+
+<!--
+  A person's page: their title, how to reach them, their units in the line and
+  their teams with their roles (FO-01, FO-02). Allocation (AL-01) is not shown:
+  only the person, their team leads and owners and their manager may see it
+  (AL-04), and it awaits a privacy assessment.
+-->
+<Layout title={person ? `${person.name} — ilag` : 'Fant ikke personen — ilag'} wide>
+  <div class="page">
+    <p class="ds-paragraph">
+      <a class="ds-link" href="/folk">Tilbake til Folk</a>
+    </p>
+    {
+      person ? (
+        <>
+          <header>
+            <Avatar name={person.name} size="lg" />
+            <div>
+              <h1 class="ds-heading" data-size="lg">
+                {person.name}
+              </h1>
+              {person.title && (
+                <p class="ds-paragraph title" data-color="neutral">
+                  {person.title}
+                </p>
+              )}
+            </div>
+          </header>
+          <div class="sections">
+            <section class="ds-card" data-color="neutral" aria-labelledby="kontakt">
+              <h2 class="ds-heading" data-size="sm" id="kontakt">
+                Kontakt og tilhørighet
+              </h2>
+              <PersonFacts person={person} />
+            </section>
+            <section class="ds-card" data-color="neutral" aria-labelledby="team">
+              <h2 class="ds-heading" data-size="sm" id="team">
+                Team
+              </h2>
+              <PersonTeams teams={person.teams} />
+            </section>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 class="ds-heading" data-size="lg">
+            Fant ikke personen
+          </h1>
+          <p class="ds-paragraph">Personen finnes ikke, har sluttet, eller du har ikke tilgang.</p>
+        </>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-8);
+    max-width: 56rem;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-4);
+  }
+
+  h1,
+  .title {
+    margin: 0;
+  }
+
+  .title {
+    color: var(--ds-color-text-subtle);
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  section h2 {
+    margin-bottom: var(--ds-size-4);
+  }
+</style>

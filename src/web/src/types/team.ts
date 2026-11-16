@@ -5,7 +5,10 @@ import type { Team, TeamType } from '@ilag/shared'
 
 /** A person in a team, with the names of their roles there. */
 export type Member = {
+  /** The membership's ID. */
   id: number
+  /** The person's ID, for the link to their page; null if they have left or weren't fetched. */
+  personId: number | null
   name: string
   roles: string[]
   /** Only filled in by getTeam, which asks for one level more. */

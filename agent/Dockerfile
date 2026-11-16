@@ -23,6 +23,24 @@ RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
     && HOME="${scratch}" TMPDIR="${scratch}" pnpm --version \
     && rm -rf "${scratch}" /tmp/node-compile-cache
 
+# The system libraries Playwright's Chromium needs for `pnpm test:e2e`, as CI installs them with `--with-deps`.
+# Without them the browser fails to start (libnspr4.so missing). Only the libraries: the browser itself goes in
+# /home/agent/.cache, so the agent installs it per checkout with `pnpm --filter cms exec playwright install chromium`.
+# Keep the version in step with @playwright/test in src/cms/package.json.
+ARG PLAYWRIGHT_VERSION=1.64.1
+RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
+      export NODE_EXTRA_CA_CERTS=/run/agent/tls/ca-bundle.pem; \
+    fi; \
+    scratch="$(mktemp -d)" \
+    && HOME="${scratch}" npm_config_cache="${scratch}/npm" \
+       npx --yes "playwright@${PLAYWRIGHT_VERSION}" install-deps chromium \
+    && rm -rf "${scratch}" /tmp/node-compile-cache /var/lib/apt/lists/*
+
+# `pnpm dev:stop` (scripts/dev-stop.sh) finds the CMS by its port with lsof. Without it, the CMS keeps running.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends lsof \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 
 # The repositories agent-workspace-init clones into /home/agent/code at boot.

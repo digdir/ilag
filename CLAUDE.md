@@ -157,6 +157,9 @@ change the files, not the collections, and keep them in step with the contracts.
   which loads both. Look components up in <https://designsystemet.no/llms.txt>
   (add `.md` to any page URL) instead of guessing class names, and use `--ds-*`
   tokens for your own styles.
+- Look Astro up in the Astro docs MCP server (`astro-docs` in `.mcp.json`) instead
+  of answering from memory: the frontend is on Astro 7, and its APIs change between
+  majors.
 - The e2e tests write to whatever `DATABASE_URL` points at — they seed and delete
   a user and a media document. Local databases only.
 
