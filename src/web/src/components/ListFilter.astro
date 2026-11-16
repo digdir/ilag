@@ -44,10 +44,13 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
   {
     chips && (
       <fieldset class="ds-fieldset">
-        <legend class="ds-label" data-weight="regular">
-          {chips.legend}
-        </legend>
+        {/* The legend names the chips for screen readers; the same word shows,
+            greyed, on the same line before them, where a legend can't be placed. */}
+        <legend class="ds-sr-only">{chips.legend}</legend>
         <div class="chips" data-size="sm">
+          <span class="chips-label" aria-hidden="true">
+            {chips.legend}
+          </span>
           {[{ value: '', label: 'Alle' }, ...chips.options].map((chip) => (
             <label class="ds-chip">
               <input
@@ -113,7 +116,14 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
   .chips {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: var(--ds-size-2);
+  }
+
+  .chips-label {
+    margin-inline-end: var(--ds-size-2);
+    color: var(--ds-color-neutral-text-subtle);
+    font-size: var(--ds-body-sm-font-size);
   }
 
   /* Chips without the radio circle: the chosen one still has its colour. The
