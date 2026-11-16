@@ -72,7 +72,8 @@ const { pathname } = Astro.props
     outline-offset: 2px;
   }
 
-  ul :global(.item[aria-current='page']),
+  /* One item at a time: the open section if there is one, otherwise the current one. */
+  ul:not(:has(:global([aria-expanded='true']))) :global(.item[aria-current='page']),
   ul :global(.item[aria-expanded='true']),
   ul :global(.item[data-current]:not([aria-expanded='false'])) {
     background: var(--ds-color-accent-surface-tinted);
