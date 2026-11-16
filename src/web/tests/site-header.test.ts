@@ -69,8 +69,9 @@ describe('site header', () => {
 
     expect(html).toContain('aria-label="Organisering"')
     expect(menuLink(html, 'Team')).toMatch(/href="\/organisering\/team"[^>]*aria-current="page"/)
-    expect(html).toMatch(/<span [^>]*>\s*Linjeorganisasjon\s*<\/span>/)
-    expect(menuLink(html, 'Linjeorganisasjon')).toBeUndefined()
+    expect(html).toMatch(/<span [^>]*>\s*Innsatsområde\s*<\/span>/)
+    expect(menuLink(html, 'Innsatsområde')).toBeUndefined()
+    expect(menuLink(html, 'Linjeorganisasjon')).toContain('href="/organisering/linjeorganisasjon"')
   })
 
   it('shows only the logo when nobody is logged in', async () => {

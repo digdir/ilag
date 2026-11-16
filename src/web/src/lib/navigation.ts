@@ -29,14 +29,14 @@ export const NAV: NavGroup[] = [
   {
     label: 'Folk',
     path: '/folk',
-    pages: [{ label: 'Folk', href: '/folk', built: false }],
+    pages: [{ label: 'Folk', href: '/folk', built: true }],
   },
   {
     label: 'Organisering',
     path: '/organisering',
     pages: [
       { label: 'Team', href: '/organisering/team', built: true },
-      { label: 'Linjeorganisasjon', href: '/organisering/linjeorganisasjon', built: false },
+      { label: 'Linjeorganisasjon', href: '/organisering/linjeorganisasjon', built: true },
       { label: 'Innsatsområde', href: '/organisering/innsatsomrade', built: false },
       { label: 'Roller', href: '/organisering/roller', built: false },
     ],
