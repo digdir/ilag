@@ -23,7 +23,10 @@ const { group, pathname, hidden = false } = Astro.props
               {page.label}
             </a>
           ) : (
-            <span title="Kommer snart">{page.label}</span>
+            <span title="Kommer snart">
+              {page.label}
+              <span class="ds-sr-only"> (kommer snart)</span>
+            </span>
           )}
         </li>
       ))
@@ -42,7 +45,7 @@ const { group, pathname, hidden = false } = Astro.props
   }
 
   a,
-  span {
+  li > span {
     display: block;
     position: relative;
     padding: var(--ds-size-2) var(--ds-size-4);
@@ -83,10 +86,12 @@ const { group, pathname, hidden = false } = Astro.props
     background: var(--ds-color-accent-text-subtle);
   }
 
-  /* Pages that are not built yet. */
-  span {
+  /* Pages that are not built yet: dimmed, but no further than the 4.5:1
+     contrast text needs (WCAG 1.4.3). Screen readers hear «kommer snart»,
+     which the title only shows on hover. */
+  li > span {
     color: var(--ds-color-neutral-text-subtle);
-    opacity: 0.55;
+    opacity: 0.85;
     cursor: default;
   }
 </style>
