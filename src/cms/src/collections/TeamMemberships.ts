@@ -31,6 +31,7 @@ export const TeamMemberships: CollectionConfig = {
     interface: 'TeamMembership',
   },
   admin: {
+    useAsTitle: 'personName',
     defaultColumns: ['team', 'person', 'roles'],
     // Only the list in the admin panel; read is open to everyone signed in.
     baseFilter: async ({ req }) => {
@@ -71,6 +72,16 @@ export const TeamMemberships: CollectionConfig = {
       type: 'relationship',
       relationTo: 'personer',
       required: true,
+    },
+    {
+      // The person's name, read from the person, as the membership's title in
+      // the admin panel. Not stored.
+      name: 'personName',
+      type: 'text',
+      virtual: 'person.fullName',
+      admin: {
+        hidden: true,
+      },
     },
     {
       // At least one, chosen by whoever adds the person to the team.

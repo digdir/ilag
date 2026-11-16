@@ -317,6 +317,7 @@ export interface TeamMembership {
   id: number;
   team: number | Team;
   person: number | Person;
+  personName?: string | null;
   roles: (number | Role)[];
   updatedAt: string;
   createdAt: string;
@@ -768,6 +769,7 @@ export interface TeamSelect<T extends boolean = true> {
 export interface TeammedlemskapSelect<T extends boolean = true> {
   team?: T;
   person?: T;
+  personName?: T;
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
