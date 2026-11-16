@@ -1,6 +1,7 @@
 import type { CollectionConfig, FieldAccess } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 import { importEndpoints } from '../imports/endpoints'
 
@@ -29,6 +30,8 @@ export const Units: CollectionConfig = {
     interface: 'Unit',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name', 'level', 'parent', 'leader', 'active'],
   },

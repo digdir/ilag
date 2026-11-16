@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier,
@@ -18,6 +19,8 @@ export const Roles: CollectionConfig = {
     interface: 'Role',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name'],
   },

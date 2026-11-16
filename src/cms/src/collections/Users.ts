@@ -1,6 +1,7 @@
 import { APIError, type CollectionBeforeChangeHook, type CollectionBeforeLoginHook, type CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors, isTeamEditor } from '../access/teamEditor'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
@@ -39,6 +40,8 @@ export const Users: CollectionConfig = {
     interface: 'User',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'email',
     defaultColumns: ['email', 'firstName', 'lastName', 'roles'],
   },
@@ -51,7 +54,9 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
   },
   access: {
-    admin: ({ req }) => isAdmin(req.user),
+    // Administrators, and the teameiere and teamledere who edit their teams
+    // (TO-08, RO-06).
+    admin: async ({ req }) => isAdmin(req.user) || (await isTeamEditor(req)),
     read: ({ req }) => isAdmin(req.user) || (isSignedIn(req.user) ? { id: { equals: req.user!.id } } : false),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
@@ -86,6 +91,23 @@ export const Users: CollectionConfig = {
         Array.isArray(value) && value.includes('integration') && value.length > 1
           ? 'Integrasjonsbrukeren kan ikke ha andre roller.'
           : true,
+    },
+    {
+      // The person the user is, so ilag can find their team memberships and
+      // what they may edit (TO-08, RO-06). Set on every Entra ID login from
+      // the active person with the same email; administrators can set it by
+      // hand, for accounts whose email doesn't match.
+      name: 'person',
+      type: 'relationship',
+      relationTo: 'personer',
+      access: {
+        create: ({ req }) => isAdmin(req.user),
+        update: ({ req }) => isAdmin(req.user),
+      },
+      admin: {
+        position: 'sidebar',
+        description: 'Settes ved innlogging fra personen med samme e-post.',
+      },
     },
     {
       // How the user logs in besides a password: one entry per provider, with

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 
 export const Media: CollectionConfig = {
@@ -16,6 +17,10 @@ export const Media: CollectionConfig = {
   // Media includes photos of employees (people.photo), so documents and files
   // are only for signed-in users. Everyone who works in Digdir can log in, so
   // only administrators change them.
+  admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
+  },
   access: {
     read: ({ req }) => isSignedIn(req.user),
     create: ({ req }) => isAdmin(req.user),

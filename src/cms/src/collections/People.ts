@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isSignedIn } from '../access/isSignedIn'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { importEndpoints } from '../imports/endpoints'
 
 // Employees and contractors, imported from Digdir's authoritative source
@@ -26,6 +27,8 @@ export const People: CollectionConfig = {
     interface: 'Person',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'title', 'units', 'location', 'isEmployee', 'active'],
   },

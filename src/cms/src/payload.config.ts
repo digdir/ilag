@@ -36,6 +36,11 @@ export default buildConfig({
     },
     components: {
       afterLogin: ['/components/ProviderLoginButtons#ProviderLoginButtons'],
+      // Teameiere and teamledere get their own teams first (TO-08, RO-06).
+      beforeDashboard: ['/components/MyTeams#MyTeams'],
+    },
+    meta: {
+      titleSuffix: ' – ilag',
     },
   },
   // The admin panel uses the language a user picked under Account. Otherwise

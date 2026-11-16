@@ -173,6 +173,10 @@ export interface User {
   firstName?: string | null;
   lastName?: string | null;
   roles?: ('admin' | 'integration')[] | null;
+  /**
+   * Settes ved innlogging fra personen med samme e-post.
+   */
+  person?: (number | null) | Person;
   identities?:
     | {
         provider: 'entra';
@@ -203,25 +207,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'brukere';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medier".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -303,6 +288,25 @@ export interface Unit {
   };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medier".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -614,6 +618,7 @@ export interface BrukereSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   roles?: T;
+  person?: T;
   identities?:
     | T
     | {

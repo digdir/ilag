@@ -191,6 +191,18 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Users for some of the people, to try the admin panel as a team editor or
+  // as someone who may not edit, linked the way an Entra ID login links them.
+  for (const { person, email } of data.users) {
+    if (!(await findId(payload, 'brukere', { email: { equals: email } }))) {
+      await payload.create({
+        collection: 'brukere',
+        data: { email, password: ADMIN.password, person: personIds.get(person) },
+      })
+      count('brukere')
+    }
+  }
+
   return created
 }
 
@@ -214,7 +226,7 @@ const removeSeed = async (payload: Payload) => {
     ),
     ['lokasjoner', { code: { in: data.locations.map((l) => l.code) } }],
     ['importkjoringer', { 'sender.email': { equals: ADMIN.email } }],
-    ['brukere', { email: { equals: ADMIN.email } }],
+    ['brukere', { email: { in: [ADMIN.email, ...data.users.map((u) => u.email)] } }],
   ]
   for (const [collection, where] of deletes) {
     const { docs, errors } = await payload.delete({ collection, where })
@@ -238,6 +250,7 @@ if (command !== 'clear') {
   const summary = Object.entries(created).map(([collection, n]) => `${n} ${collection}`)
   console.log(summary.length ? `Created ${summary.join(', ')}.` : 'Nothing else to create; the test data is already there.')
   console.log(`Log in to the admin panel as ${ADMIN.email} with the password «${ADMIN.password}».`)
+  for (const { email, description } of data.users) console.log(`  ${email}: ${description}, same password.`)
 }
 
 await payload.destroy()
