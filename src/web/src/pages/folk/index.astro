@@ -1,5 +1,5 @@
 ---
-import PeopleSearch from '../../components/folk/PeopleSearch.astro'
+import ListFilter from '../../components/ListFilter.astro'
 import PeopleTable from '../../components/folk/PeopleTable.astro'
 import Layout from '../../layouts/Layout.astro'
 import { getPeople } from '../../lib/cms/people'
@@ -18,9 +18,16 @@ const people = await getPeople(Astro.request.headers.get('cookie'))
     {
       people.length ? (
         <>
-          <PeopleSearch count={people.length} />
-          <PeopleTable people={people} />
-          <p class="ds-paragraph empty" data-people-empty hidden>
+          <ListFilter
+            list="folk"
+            empty="folk-tom"
+            label="Søk blant ansatte"
+            placeholder="Søk etter navn, rolle, enhet eller team"
+            count={people.length}
+            noun={{ one: 'person', other: 'personer' }}
+          />
+          <PeopleTable id="folk" people={people} />
+          <p class="ds-paragraph empty" id="folk-tom" hidden>
             Ingen treff. Prøv et annet ord.
           </p>
         </>

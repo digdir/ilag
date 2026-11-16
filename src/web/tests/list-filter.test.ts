@@ -41,5 +41,15 @@ describe('list filter', () => {
     expect(html).toContain('<legend')
     expect(html).toMatch(/name="ting-chip" value checked[^>]*>\s*Alle/)
     expect(html).toMatch(/name="ting-chip" value="7"[^>]*>\s*Sju/)
+    expect(html).not.toContain('data-count-suffix')
+  })
+
+  it('passes the words to name a chosen chip in the count by, if any', async () => {
+    const html = await render({
+      count: 2,
+      chips: { legend: 'Type', options: [{ value: '7', label: 'Sju' }], countSuffix: 'av typen' },
+    })
+
+    expect(html).toContain('data-count-suffix="av typen"')
   })
 })

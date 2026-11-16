@@ -15,8 +15,12 @@ interface Props {
   count: number
   /** The word for what is counted, such as `{ one: 'rolle', other: 'roller' }`. */
   noun: { one: string; other: string }
-  /** Optional chips to filter by, with «Alle» first. Items carry their values in `data-filter`. */
-  chips?: { legend: string; options: Chip[] }
+  /**
+   * Optional chips to filter by, with «Alle» first. Items carry their values in `data-filter`.
+   * With `countSuffix`, a chosen chip is named in the count after it, in lowercase, such as
+   * `'av typen'` for «2 team av typen produktteam».
+   */
+  chips?: { legend: string; options: Chip[]; countSuffix?: string }
 }
 
 const { list, empty, label, placeholder, count, noun, chips } = Astro.props
@@ -36,6 +40,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
   data-empty={empty}
   data-one={noun.one}
   data-other={noun.other}
+  data-count-suffix={chips?.countSuffix}
 >
   <ds-field class="ds-field">
     <label class="ds-label" for={`${list}-search`}>{label}</label>
@@ -80,7 +85,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 
 <script>
   for (const filter of document.querySelectorAll<HTMLElement>('[data-list-filter]')) {
-    const { list, empty, one, other } = filter.dataset
+    const { list, empty, one, other, countSuffix } = filter.dataset
     const search = filter.querySelector<HTMLInputElement>('input[type=search]')!
     const count = filter.querySelector<HTMLElement>('[data-filter-count]')!
     const message = empty ? document.getElementById(empty) : null
@@ -88,7 +93,8 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 
     filter.addEventListener('input', () => {
       const words = search.value.trim().toLowerCase().split(/\s+/)
-      const chip = filter.querySelector<HTMLInputElement>('input[type=radio]:checked')?.value ?? ''
+      const chosen = filter.querySelector<HTMLInputElement>('input[type=radio]:checked')
+      const chip = chosen?.value ?? ''
       let shown = 0
       for (const item of items) {
         const matches = words.every((word) => item.dataset.search!.includes(word))
@@ -96,7 +102,9 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
         item.hidden = !(matches && inChip)
         if (!item.hidden) shown++
       }
-      count.textContent = `${shown} ${shown === 1 ? one : other}`
+      const chipName = countSuffix && chip ? chosen!.parentElement!.textContent!.trim().toLowerCase() : ''
+      count.textContent =
+        `${shown} ${shown === 1 ? one : other}` + (chipName ? ` ${countSuffix} ${chipName}` : '')
       if (message) message.hidden = shown > 0
     })
   }
