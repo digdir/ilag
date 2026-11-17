@@ -321,6 +321,7 @@ export interface Unit {
  */
 export interface Mandate {
   id: number;
+  title?: string | null;
   /**
    * Teamet mandatet hører til. Kan ikke endres etterpå.
    */
@@ -838,6 +839,7 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
  * via the `definition` "mandater_select".
  */
 export interface MandaterSelect<T extends boolean = true> {
+  title?: T;
   team?: T;
   unit?: T;
   problem?: T;

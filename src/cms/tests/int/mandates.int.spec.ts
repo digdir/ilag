@@ -387,5 +387,16 @@ describe('Mandates', () => {
       const withMandate = await payload.findByID({ collection: 'enheter', id: unit.id, depth: 1, ...as(reader) })
       expect((withMandate.mandate?.docs?.[0] as Mandate).status).toBe('current')
     })
+
+    it('is titled by its owner in the admin panel, a unit or a team', async () => {
+      const { docs } = await payload.find({
+        collection: 'mandater',
+        where: { or: [{ unit: { equals: unit.id } }, { team: { equals: team.id } }] },
+        sort: 'id',
+        depth: 0,
+        ...as(admin),
+      })
+      expect(docs.map((d) => d.title)).toEqual([`Mandat for ${team.name}`, `Mandat for ${unit.name}`])
+    })
   })
 })

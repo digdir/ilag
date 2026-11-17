@@ -5,6 +5,7 @@ import {
   type CollectionBeforeValidateHook,
   type CollectionConfig,
   type FieldAccess,
+  type PayloadRequest,
   type TextareaField,
   ValidationError,
 } from 'payload'
@@ -144,6 +145,24 @@ const datesFollowApproval: CollectionBeforeChangeHook<Mandate> = async ({ data, 
   return data
 }
 
+// The name of the mandate's team or unit, whether the owner is populated or
+// only its ID.
+const ownerName = async (doc: Partial<Mandate>, req: PayloadRequest): Promise<string> => {
+  const owner = doc.team ?? doc.unit
+  if (owner && typeof owner === 'object') return owner.name
+  const id = idOf(owner)
+  if (id == null) return 'ukjent eier'
+  const found = await req.payload.findByID({
+    collection: doc.team ? 'team' : 'enheter',
+    id,
+    depth: 0,
+    select: { name: true },
+    disableErrors: true,
+    req,
+  })
+  return found?.name ?? 'ukjent eier'
+}
+
 // Utkast, gjeldende or utgått (TO-16, LO-04), from `_status` and `expiredAt`.
 export const mandateStatus = (doc: Pick<Mandate, '_status' | 'expiredAt'>): 'draft' | 'current' | 'expired' =>
   doc._status !== 'published' ? 'draft' : doc.expiredAt ? 'expired' : 'current'
@@ -159,7 +178,8 @@ export const Mandates: CollectionConfig = {
     interface: 'Mandate',
   },
   admin: {
-    defaultColumns: ['team', 'unit', '_status', 'approvedAt', 'expiredAt', 'updatedAt'],
+    // The first column links to the mandate, so it names the owner.
+    defaultColumns: ['title', 'team', 'unit', '_status', 'approvedAt', 'expiredAt', 'updatedAt'],
     description:
       'Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).',
   },
@@ -182,6 +202,8 @@ export const Mandates: CollectionConfig = {
     collaboration: true,
     _status: true,
     expiredAt: true,
+    team: true,
+    unit: true,
   },
   access: {
     // Everyone signed in reads approved mandates. Drafts, including a
@@ -226,6 +248,25 @@ export const Mandates: CollectionConfig = {
     beforeChange: [ownerNeverChanges, datesFollowApproval],
   },
   fields: [
+    {
+      // «Mandat for Team Skjemabygger», for the first column of the admin
+      // panel's list, which links to the mandate. Calculated, never stored, so
+      // it follows when a team or unit is renamed. Payload doesn't allow a
+      // calculated field as the document's title (`useAsTitle`), so the
+      // document itself is still titled by its ID.
+      name: 'title',
+      type: 'text',
+      label: 'Mandat',
+      virtual: true,
+      admin: {
+        // Only a list column: never shown in the form.
+        condition: () => false,
+        disableListFilter: true,
+      },
+      hooks: {
+        afterRead: [({ siblingData, req }) => ownerName(siblingData, req).then((name) => `Mandat for ${name}`)],
+      },
+    },
     {
       name: 'team',
       type: 'relationship',
