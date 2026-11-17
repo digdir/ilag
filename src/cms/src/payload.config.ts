@@ -36,6 +36,7 @@ export default buildConfig({
     },
     components: {
       afterLogin: ['/components/ProviderLoginButtons#ProviderLoginButtons'],
+      actions: ['/components/GoToWebsite#GoToWebsite'],
     },
     // Teameiere and teamledere see only their own teams on the dashboard
     // (TO-08, RO-06); administrators see Payload's cards for all collections.

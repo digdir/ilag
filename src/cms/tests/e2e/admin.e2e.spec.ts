@@ -25,6 +25,12 @@ test.describe('Admin Panel', () => {
     await expect(dashboardArtifact).toBeVisible()
   })
 
+  test('links back to the frontend from the top bar', async () => {
+    await page.goto('http://localhost:3000/admin/collections/brukere')
+    const link = page.getByRole('link', { name: /^(Gå til|Go to) ilag$/ })
+    await expect(link).toHaveAttribute('href', 'http://localhost:4321')
+  })
+
   test('can navigate to list view', async () => {
     await page.goto('http://localhost:3000/admin/collections/brukere')
     // The list view may add its default query (?depth=1&limit=10) once loaded.
