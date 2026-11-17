@@ -22,14 +22,16 @@ expected of it. The specification asks for:
 - the team owner (teameier) and the team lead (teamleder) edit a team's
   mandate, and only the team owner approves it and makes it current
   (TO-09, TO-16). The unit leader edits the unit's mandate (LO-03).
-- a mandate on the unit page (LO-02) as well as the team page (TO-04). Units
-  can share one mandate: the prototype has a single mandate for the three
-  departments of Utvikling og drift.
+- a mandate on the unit page (LO-02) as well as the team page (TO-04). A
+  mandate belongs to one team or one unit, and each has at most one. A shared
+  mandate would need approval from several leaders, so units that share one
+  in the prototype, such as the three departments of Utvikling og drift, get
+  one each.
 
 ADR-0005 (Proposed) decides that teameiere and teamledere edit their team's
 content in the Payload admin panel. It links each user to a person by email
 when they log in, and finds the teams a user edits from their memberships with
-the roles named Teameier and Teamleder (`src/cms/src/access/teamEditor.ts`). A
+the roles Teameier and Teamleder (`src/cms/src/access/teamEditor.ts`). A
 mandate is part of a team's content, so this record builds on it. Who
 approves the mandate is narrower than who edits the team: only the teameier.
 
@@ -38,9 +40,9 @@ The specification's data model had mandates as generic «Innhold» of the type
 
 ## Options
 
-- **A group of fields on Teams and Units.** The fewest moving parts. But a
-  mandate can't be shared between units. Approval would be field access on
-  collections that already have their own rules. Versions in Payload are per
+- **A group of fields on Teams and Units.** The fewest moving parts. But
+  approval would be field access on collections that already have their own
+  rules, and Units is partly locked by the import (ADR-0003). Versions in Payload are per
   collection, so turning them on would version every change to a team or unit,
   not only the mandate.
 - **Generic content with a content type («Innhold» and «Innholdstype»).** One
@@ -70,7 +72,8 @@ For the history there are two ways to use Payload:
 
 | Field | Type | Label |
 | --- | --- | --- |
-| `owners` | relationship to `team` and `enheter`, many | Eier |
+| `team` | relationship to `team`, unique | Team |
+| `unit` | relationship to `enheter`, unique | Enhet |
 | `problem` | textarea, markdown | Hva skal vi løse? |
 | `outcomes` | textarea, markdown | Hva skal vi oppnå? |
 | `expectations` | textarea, markdown | Hva forventes av oss? |
@@ -80,8 +83,11 @@ For the history there are two ways to use Payload:
 | `approvedBy` | relationship to `personer`, set by the CMS | Godkjent av |
 | `completeness` | virtual: `{ complete, missing[] }` | |
 
-- **Owners.** Either exactly one team, or one or more units. A hook refuses a
-  mix of the two, and a second mandate for a team or unit that already has one.
+- **Owner.** Exactly one of `team` and `unit` is set; validation refuses
+  both or neither. Two plain relationships rather than one polymorphic
+  relationship: each is a column of its own, so a unique index in the
+  database stops a second mandate for the same team or unit. A polymorphic
+  relationship is stored in a separate table, where it can't be unique.
   Teams and Units get a `mandate` join, so the frontend fetches it with the
   rest, and the team's page in the admin panel shows it.
 - **Versions.** `versions: { drafts: true, maxPerDoc: 0 }`: drafts, and every
@@ -129,8 +135,13 @@ Access lives in the collection's access functions, as everywhere else:
 
 - **Who edits** comes from ADR-0005: `editableTeamIds` in
   `src/cms/src/access/teamEditor.ts`. **Who approves** needs the teams where the
-  user is Teameier only, so the helper gets a variant for one role, matched on
-  the role's name like the rest of ADR-0005.
+  user is Teameier only, so the helper gets a variant for one role.
+- **Roles are matched by a stable code, not by name.** Roller gets a `code`
+  (`teameier`, `teamleder`) that the access functions match on. The name is
+  text for people and can be changed or translated without changing anyone's
+  rights. The code is required, unique, and can't be changed once set. This
+  replaces matching on names in ADR-0005, as suggested in the review of #58;
+  if #58 is merged before that changes, this implementation makes the switch.
 - `update` lets editors in, and refuses `_status: 'published'` unless the user
   may approve. The admin panel asks the same access function with
   `_status: 'published'` and only shows «Publish» when it is allowed, so a
