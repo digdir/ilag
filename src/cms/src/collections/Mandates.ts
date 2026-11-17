@@ -91,11 +91,6 @@ const today = () => {
   return date.toISOString()
 }
 
-// The status follows the approval (TO-16). A draft is a draft, with no
-// approval date: approving it is a new approval. Publishing approves the
-// mandate and makes it current, dated today unless the approver gives an
-// earlier date, or marks it expired. Only approvers publish, so only they
-// set the status and the date.
 // The owner is set when the mandate is created, and never changes (ADR-0006):
 // a mandate can't be moved to a team or unit whose leaders didn't approve it.
 // The field access makes the owner read-only in the admin panel. A restore
@@ -114,18 +109,24 @@ const ownerNeverChanges: CollectionBeforeChangeHook<Mandate> = ({ data, operatio
   return data
 }
 
-const followApproval: CollectionBeforeChangeHook<Mandate> = async ({ data, originalDoc, req }) => {
-  // A restored version arrives with the status it had, but is always saved
-  // as a draft (onlyDraftsOrPublish).
+// Payload's `_status` says whether a version is a draft or approved
+// (published); `expiredAt` says whether an approved mandate has expired
+// (TO-16). The dates follow the approval. A draft has neither: approving it
+// is a new approval, which clears an expiry. Approving is dated today unless
+// the approver gives an earlier date. Expiring is publishing with
+// `expiredAt`, and keeps the date of the approval that ends. Only approvers
+// publish, so only they set the dates.
+const datesFollowApproval: CollectionBeforeChangeHook<Mandate> = async ({ data, originalDoc, req }) => {
+  // A restored version arrives with its old `_status`, but is always saved as
+  // a draft (onlyDraftsOrPublish).
   const publishing = data._status === 'published' && !req.context.isRestoringVersion
   if (!publishing) {
-    data.status = 'draft'
     data.approvedAt = null
+    data.expiredAt = null
     return data
   }
-  if (data.status === 'expired') {
-    // Expiring keeps the date of the approval that ends, also when the form
-    // was opened on a draft, which has none.
+  if (data.expiredAt) {
+    // Also when the form was opened on a draft, which has no approval date.
     if (!data.approvedAt && originalDoc?.id) {
       const published = await req.payload.findByID({
         collection: 'mandater',
@@ -138,10 +139,14 @@ const followApproval: CollectionBeforeChangeHook<Mandate> = async ({ data, origi
     }
     return data
   }
-  data.status = 'current'
+  data.expiredAt = null
   data.approvedAt = data.approvedAt || today()
   return data
 }
+
+// Utkast, gjeldende or utgått (TO-16, LO-04), from `_status` and `expiredAt`.
+export const mandateStatus = (doc: Pick<Mandate, '_status' | 'expiredAt'>): 'draft' | 'current' | 'expired' =>
+  doc._status !== 'published' ? 'draft' : doc.expiredAt ? 'expired' : 'current'
 
 export const Mandates: CollectionConfig = {
   slug: 'mandater',
@@ -154,7 +159,7 @@ export const Mandates: CollectionConfig = {
     interface: 'Mandate',
   },
   admin: {
-    defaultColumns: ['team', 'unit', 'status', 'approvedAt', 'updatedAt'],
+    defaultColumns: ['team', 'unit', '_status', 'approvedAt', 'expiredAt', 'updatedAt'],
     description:
       'Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).',
   },
@@ -168,9 +173,16 @@ export const Mandates: CollectionConfig = {
     },
   },
   disableDuplicate: true,
-  // The completeness is calculated from these, so they are read even when a
-  // query selects only `complete` or `missingFields`.
-  forceSelect: { problem: true, outcomes: true, expectations: true, collaboration: true },
+  // The calculated fields are made from these, so they are read even when a
+  // query selects only those.
+  forceSelect: {
+    problem: true,
+    outcomes: true,
+    expectations: true,
+    collaboration: true,
+    _status: true,
+    expiredAt: true,
+  },
   access: {
     // Everyone signed in reads approved mandates. Drafts, including a
     // mandate that has never been approved, only those who may edit it.
@@ -211,7 +223,7 @@ export const Mandates: CollectionConfig = {
   hooks: {
     beforeOperation: [onlyDraftsOrPublish],
     beforeValidate: [oneOwner],
-    beforeChange: [ownerNeverChanges, followApproval],
+    beforeChange: [ownerNeverChanges, datesFollowApproval],
   },
   fields: [
     {
@@ -250,25 +262,6 @@ export const Mandates: CollectionConfig = {
       }),
     ),
     {
-      // Set by followApproval: draft until approved. Not Payload's own
-      // `_status`, whose enum would otherwise get the same name in Postgres.
-      name: 'status',
-      type: 'select',
-      enumName: 'enum_mandates_approval_status',
-      required: true,
-      defaultValue: 'draft',
-      index: true,
-      options: [
-        { label: 'Utkast', value: 'draft' },
-        { label: 'Gjeldende', value: 'current' },
-        { label: 'Utgått', value: 'expired' },
-      ],
-      admin: {
-        position: 'sidebar',
-        description: 'Blir gjeldende når mandatet godkjennes. Velg Utgått og godkjenn når mandatet ikke lenger gjelder.',
-      },
-    },
-    {
       name: 'approvedAt',
       type: 'date',
       label: 'Godkjent',
@@ -276,6 +269,35 @@ export const Mandates: CollectionConfig = {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly', displayFormat: 'd. MMMM yyyy' },
         description: 'Dagens dato hvis tomt når mandatet godkjennes.',
+      },
+    },
+    {
+      // Set by an approver, by publishing with it. Empty while the mandate
+      // applies. Cleared by datesFollowApproval when a new version is
+      // approved.
+      name: 'expiredAt',
+      type: 'date',
+      label: 'Utgått',
+      admin: {
+        position: 'sidebar',
+        date: { pickerAppearance: 'dayOnly', displayFormat: 'd. MMMM yyyy' },
+        description: 'Når mandatet ikke lenger gjelder: sett datoen og publiser. Mandatet vises fortsatt, merket som utgått.',
+      },
+    },
+    {
+      // Calculated, never stored: Payload's `_status` and `expiredAt` say it
+      // already. Can't be queried; query those two instead.
+      name: 'status',
+      type: 'select',
+      virtual: true,
+      options: [
+        { label: 'Utkast', value: 'draft' },
+        { label: 'Gjeldende', value: 'current' },
+        { label: 'Utgått', value: 'expired' },
+      ],
+      admin: { position: 'sidebar', readOnly: true },
+      hooks: {
+        afterRead: [({ siblingData }) => mandateStatus(siblingData)],
       },
     },
     {

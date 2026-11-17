@@ -346,13 +346,14 @@ export interface Mandate {
    */
   collaboration: string;
   /**
-   * Blir gjeldende når mandatet godkjennes. Velg Utgått og godkjenn når mandatet ikke lenger gjelder.
-   */
-  status: 'draft' | 'current' | 'expired';
-  /**
    * Dagens dato hvis tomt når mandatet godkjennes.
    */
   approvedAt?: string | null;
+  /**
+   * Når mandatet ikke lenger gjelder: sett datoen og publiser. Mandatet vises fortsatt, merket som utgått.
+   */
+  expiredAt?: string | null;
+  status?: ('draft' | 'current' | 'expired') | null;
   complete?: boolean | null;
   missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
   updatedAt: string;
@@ -843,8 +844,9 @@ export interface MandaterSelect<T extends boolean = true> {
   outcomes?: T;
   expectations?: T;
   collaboration?: T;
-  status?: T;
   approvedAt?: T;
+  expiredAt?: T;
+  status?: T;
   complete?: T;
   missingFields?: T;
   updatedAt?: T;
