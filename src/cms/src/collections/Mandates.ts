@@ -196,6 +196,10 @@ export const Mandates: CollectionConfig = {
     defaultColumns: ['title', 'team', 'unit', '_status', 'approvedAt', 'expiredAt', 'updatedAt'],
     description:
       'Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).',
+    components: {
+      // Shows the description above, and titles a mandate by its owner.
+      Description: '/components/MandateTitle#MandateTitle',
+    },
   },
   versions: {
     // Every version, not Payload's default of the last 100 (TO-17).
