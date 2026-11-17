@@ -30,6 +30,7 @@ type Slug =
   | 'teamtyper'
   | 'team'
   | 'teammedlemskap'
+  | 'mandater'
 
 // An administrator to log in to the admin panel with.
 const ADMIN = { email: 'admin@example.com', password: 'ilag' }
@@ -191,6 +192,33 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Mandates, made through drafts and approval like in the admin panel. A
+  // team or unit that already has a mandate keeps it.
+  for (const { team, unit, approvedAt, draft, ...fields } of data.mandates) {
+    const ownerId = team
+      ? await findId(payload, 'team', { name: { equals: team } })
+      : await findId(payload, 'enheter', { externalUnitId: { equals: unit } })
+    if (!ownerId) continue
+    const owner = team ? { team: ownerId } : { unit: ownerId }
+    if (await findId(payload, 'mandater', team ? { team: { equals: ownerId } } : { unit: { equals: ownerId } })) continue
+    const mandate = await payload.create({
+      collection: 'mandater',
+      data: { ...owner, ...fields } as RequiredDataFromCollectionSlug<'mandater'>,
+      draft: true,
+    })
+    if (approvedAt) {
+      await payload.update({
+        collection: 'mandater',
+        id: mandate.id,
+        data: { _status: 'published', approvedAt: new Date(approvedAt).toISOString() },
+      })
+    }
+    if (draft) {
+      await payload.update({ collection: 'mandater', id: mandate.id, data: draft, draft: true })
+    }
+    count('mandater')
+  }
+
   return created
 }
 
@@ -202,8 +230,9 @@ const removeSeed = async (payload: Payload) => {
   const employeeNumbers = files.people.people.map((p) => p.employeeNumber)
   const unitIds = files.units.units.map((u) => u.externalUnitId)
   const deletes: [Slug | 'importkjoringer', Where][] = [
-    // Deleting a team deletes its memberships.
+    // Deleting a team deletes its memberships and its mandate.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
+    ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['roller', { name: { in: data.roles.map((r) => r.name) } }],
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
