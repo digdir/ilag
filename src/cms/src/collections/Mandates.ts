@@ -193,7 +193,7 @@ export const Mandates: CollectionConfig = {
   },
   admin: {
     // The first column links to the mandate, so it names the owner.
-    defaultColumns: ['title', 'team', 'unit', '_status', 'approvedAt', 'expiredAt', 'updatedAt'],
+    defaultColumns: ['title', '_status', 'approvedAt', 'updatedAt'],
     description:
       'Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).',
     components: {
