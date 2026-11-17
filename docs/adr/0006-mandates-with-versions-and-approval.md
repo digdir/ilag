@@ -88,6 +88,19 @@ For the link between a mandate and its team or unit:
   creating a mandate is one write. Teams and Units read it through a join.
   The join returns a list, so the reader takes its only item.
 
+For the status (draft, current or expired):
+
+- **A `status` select of our own.** One field to read and filter on. But
+  draft and current only mirror Payload's `_status`, so a hook has to keep the
+  two in step on every save, publish and restore, and a path it misses leaves
+  them disagreeing. The select also gets the same enum name in Postgres as
+  `_status` unless renamed.
+- **Payload's `_status`, and a date for expiry (chosen).** `_status` already
+  says whether a version is a draft or approved. Only expiry is ours: an
+  `expiredAt` date, which also says when. The status is calculated from the
+  two for display. It can't be filtered on as one field; queries use
+  `_status` and `expiredAt`.
+
 ## Decision
 
 ### The collection
@@ -102,10 +115,13 @@ For the link between a mandate and its team or unit:
 | `outcomes` | textarea, markdown | Hva skal vi oppnå? |
 | `expectations` | textarea, markdown | Hva forventes av oss? |
 | `collaboration` | textarea, markdown | Hvordan samarbeider vi med andre? |
-| `status` | select: `draft`, `current`, `expired` | Status |
 | `approvedAt` | date | Godkjent |
+| `expiredAt` | date | Utgått |
 | `approvedBy` | relationship to `personer`, set by the CMS | Godkjent av |
-| `completeness` | virtual: `{ complete, missing[] }` | |
+| `status` | virtual: `draft`, `current`, `expired` | Status |
+| `complete`, `missingFields` | virtual | |
+
+Payload adds `_status` (`draft` or `published`) for the drafts.
 
 - **Owner.** Exactly one of `team` and `unit` is set; validation refuses
   both or neither. Two plain relationships rather than one polymorphic
@@ -113,9 +129,13 @@ For the link between a mandate and its team or unit:
   database stops a second mandate for the same team or unit. A polymorphic
   relationship is stored in a separate table, where it can't be unique.
   The owner is set when the mandate is created and can't be changed after
-  that (field access `update: () => false`), the same way a membership can't
-  be moved to another team in ADR-0005: a mandate can't be moved to a team
-  or unit whose leaders didn't approve it.
+  that, the same way a membership can't be moved to another team in
+  ADR-0005: a mandate can't be moved to a team or unit whose leaders didn't
+  approve it. A `beforeChange` hook always keeps the original owner. Field
+  access makes the owner read-only in the admin panel, except while a
+  version is restored: a restore builds its data from the old version and
+  drops the fields the user may not update, which would leave the mandate
+  without an owner.
   Teams and Units get a `mandate` join, so the frontend fetches it with the
   rest, and the team's page in the admin panel shows it.
 - **Versions.** `versions: { drafts: true, maxPerDoc: 0 }`: drafts, and every
@@ -124,31 +144,55 @@ For the link between a mandate and its team or unit:
   note on formatting under each. The frontend renders it on the server with
   markdown-it with raw HTML turned off, so nobody can put HTML or scripts on a
   page; links are limited to the schemes markdown-it allows.
-- **Completeness (TO-10, LO-04).** A virtual field calculated when the mandate
-  is read: which of the four fields are empty. It is never stored, so it can't
+- **Completeness (TO-10, LO-04).** Virtual fields calculated when the mandate
+  is read: whether it is complete, and which of the four fields are empty. It is never stored, so it can't
   go stale. The four fields are `required`, which Payload checks only when
   publishing, so a draft can be incomplete but an approved mandate can't.
 
 ### Status and approval
 
-The status and Payload's own `_status` (draft or published) work together:
+Payload's `_status` says whether a version is a draft or approved
+(published), and `expiredAt` whether an approved mandate has expired. The
+calculated `status` is `draft` for a draft, `expired` for a published mandate
+with `expiredAt`, and `current` otherwise.
 
 - **Draft.** Saving with Payload's «Save draft». Readers keep seeing the
   published version, if there is one. A mandate that has never been approved
-  is a draft and isn't shown to readers.
-- **Current.** Approving publishes the draft with `status: 'current'`. The
-  approver gives `approvedAt`, which defaults to today but can be earlier,
-  for a mandate approved in a meeting before it was registered. The CMS sets
-  `approvedBy` to the approver's person, since Payload's versions don't record
-  who saved them.
-- **Expired.** The team owner publishes the mandate with `status: 'expired'`
-  when it no longer applies, for example when a team is closed. It stays
-  readable, marked as expired.
+  is a draft and isn't shown to readers. A draft has no `approvedAt` or
+  `expiredAt`: approving it is a new approval.
+- **Current.** Approving publishes the draft. The approver gives
+  `approvedAt`, which defaults to today but can be earlier, for a mandate
+  approved in a meeting before it was registered. A new approval clears
+  `expiredAt`. The CMS sets `approvedBy` to the approver's person, since
+  Payload's versions don't record who saved them; this needs users linked to
+  people, so it comes with ADR-0005's implementation (#58).
+- **Expired.** The team owner publishes the mandate with `expiredAt` when it
+  no longer applies, for example when a team is closed. It keeps the date of
+  the approval that ends, stays readable, and is marked as expired.
+
+A hook sets the dates; only approvers publish, so only they set them.
 
 When a new version is approved, the previous one is not changed: it is in the
 version history with its own approval date. The history shows earlier approved
 versions as replaced; «expired» is only for a mandate that no longer applies at
 all.
+
+### Guarding the drafts
+
+Payload decides whether a save is a draft from the operation's `draft`
+argument (`?draft=true` in REST), which neither access functions nor
+`beforeChange` hooks see. Without it, a save writes straight to the published
+mandate, even when `_status` stays `published`, and one with
+`_status: 'draft'` unpublishes it. Restoring a version without it writes the
+old version as published, or unpublishes the mandate if the version was a
+draft. Left alone, an editor could change or hide the approved mandate
+without approval.
+
+- A `beforeOperation` hook, which does see `draft`, lets every change through
+  the API be either a draft save or a publish, and every restore only a
+  draft. Restored text is approved again like any other draft.
+- Unpublishing is refused for everyone, administrators included. A mandate
+  that no longer applies is expired, not hidden.
 
 ### Access
 
@@ -173,9 +217,8 @@ Access lives in the collection's access functions, as everywhere else:
 - `update` lets editors in, and refuses `_status: 'published'` unless the user
   may approve. The admin panel asks the same access function with
   `_status: 'published'` and only shows «Publish» when it is allowed, so a
-  teamleder sees «Save draft» only. `status`, `approvedAt` and `approvedBy`
-  have field access of their own, so a teamleder can't change them in a draft
-  either.
+  teamleder sees «Save draft» only. A draft never carries `approvedAt` or
+  `expiredAt`, so a teamleder can't set them either.
 - `readVersions` returns a query: published versions to everyone signed in,
   drafts only to editors.
 - In the admin panel the collection is shown to team editors, with the list
@@ -196,6 +239,11 @@ Access lives in the collection's access functions, as everywhere else:
 - The history grows with every save. Mandates are short text, so keeping all
   versions is cheap. The admin panel shows the history and can compare
   versions.
+- The admin panel still shows «Unpublish», and «Restore» for draft versions,
+  which only restores as published. Both are refused with a message. Hiding
+  them needs custom components.
+- A restored version keeps the old version's `createdAt`; the history is
+  sorted by `updatedAt`.
 - Payload's button says «Publish», not «Godkjenn». Renaming it needs a custom
   component; that can come when editors try it.
 - Markdown is markup, and NF-06 asks for editing without it. Plain text is
