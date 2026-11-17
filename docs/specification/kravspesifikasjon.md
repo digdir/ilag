@@ -148,9 +148,13 @@ ilag inngår i og må sees i sammenheng med følgende:
 
 - **Prosjektleder** — kan redigere innhold knyttet til sitt eget prosjekt.
 
+- **Teameier** — kan redigere mandatet til sine team, og er den eneste som kan godkjenne det (jf. TO-09, TO-16).
+
 - **Teamleder/produkteier** — kan redigere innhold knyttet til sitt eget team.
 
 - **Teammedlem/prosjektdeltaker** — kan redigere innhold knyttet til teamet eller prosjektet vedkommende er medlem av, jf. 2.1.
+
+Teamets mandat er et unntak: det kan bare redigeres av teameier og teamleder, og bare godkjennes av teameier (jf. TO-09, TO-16).
 
 - **Administrator** — kan opprette og vedlikeholde felles innhold som gjelder på tvers av Digdir (f.eks. teamtyper, verktøytyper, roller, begreper og prinsippområder). Rollen innehas av Organisasjonslæring (VSU).
 
@@ -192,13 +196,15 @@ Teamoversikt skal gi en oversikt over alle team i Digdir, deres leveranser og gr
 | TO-06 | Systemet skal la brukeren filtrere team etter medlemmenes lokasjon.                                                                                                        | Kan       |
 | TO-07 | Systemet skal vise hvilke verktøy et team bruker, der dette er registrert.                                                                                                 | Kan       |
 | TO-08 | Systemet skal la ledere opprette og endre team.                                                                                                                            | Må        |
-| TO-09 | Systemet skal la teamet registrere mandatet i faste felter etter Digdirs mandatmal (jf. Vedlegg 3).                                                                        | Må        |
+| TO-09 | Systemet skal la teameier og teamleder registrere mandatet i de fire faste feltene fra Digdirs mandatmal (jf. Vedlegg 3), formatert med markdown.                         | Må        |
 | TO-10 | Systemet skal vise om mandatet er komplett, og hvilke felter som mangler.                                                                                                  | Bør       |
 | TO-11 | Systemet skal la teamet registrere teamkontrakten i faste felter etter strukturen i Vedlegg 4.                                                                             | Bør       |
 | TO-12 | Systemet skal vise om teamkontrakten er komplett, og hvilke felter som mangler.                                                                                            | Kan       |
 | TO-13 | Systemet skal vise feltet «Personlig bruksanvisning» i teamkontrakten bare for teamets medlemmer.                                                                          | Må        |
 | TO-14 | Systemet skal la teamet registrere hvilke brukergrupper det leverer til, valgt fra brukergruppene i styringsfundamentet, eller markere at teamet leverer internt i Digdir. | Bør       |
 | TO-15 | Systemet skal la brukeren filtrere teamoversikten etter brukergruppe.                                                                                                      | Kan       |
+| TO-16 | Systemet skal vise mandatets status (utkast, gjeldende eller utgått) og datoen det ble godkjent. Bare teameier kan godkjenne mandatet og gjøre det gjeldende.               | Må        |
+| TO-17 | Systemet skal ta vare på alle versjoner av et mandat, både utkast og godkjente versjoner.                                                                                  | Må        |
 
 ### 3.2 Roller og ansvar (RAMO)
 RAMO (Rolle, Ansvar, Myndighet og Oppgaver) er en strukturmodell som gir en tydelig beskrivelse av hva en rolle innebærer. Modellen bidrar til å avklare forventninger, redusere uklarheter og skape et bedre grunnlag for samarbeid og oppgaveløsning. Forkortelsene står for Rolle, Ansvar, Myndighet og Oppgaver.
@@ -397,7 +403,7 @@ Linjeorganisasjon skal gi alle ansatte en oppdatert oversikt over Digdirs enhete
 | LO-01 | Systemet skal vise et organisasjonskart over Digdirs linjeorganisasjon med divisjoner, avdelinger og seksjoner.              | Må        |
 | LO-02 | Systemet skal ha en side per enhet som viser mandat, leder med kontaktinformasjon, ansatte og underenheter.                  | Må        |
 | LO-03 | Systemet skal la enhetsleder redigere mandat og øvrig innhold for egen enhet.                                                | Må        |
-| LO-04 | Systemet skal vise status for enhetens mandat, for eksempel førsteutkast eller ikke komplett.                                | Bør       |
+| LO-04 | Systemet skal vise status for enhetens mandat (utkast, gjeldende eller utgått), og om det er komplett (jf. TO-10).           | Bør       |
 | LO-05 | Systemet skal la brukeren navigere fra organisasjonskartet til enhetssider og videre til teamene som er knyttet til enheten. | Bør       |
 | LO-06 | Systemet skal markere enheter som bistår og rådgir hele Digdir, ikke bare egen divisjon.                                     | Kan       |
 | LO-07 | Systemet skal ha en egen side for direktøren med presentasjon, direktørens ansvar og lenker til aktuelle opptak og nyheter.  | Bør       |
@@ -484,11 +490,13 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Begrep** – definert begrep fra begrepsapparatet, med mulig kobling mot ekstern begrepskatalog (data.norge.no) og egne metadata utover beskrivelsen
 
-- **Innhold** – tekstinnhold av en definert type knyttet til team eller prosjekt, f.eks. mandat
+- **Mandat** – hvorfor et team eller en enhet finnes, hva det skal oppnå og hva som forventes, i de fire faste feltene fra mandatmalen (jf. Vedlegg 3), skrevet i markdown. Et mandat hører til ett team, eller til én eller flere enheter som deler det. Mandatet har status utkast, gjeldende eller utgått, og datoen det ble godkjent. Alle versjoner tas vare på, også utkast (jf. TO-16, TO-17).
+
+- **Innhold** – tekstinnhold av en definert type knyttet til team eller prosjekt, f.eks. strategi
 
 - **Lokasjon** – kontor i en by som en person hører til, med kode og navn. Lokasjonene registreres manuelt i ilag av en administrator. Personens lokasjon hentes som en kode fra Digdirs autoritative kilde (jf. NF-07)
 
-- **Innholdstype** – definert type innhold f eks mandat og strategi
+- **Innholdstype** – definert type innhold f eks strategi
 
 ### 4.2 Logisk datamodell
 Den logiske datamodell viser entitetene og relasjonene imellom dem, samt hva relasjonen er.
@@ -511,6 +519,8 @@ erDiagram
     Enhet ||--o{ Prosjekt : "eier"
     Enhet ||--o{ Team : "eier"
     Prosjekt ||--|{ Team : ""
+    Team |o--o| Mandat : "har"
+    Enhet }o--o| Mandat : "har"
     Enhet ||--o{ Innhold : "skaper"
     Team ||--o{ Innhold : "skaper"
     Innhold }o--o{ Begrep : "bruker"
@@ -733,7 +743,7 @@ Et tydelig formål gjør det enklere å skape relevant aktivitet og verdi for de
 ## Vedlegg 3: Verktøy - Teammandat
 Et teammandat sier hvorfor teamet finnes, hva det skal oppnå og hvilke rammer det har. ilag bruker mandatmalen fra arbeidspakken «Helhetlig prioritering og styringspraksis», slik at team, prosjekter og enheter beskriver oppdraget sitt på samme måte.
 
-Malen består av følgende felter:
+Malen består av følgende felter. I ilag registreres de fire første, frem til «Andre rammer». De øvrige er veiledning for arbeidet med mandatet, og registreres ikke som egne felter.
 
 **Hva skal vi løse?**
 
