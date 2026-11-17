@@ -65,3 +65,31 @@ export const hasSubMenu = (group: NavGroup) => group.pages.length > 1
 
 /** The id of the group's submenu row, which its main menu item shows. */
 export const subMenuId = (group: NavGroup) => `undermeny-${group.path.slice(1)}`
+
+/** A link in the breadcrumbs. */
+export interface Crumb {
+  label: string
+  href: string
+}
+
+/**
+ * The breadcrumbs for a page below a menu page, such as a team at
+ * `/organisering/team/7`: the menu page, then `trail`, then the page itself
+ * as `current`, if it was found. Null on the menu pages themselves and on
+ * pages outside the menu, where the menu shows where you are.
+ */
+export function breadcrumbs(
+  pathname: string,
+  { trail = [], current }: { trail?: Crumb[]; current?: string | null } = {},
+  nav: NavGroup[] = NAV,
+): Crumb[] | null {
+  const above = nav
+    .flatMap((group) => group.pages)
+    .find((page) => page.built && pathname.startsWith(`${page.href}/`))
+  if (!above) return null
+  return [
+    { label: above.label, href: above.href },
+    ...trail,
+    ...(current ? [{ label: current, href: pathname }] : []),
+  ]
+}

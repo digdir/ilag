@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Person from '../src/pages/folk/[id].astro'
 import { cookie, json } from './teams'
+import { backLink, trail } from './breadcrumbs'
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
@@ -78,7 +79,10 @@ describe('person page', () => {
     expect(html).toContain('<title>Åse Ødegård — ilag</title>')
     expect(html).toMatch(/<h1[^>]*>\s*Åse Ødegård\s*<\/h1>/)
     expect(html).toContain('Seniorutvikler')
-    expect(html).toContain('href="/folk"')
+    expect(trail(html)).toEqual([
+      ['Folk', '/folk'],
+      ['Åse Ødegård', '/folk/1'],
+    ])
     expect(html).toMatch(/class="ds-avatar"[^>]*>ÅØ</)
   })
 
@@ -129,7 +133,9 @@ describe('person page', () => {
     vi.stubGlobal('fetch', cms({ ...ase, active: false }))
     const left = await render('1')
     expect(left.status).toBe(404)
-    expect(await left.text()).toContain('Fant ikke personen')
+    const html = await left.text()
+    expect(html).toContain('Fant ikke personen')
+    expect(backLink(html)).toEqual(['Folk', '/folk'])
 
     vi.stubGlobal('fetch', vi.fn(async () => json({ errors: [{ message: 'Not Found' }] }, 404)))
     expect((await render('42')).status).toBe(404)
