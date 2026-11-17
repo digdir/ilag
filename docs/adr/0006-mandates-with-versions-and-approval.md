@@ -64,6 +64,30 @@ For the history there are two ways to use Payload:
   the approved mandate, and a draft can be worked on without changing what
   everyone else sees. Every save is a version.
 
+For the link between a mandate and its team or unit:
+
+- **On Team and Unit, a `mandate` relationship to the mandate.** Reads
+  naturally from the team. But the link would follow the team's and the
+  unit's edit rights, not the mandate's:
+  - A teamleder may edit the team (ADR-0005), so they could point it at
+    another mandate document that nobody has approved, and get around the rule
+    that only the teameier approves.
+  - Units are only updated by administrators, and the import owns most of
+    their fields (ADR-0003). Unit leaders would need write access to Units.
+  - Two teams could point at the same mandate unless that field were unique
+    too, and a mandate could exist that no team or unit points at.
+  - Access to a mandate would first need a lookup of which team or unit
+    points at it.
+  - Creating a mandate would be two writes, the mandate and then the team,
+    each with its own access check, and a failed second write leaves an
+    orphan.
+- **On the mandate, a relationship to its team or unit (chosen).** The link
+  is covered by the mandate's own access rules and version history. A mandate
+  can't exist without an owner, and a unique index stops a second mandate for
+  the same team or unit. Access is a plain query (`{ team: { in: … } }`), and
+  creating a mandate is one write. Teams and Units read it through a join.
+  The join returns a list, so the reader takes its only item.
+
 ## Decision
 
 ### The collection
@@ -88,6 +112,10 @@ For the history there are two ways to use Payload:
   relationship: each is a column of its own, so a unique index in the
   database stops a second mandate for the same team or unit. A polymorphic
   relationship is stored in a separate table, where it can't be unique.
+  The owner is set when the mandate is created and can't be changed after
+  that (field access `update: () => false`), the same way a membership can't
+  be moved to another team in ADR-0005: a mandate can't be moved to a team
+  or unit whose leaders didn't approve it.
   Teams and Units get a `mandate` join, so the frontend fetches it with the
   rest, and the team's page in the admin panel shows it.
 - **Versions.** `versions: { drafts: true, maxPerDoc: 0 }`: drafts, and every
@@ -162,8 +190,9 @@ Access lives in the collection's access functions, as everywhere else:
 - This depends on ADR-0005 and its implementation (#58). If ADR-0005 changes
   who edits or where, this record changes with it.
 - Readers only ever see an approved mandate. Tests have to check that a draft
-  saved on top of an approved mandate doesn't reach readers, and that a
-  teamleder can't publish through the REST API.
+  saved on top of an approved mandate doesn't reach readers, also through the
+  `mandate` join on Teams and Units, and that a teamleder can't publish
+  through the REST API.
 - The history grows with every save. Mandates are short text, so keeping all
   versions is cheap. The admin panel shows the history and can compare
   versions.
