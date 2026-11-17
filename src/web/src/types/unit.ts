@@ -35,8 +35,8 @@ export type UnitDetail = {
   level: Unit['level']
   /** What the unit does, in paragraphs; empty until an administrator writes one. */
   description: string[]
-  /** The unit above, for the way back; null for the directorate. */
-  parent: { id: number; name: string } | null
+  /** The units above it, from the directorate down, for the breadcrumbs; empty for the directorate. */
+  ancestors: { id: number; name: string }[]
   advisesAllOfDigdir: boolean
   /** Null until an administrator has set an active leader. */
   leader: UnitPerson | null

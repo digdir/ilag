@@ -13,11 +13,8 @@ if (!team) Astro.response.status = 404
 const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.teamOwner)
 ---
 
-<Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'} wide>
+<Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'} wide current={team?.name}>
   <div class="page">
-    <p class="ds-paragraph">
-      <a class="ds-link" href="/organisering/team">Tilbake til teamoversikten</a>
-    </p>
     {
       team ? (
         <>

@@ -3,12 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Team from '../src/pages/organisering/team/[id].astro'
 import { cookie, json, nettverk, skjemabygger } from './teams'
+import { backLink, trail } from './breadcrumbs'
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
   return container.renderToResponse(Team, {
     params: { id },
-    request: new Request(`http://localhost/team/${id}`, { headers: { cookie } }),
+    request: new Request(`http://localhost/organisering/team/${id}`, { headers: { cookie } }),
   })
 }
 
@@ -31,7 +32,10 @@ describe('team page', () => {
     expect(html).toContain('Team Skjemabygger')
     expect(html).toContain('Produktteam')
     expect(html).toContain('Teamleder, Produkteier')
-    expect(html).toContain('href="/organisering/team"')
+    expect(trail(html)).toEqual([
+      ['Team', '/organisering/team'],
+      ['Team Skjemabygger', '/organisering/team/7'],
+    ])
   })
 
   it('TO-03: shows the team owner in a box of their own, with location and unit', async () => {
@@ -129,7 +133,9 @@ describe('team page', () => {
     const res = await render('99999')
 
     expect(res.status).toBe(404)
-    expect(await res.text()).toContain('Fant ikke teamet')
+    const html = await res.text()
+    expect(html).toContain('Fant ikke teamet')
+    expect(backLink(html)).toEqual(['Team', '/organisering/team'])
   })
 
   it('answers 404 without asking the CMS when the id is not a number', async () => {

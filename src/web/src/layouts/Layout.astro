@@ -1,15 +1,26 @@
 ---
 import '../styles/global.css'
 
+import Breadcrumbs from '../components/Breadcrumbs.astro'
 import SiteHeader from '../components/SiteHeader.astro'
+import { breadcrumbs, type Crumb } from '../lib/navigation'
 
 interface Props {
   title: string
   /** Room for a grid of cards; text pages keep the narrow column. */
   wide?: boolean
+  /**
+   * The name of what the page shows, the last of the breadcrumbs. Pages below
+   * a menu page get breadcrumbs from it without this; leave it out when the
+   * thing was not found.
+   */
+  current?: string | null
+  /** Pages between the menu page and this one, such as the units above a unit. */
+  trail?: Crumb[]
 }
 
-const { title, wide = false } = Astro.props
+const { title, wide = false, current, trail } = Astro.props
+const crumbs = breadcrumbs(Astro.url.pathname, { trail, current })
 ---
 
 <html lang="no">
@@ -30,6 +41,7 @@ const { title, wide = false } = Astro.props
     <a class="ds-skip-link" href="#hovedinnhold">Hopp til hovedinnhold</a>
     <SiteHeader user={Astro.locals.user} pathname={Astro.url.pathname} />
     <main id="hovedinnhold" tabindex="-1" class:list={{ wide }}>
+      {crumbs && <Breadcrumbs items={crumbs} />}
       <slot />
     </main>
     <script>
@@ -38,3 +50,10 @@ const { title, wide = false } = Astro.props
     </script>
   </body>
 </html>
+
+<style>
+  /* As far from the page as the pages space their own parts. */
+  main > :global(.ds-breadcrumbs) {
+    margin-block-end: var(--ds-size-8);
+  }
+</style>

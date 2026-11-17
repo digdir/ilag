@@ -9,6 +9,12 @@ import { getUnit, levelLabels } from '../../../lib/cms/units'
 const unit = await getUnit(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!unit) Astro.response.status = 404
 
+// The units above it, between Linjeorganisasjon and the unit in the breadcrumbs.
+const trail = unit?.ancestors.map(({ id, name }) => ({
+  label: name,
+  href: `/organisering/linjeorganisasjon/${id}`,
+}))
+
 const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
 ---
 
@@ -16,31 +22,13 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
   The unit page (LO-02): the leader with contact information, the people who
   work in the unit and the units under it. Mandate and OKR come later.
 -->
-<Layout title={unit ? `${unit.name} — ilag` : 'Fant ikke enheten — ilag'} wide>
+<Layout
+  title={unit ? `${unit.name} — ilag` : 'Fant ikke enheten — ilag'}
+  wide
+  current={unit?.name}
+  trail={trail}
+>
   <div class="page">
-    <nav class="ds-breadcrumbs" aria-label="Du er her:">
-      <ol>
-        <li><a class="ds-link" href="/organisering/linjeorganisasjon">Linjeorganisasjon</a></li>
-        {
-          unit?.parent && (
-            <li>
-              <a class="ds-link" href={`/organisering/linjeorganisasjon/${unit.parent.id}`}>
-                {unit.parent.name}
-              </a>
-            </li>
-          )
-        }
-        {
-          unit && (
-            <li>
-              <a class="ds-link" href={`/organisering/linjeorganisasjon/${unit.id}`} aria-current="page">
-                {unit.name}
-              </a>
-            </li>
-          )
-        }
-      </ol>
-    </nav>
     {
       unit ? (
         <>

@@ -1,0 +1,36 @@
+---
+import type { Crumb } from '../lib/navigation'
+
+interface Props {
+  /** From the list page down to the current page, which comes last. */
+  items: Crumb[]
+}
+
+const { items } = Astro.props
+// The page above this one. With a single crumb (the record wasn't found) it is
+// the only way out.
+const up = items.length > 1 ? items.at(-2)! : items[0]!
+---
+
+{/*
+  Designsystemet's breadcrumbs: below 650px only the back link shows, above it
+  only the trail. Without a trail the back link shows at every width.
+*/}
+<nav class="ds-breadcrumbs" aria-label="Du er her:">
+  <a class="ds-link" href={up.href} aria-label={`Tilbake til ${up.label}`}>
+    {up.label}
+  </a>
+  {
+    items.length > 1 && (
+      <ol>
+        {items.map((item, i) => (
+          <li>
+            <a class="ds-link" href={item.href} aria-current={i === items.length - 1 ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+</nav>
