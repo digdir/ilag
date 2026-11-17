@@ -490,7 +490,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Begrep** – definert begrep fra begrepsapparatet, med mulig kobling mot ekstern begrepskatalog (data.norge.no) og egne metadata utover beskrivelsen
 
-- **Mandat** – hvorfor et team eller en enhet finnes, hva det skal oppnå og hva som forventes, i de fire faste feltene fra mandatmalen (jf. Vedlegg 3), skrevet i markdown. Et mandat hører til ett team, eller til én eller flere enheter som deler det. Mandatet har status utkast, gjeldende eller utgått, og datoen det ble godkjent. Alle versjoner tas vare på, også utkast (jf. TO-16, TO-17).
+- **Mandat** – hvorfor et team eller en enhet finnes, hva det skal oppnå og hva som forventes, i de fire faste feltene fra mandatmalen (jf. Vedlegg 3), skrevet i markdown. Et mandat hører til ett team eller én enhet, og et team eller en enhet har høyst ett mandat. Enheter deler ikke mandat; enheter som har et felles mandat, får hvert sitt. Mandatet har status utkast, gjeldende eller utgått, og datoen det ble godkjent. Alle versjoner tas vare på, også utkast (jf. TO-16, TO-17).
 
 - **Innhold** – tekstinnhold av en definert type knyttet til team eller prosjekt, f.eks. strategi
 
@@ -520,7 +520,7 @@ erDiagram
     Enhet ||--o{ Team : "eier"
     Prosjekt ||--|{ Team : ""
     Team |o--o| Mandat : "har"
-    Enhet }o--o| Mandat : "har"
+    Enhet |o--o| Mandat : "har"
     Enhet ||--o{ Innhold : "skaper"
     Team ||--o{ Innhold : "skaper"
     Innhold }o--o{ Begrep : "bruker"
