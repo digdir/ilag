@@ -296,6 +296,6 @@ export const teams = [
 // Users to log in as with a password, linked to people in the teams above.
 export const users = [
   { person: '1008', email: 'ekristiansen@example.com', description: 'teamleder for Team Skjemabygger' },
-  { person: '1004', email: 'slarsen@example.com', description: 'teameier for Team Innlogging' },
+  { person: '1004', email: 'teameier@example.com', description: 'teameier for Team Innlogging' },
   { person: '1012', email: 'ihaugen@example.com', description: 'teammedlem and fagkoordinator, edits no team' },
 ] as const
