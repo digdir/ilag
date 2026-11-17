@@ -8,7 +8,7 @@ const role = await getRole(Astro.params.id!, Astro.request.headers.get('cookie')
 if (!role) Astro.response.status = 404
 ---
 
-<Layout title={role ? `${role.name} — ilag` : 'Fant ikke rollen — ilag'} current={role?.name}>
+<Layout title={role ? `${role.name} — ilag` : 'Fant ikke rollen — ilag'} wide current={role?.name}>
   <div class="page">
     {
       role ? (
