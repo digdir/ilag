@@ -363,6 +363,10 @@ export interface TeamType {
 export interface Role {
   id: number;
   name: string;
+  /**
+   * Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.
+   */
+  code?: string | null;
   role?: string | null;
   responsibility?: string | null;
   authority?: string | null;
@@ -730,6 +734,7 @@ export interface EnheterSelect<T extends boolean = true> {
  */
 export interface RollerSelect<T extends boolean = true> {
   name?: T;
+  code?: T;
   role?: T;
   responsibility?: T;
   authority?: T;

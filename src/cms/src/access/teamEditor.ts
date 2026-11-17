@@ -2,29 +2,35 @@ import type { Payload, PayloadRequest, Where } from 'payload'
 
 import { isAdmin } from './isAdmin'
 
+// Roles that access depends on, by their fixed code (`code` on Roller). The
+// names are for people and can be changed or translated without changing
+// anyone's rights.
+export const ROLE_CODES = {
+  teamOwner: 'teameier',
+  teamLead: 'teamleder',
+} as const
+
 // The roles that may edit a team: change the team and add, change and remove
-// its members (TO-08, RO-06). Matched on the role's name, so renaming one of
-// these roles in Roller takes the rights away from everyone who has it.
-export const TEAM_EDITOR_ROLES = ['Teameier', 'Teamleder']
+// its members (TO-08, RO-06).
+export const TEAM_EDITOR_ROLES: readonly string[] = [ROLE_CODES.teamOwner, ROLE_CODES.teamLead]
 
 type ID = number
 
-const CACHE_KEY = 'editableTeamIds'
-
-// The teams the user is teameier or teamleder of. `req` only to run in its
-// transaction; the dashboard has a user but no request.
-export const teamsEditedBy = async (
+// The teams where the user has one of the roles with these codes. `req` only to
+// run in its transaction; the dashboard has a user but no request.
+export const teamsWithRoles = async (
   payload: Payload,
   user: PayloadRequest['user'],
+  codes: readonly string[],
   req?: PayloadRequest,
 ): Promise<ID[]> => {
   const person = user?.person
   const personId = typeof person === 'object' && person ? person.id : person
-  if (!personId) return []
+  if (!personId || !codes.length) return []
 
   const { docs: roles } = await payload.find({
     collection: 'roller',
-    where: { name: { in: TEAM_EDITOR_ROLES } },
+    where: { code: { in: codes } },
     pagination: false,
     depth: 0,
     req,
@@ -41,15 +47,23 @@ export const teamsEditedBy = async (
   return [...new Set(memberships.map((m) => (typeof m.team === 'object' ? m.team.id : m.team)))]
 }
 
-// teamsEditedBy for the request's user, looked up once per request: the
-// access functions of one request often ask several times.
-export const editableTeamIds = (req: PayloadRequest): Promise<ID[]> => {
-  const cached = req.context[CACHE_KEY] as Promise<ID[]> | undefined
+// The teams the user is teameier or teamleder of.
+export const teamsEditedBy = (payload: Payload, user: PayloadRequest['user'], req?: PayloadRequest) =>
+  teamsWithRoles(payload, user, TEAM_EDITOR_ROLES, req)
+
+// teamsWithRoles for the request's user, looked up once per request and set of
+// codes: the access functions of one request often ask several times.
+export const teamIdsWithRoles = (req: PayloadRequest, codes: readonly string[]): Promise<ID[]> => {
+  const key = `teamIdsWithRoles:${[...codes].sort().join(',')}`
+  const cached = req.context[key] as Promise<ID[]> | undefined
   if (cached) return cached
-  const ids = teamsEditedBy(req.payload, req.user, req)
-  req.context[CACHE_KEY] = ids
+  const ids = teamsWithRoles(req.payload, req.user, codes, req)
+  req.context[key] = ids
   return ids
 }
+
+// The teams the request's user may edit.
+export const editableTeamIds = (req: PayloadRequest): Promise<ID[]> => teamIdsWithRoles(req, TEAM_EDITOR_ROLES)
 
 export const isTeamEditor = async (req: PayloadRequest): Promise<boolean> =>
   (await editableTeamIds(req)).length > 0

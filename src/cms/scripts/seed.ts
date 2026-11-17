@@ -147,7 +147,13 @@ const seed = async (payload: Payload) => {
 
   const roleIds = new Map<string, number>()
   for (const role of data.roles) {
-    let id = await findId(payload, 'roller', { name: { equals: role.name } })
+    let id = await findId(payload, 'roller', { code: { equals: role.code } })
+    // A role seeded before roles had codes gets its code.
+    const uncoded = !id && (await findId(payload, 'roller', { name: { equals: role.name }, code: { exists: false } }))
+    if (uncoded) {
+      await payload.update({ collection: 'roller', id: uncoded, data: { code: role.code } })
+      id = uncoded
+    }
     if (!id) {
       const { teamTypes, ...fields } = role
       id = (
@@ -217,7 +223,7 @@ const removeSeed = async (payload: Payload) => {
     // Deleting a team deletes its memberships.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
-    ['roller', { name: { in: data.roles.map((r) => r.name) } }],
+    ['roller', { code: { in: data.roles.map((r) => r.code) } }],
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.

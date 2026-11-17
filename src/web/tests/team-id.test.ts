@@ -46,12 +46,35 @@ describe('team page', () => {
     expect(owner).toContain('Organisasjonslæring')
   })
 
+  it('TO-03: finds the team owner by the role\'s code, whatever the role is called', async () => {
+    const renamed = {
+      ...skjemabygger,
+      members: {
+        docs: [
+          { id: 9, person: { id: 9, fullName: 'Kari Nordmann' }, roles: [{ id: 1, name: 'Eier', code: 'teameier' }] },
+          { id: 10, person: { id: 10, fullName: 'Ola Nordmann' }, roles: [{ id: 2, name: 'Teameier', code: 'annet' }] },
+        ],
+      },
+    }
+    vi.stubGlobal('fetch', vi.fn(async () => json(renamed)))
+
+    const [owner, members] = (await (await render('7')).text()).split('Hvem er vi?</h2>')
+
+    expect(owner).toContain('Kari Nordmann')
+    expect(owner).not.toContain('Ola Nordmann')
+    expect(members).toContain('Ola Nordmann')
+  })
+
   it('says when the owner has no location or unit, or there is no owner', async () => {
     const withOwner = {
       ...skjemabygger,
       members: {
         docs: [
-          { id: 9, person: { id: 9, fullName: 'Kari Nordmann' }, roles: [{ id: 1, name: 'Teameier' }] },
+          {
+            id: 9,
+            person: { id: 9, fullName: 'Kari Nordmann' },
+            roles: [{ id: 1, name: 'Teameier', code: 'teameier' }],
+          },
         ],
       },
     }

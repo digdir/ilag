@@ -1,8 +1,33 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, FieldHook, Validate } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
+
+// A code from a name: «KI-agent Æøå» → «ki-agent-aeoa».
+export const codeFromName = (name: string): string =>
+  name
+    .toLowerCase()
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'o')
+    .replace(/å/g, 'a')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+const CODE = /^[a-z0-9]+(-[a-z0-9]+)*$/
+
+// A new role without a code gets one from its name. Runs on the server before
+// validation, so the admin form may leave the code empty.
+const codeFromNameIfEmpty: FieldHook = ({ siblingData, value }) =>
+  value || (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
+
+// Empty passes: the admin form validates before the hook above has filled it.
+const validCode: Validate = (value) =>
+  !value || (typeof value === 'string' && CODE.test(value))
+    ? true
+    : 'Koden kan bare ha små bokstaver a–z, tall og bindestrek, som «teamleder».'
 
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier,
 // described after RAMO: rolle, ansvar, myndighet og oppgaver (RO-02).
@@ -22,7 +47,7 @@ export const Roles: CollectionConfig = {
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',
-    defaultColumns: ['name'],
+    defaultColumns: ['name', 'code'],
   },
   access: {
     read: ({ req }) => isSignedIn(req.user),
@@ -37,6 +62,31 @@ export const Roles: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+    },
+    {
+      // What ilag knows the role by, such as «teamleder». Access is checked
+      // against the code, never the name (access/teamEditor.ts), so the name
+      // can be changed or translated without changing anyone's rights. Set
+      // once, from the name unless typed, and never changed after that.
+      name: 'code',
+      label: 'Kode',
+      type: 'text',
+      unique: true,
+      index: true,
+      validate: validCode,
+      hooks: {
+        beforeValidate: [codeFromNameIfEmpty],
+      },
+      access: {
+        // Not required in the schema, so the column could be added to
+        // databases that already had roles; those may set it once.
+        update: ({ doc }) => !doc?.code,
+      },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.',
+      },
     },
     // RAMO. Not required, so a role can be created first and described later.
     {

@@ -66,6 +66,7 @@ export const advisesAllOfDigdir = [
 export const roles = [
   {
     name: 'Teameier',
+    code: 'teameier',
     role: 'Formelt utpekt som teameier ved etablering av teamet. Teameiere bør ha personalansvar for flere av teammedlemmene og/eller et tyngre fagansvar og risikoeierskap rundt teamets leveranser. For team som hører til et innsatsområde vil teameieren fortsatt måtte sørge for at teamet har de nødvendige rammene til å kunne levere, men teameierens ansvar, myndighet og oppgaver vil være avgrenset til drift/linjeoppgaver som ligger i teamet, mens områdeansvarlig vil styre ny utvikling og samkjøringsaktiviteter som kommer via innsatsområdet. Teameier og områdeansvarlig må formelt avtale kapasitetsfordeling og evt. endringer i mandat seg i mellom når et team går inn i et innsatsområde.',
     responsibility:
       'Sikre at teamet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
@@ -76,6 +77,7 @@ export const roles = [
   },
   {
     name: 'Teamleder',
+    code: 'teamleder',
     role: 'Formelt utpekt som teamleder ved etablering av teamet.',
     responsibility: 'Lede teamets daglige arbeid og måloppnåelse innenfor mandatet.',
     authority:
@@ -86,6 +88,7 @@ export const roles = [
   },
   {
     name: 'Teammedlem',
+    code: 'teammedlem',
     role: 'Formelt utpekt som teammedlem ved etablering av teamet, eller lagt til underveis ved behov.',
     responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med teamets mål og mandat.',
     authority:
@@ -96,6 +99,7 @@ export const roles = [
   },
   {
     name: 'Produkteier',
+    code: 'produkteier',
     role: 'Produktteam bør ha produkteier, enten kombinert med teamlederrollen eller som egen rolle i tillegg. Rollen utøves i tråd med anbefaling for produktorganisering i offentlig sektor. Begrepet produktleder brukes ikke i Digdir.',
     responsibility:
       'En produkteier har ansvar for å sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer. Rollen skal bidra til at produktet utvikles og forbedres over tid på en måte som gir verdi for brukerne og bidrar til ønskede nytteverdier for virksomheten og samfunnet.',
@@ -106,6 +110,7 @@ export const roles = [
   },
   {
     name: 'Fagkoordinator',
+    code: 'fagkoordinator',
     role: 'Utpekt som koordinator for fagnettverket. Et fagnettverk har ikke teamleder, siden det ikke svarer for en felles leveranse. Koordinatoren er registrert i teamoversikten.',
     responsibility:
       'Ansvar for at nettverket har et tydelig formål, relevant aktivitet og verdi for deltakerne.',
@@ -117,6 +122,7 @@ export const roles = [
   },
   {
     name: 'Prosjekteier',
+    code: 'prosjekteier',
     role: 'Formelt utpekt som prosjekteier ved etablering av prosjektet.',
     responsibility:
       'Sikre at prosjektet leverer i tråd med virksomhetens mål og har de nødvendige rammer.',
@@ -127,6 +133,7 @@ export const roles = [
   },
   {
     name: 'Prosjektleder',
+    code: 'prosjektleder',
     role: 'Formelt utpekt som prosjektleder ved etablering av prosjektet.',
     responsibility: 'Lede prosjektets daglige arbeid og måloppnåelse innenfor mandatet.',
     authority:
@@ -137,6 +144,7 @@ export const roles = [
   },
   {
     name: 'Prosjektdeltaker',
+    code: 'prosjektdeltaker',
     role: 'Formelt utpekt som prosjektdeltaker ved etablering av prosjektet, eller lagt til underveis ved behov.',
     responsibility: 'Levere faglige bidrag av høy kvalitet i tråd med prosjektets mål og mandat.',
     authority:
@@ -147,6 +155,7 @@ export const roles = [
   },
   {
     name: 'Linjeleder',
+    code: 'linjeleder',
     role: 'Formelt ansatt som divisjonsdirektør, avdelingsleder eller seksjonsleder med personalansvar.',
     responsibility:
       'Er ressurseier, har arbeidsgiveransvaret og beslutningsmyndighet i arbeidsforholdet. Har fagansvar og budsjettansvar. Bygger og sikrer riktig kompetansekapasitet basert på behov i linja og i innsatsområdene, sørger for ressurstildeling (allokering). Setter retning og fart på det arbeidet som skal løses i linja. Ivaretar personalansvar og medarbeiderutvikling. Leder strategisk rekruttering og omstilling (kompetanseutvikling).',
@@ -158,6 +167,7 @@ export const roles = [
   },
   {
     name: 'Områdeansvarlig',
+    code: 'omradeansvarlig',
     role: 'Oppnevnt av TLG for ett strategisk innsatsområde, for en tidsavgrenset mandatperiode (evalueres årlig). Rapporterer til Frode og er medlem av porteføljestyret. Hører personalmessig til VSU (Strategi og styring). Er ikke linjeleder og har ikke personalansvar.',
     responsibility:
       'Sikre at summen av det Digdir gjør innen innsatsområdet gir ønsket effekt, innenfor avtalt mandat, økonomiske rammer og ressursallokering. Leveranseansvaret ligger imidlertid hos de teamene som er knyttet til innsatsområdet.',
@@ -169,6 +179,7 @@ export const roles = [
   },
   {
     name: 'Medarbeider',
+    code: 'medarbeider',
     role: 'Formelt ansatt under en divisjonsdirektør, avdelingsleder eller seksjonsleder.',
     responsibility:
       'Utfører arbeidsoppgaver og leverer på avtalte mål. Utviser faglig skjønn innenfor eget ansvarsområde (fagområde). Melder fra om eventuelle risikoer og avvik, kapasitet og belastning og om kompetansen brukes på riktig måte. Tar et aktivt medansvar for egen kompetanseutvikling ved å identifisere egne læringsbehov, søke ny kunnskap og ta initiativ til å utvikle ferdigheter som bidrar til faglig vekst og bedre oppgaveløsning. Og samarbeider med andre til forbedring av leveranser og arbeidsmåter.',
@@ -180,6 +191,7 @@ export const roles = [
   },
   {
     name: 'KI-agent',
+    code: 'ki-agent',
     role: 'Kunstig intelligens som deltar i teamets arbeid som støtte, ikke som medlem. Rollen er aktuell for alle team.',
     responsibility: 'Støtte kunnskapsarbeid og effektivisering',
     authority: 'Ingen formell avgjerdsmynde',

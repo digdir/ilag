@@ -3,6 +3,7 @@ import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { teamIdsWithRoles } from '@/access/teamEditor'
 import type { Person, Role, Team, User } from '@/payload-types'
 
 // Teameiere and teamledere change their own teams and members in the admin
@@ -22,6 +23,7 @@ let leadUser: User
 let productOwnerUser: User
 let memberUser: User
 let unlinkedUser: User
+let admin: User
 let outsider: Person
 const createdRoles: number[] = []
 
@@ -60,11 +62,11 @@ const userFor = async (n: string, p?: Person) =>
     data: { email: `${prefix}-${n}@example.com`, password: 'test-password', person: p?.id },
   })
 
-// The roles that give edit rights are found by name, which is unique.
-const namedRole = async (name: string) => {
-  const { docs } = await payload.find({ collection: 'roller', where: { name: { equals: name } } })
+// The roles that give edit rights are found by their fixed code.
+const roleWithCode = async (code: string, name: string) => {
+  const { docs } = await payload.find({ collection: 'roller', where: { code: { equals: code } } })
   if (docs[0]) return docs[0]
-  const role = await payload.create({ collection: 'roller', data: { name } })
+  const role = await payload.create({ collection: 'roller', data: { name, code } })
   createdRoles.push(role.id)
   return role
 }
@@ -78,15 +80,15 @@ describe('Team editors', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
     // In an empty database the first user becomes an administrator.
-    await payload.create({
+    admin = await payload.create({
       collection: 'brukere',
       data: { email: `${prefix}-admin@example.com`, password: 'test-password', roles: ['admin'] },
     })
     location = (await payload.create({ collection: 'lokasjoner', data: { code: `${prefix}-LEI`, name: 'Leikanger' } }))
       .code
     teamType = (await payload.create({ collection: 'teamtyper', data: { name: `${prefix} Produktteam` } })).id
-    owner = await namedRole('Teameier')
-    lead = await namedRole('Teamleder')
+    owner = await roleWithCode('teameier', 'Teameier')
+    lead = await roleWithCode('teamleder', 'Teamleder')
     productOwner = await payload.create({ collection: 'roller', data: { name: `${prefix} Produkteier` } })
     member = await payload.create({ collection: 'roller', data: { name: `${prefix} Teammedlem` } })
 
@@ -233,6 +235,52 @@ describe('Team editors', () => {
     expect(await mayUseAdminPanel(productOwnerUser)).toBe(false)
     expect(await mayUseAdminPanel(memberUser)).toBe(false)
     expect(await mayUseAdminPanel(unlinkedUser)).toBe(false)
+  })
+
+  it('TO-08: checks roles by their code, so renaming a role changes no rights', async () => {
+    await payload.update({ collection: 'roller', id: lead.id, data: { name: `${prefix} Leder` } })
+    try {
+      const updated = await payload.update({
+        collection: 'team',
+        id: ownTeam.id,
+        data: { description: 'Etter navnebytte' },
+        ...as(leadUser),
+      })
+      expect(updated.description).toBe('Etter navnebytte')
+    } finally {
+      await payload.update({ collection: 'roller', id: lead.id, data: { name: lead.name } })
+    }
+  })
+
+  it('finds the teams where the user has given roles, such as only teameier', async () => {
+    const reqFor = (u: User) => createLocalReq({ user: { ...u, collection: 'brukere' } }, payload)
+    expect(await teamIdsWithRoles(await reqFor(ownerUser), ['teameier'])).toEqual([ownTeam.id])
+    expect(await teamIdsWithRoles(await reqFor(leadUser), ['teameier'])).toEqual([])
+    expect(await teamIdsWithRoles(await reqFor(leadUser), ['teameier', 'teamleder'])).toEqual([ownTeam.id])
+  })
+
+  it('RO-07: gives a new role a code from its name, and never changes it', async () => {
+    const role = await payload.create({ collection: 'roller', data: { name: `${prefix} KI-agent Æøå` } })
+    expect(role.code).toBe(`${prefix}-ki-agent-aeoa`)
+
+    const renamed = await payload.update({
+      collection: 'roller',
+      id: role.id,
+      data: { name: `${prefix} Nytt navn`, code: 'noe-annet' },
+      user: { ...admin, collection: 'brukere' },
+      overrideAccess: false,
+    })
+    expect(renamed.name).toBe(`${prefix} Nytt navn`)
+    expect(renamed.code).toBe(`${prefix}-ki-agent-aeoa`)
+  })
+
+  it('RO-07: refuses a code another role has, or one that isn\'t a code', async () => {
+    await expect(
+      payload.create({ collection: 'roller', data: { name: `${prefix} Kopi`, code: 'teamleder' } }),
+    ).rejects.toThrow()
+    await expect(
+      payload.create({ collection: 'roller', data: { name: `${prefix} Feil`, code: 'Team Leder' } }),
+    ).rejects.toThrow()
   })
 
   it('TO-08: lets only administrators link a user to a person', async () => {
