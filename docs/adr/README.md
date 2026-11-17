@@ -41,6 +41,7 @@ exploit a weakness that hasn't been fixed yet.
 | [0002](0002-password-login-only-for-break-glass-accounts.md) | Password login only for break-glass accounts | Proposed |
 | [0003](0003-imports-from-the-authoritative-source.md) | Imports from the authoritative source | Accepted |
 | [0004](0004-payload-sdk-for-cms-reads.md) | Payload's SDK for reading the CMS | Proposed |
+| [0006](0006-mandates-with-versions-and-approval.md) | Mandates as a versioned collection with approval | Proposed |
 
 ## Template
 
