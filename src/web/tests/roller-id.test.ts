@@ -39,6 +39,14 @@ describe('role page', () => {
     expect(html).toContain('href="/organisering/roller"')
   })
 
+  it('lines up with the other pages, in the wide column', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(teameier)))
+
+    const html = await (await render('1')).text()
+
+    expect(html).toMatch(/<main[^>]*class="wide[^"]*"/)
+  })
+
   it('shows only the parts of RAMO that are written', async () => {
     vi.stubGlobal(
       'fetch',
