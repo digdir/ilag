@@ -398,5 +398,12 @@ describe('Mandates', () => {
       })
       expect(docs.map((d) => d.title)).toEqual([`Mandat for ${team.name}`, `Mandat for ${unit.name}`])
     })
+
+    it('ignores a sort on a calculated field instead of returning nothing', async () => {
+      for (const sort of ['title', '-status', 'complete']) {
+        const { totalDocs } = await payload.find({ collection: 'mandater', sort, ...as(admin) })
+        expect(totalDocs).toBeGreaterThan(0)
+      }
+    })
   })
 })

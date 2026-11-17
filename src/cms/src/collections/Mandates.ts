@@ -71,6 +71,20 @@ const onlyDraftsOrPublish: CollectionBeforeOperationHook = ({ args, operation, o
   return args
 }
 
+// Sorting on a calculated field returns nothing at all from Postgres, and the
+// admin panel saves the list's sort per user, so a sort on `title`,
+// `status`, `complete` or `missingFields` from a URL would leave that user
+// an empty list for good. Such a sort is dropped, for the default order.
+const CALCULATED = ['title', 'status', 'complete', 'missingFields']
+
+const noSortOnCalculated: CollectionBeforeOperationHook = ({ args, operation }) => {
+  if (operation !== 'read' || !('sort' in args) || !args.sort) return args
+  const sort = (Array.isArray(args.sort) ? args.sort : String(args.sort).split(','))
+    .map((s: string) => s.trim())
+    .filter((s: string) => !CALCULATED.includes(s.replace(/^-/, '')))
+  return { ...args, sort: sort.length ? sort : undefined }
+}
+
 // Exactly one owner, a team or a unit (ADR-0006). On create only, since the
 // owner can't change afterwards. Not a field validation: Payload skips those
 // for drafts.
@@ -243,7 +257,7 @@ export const Mandates: CollectionConfig = {
     delete: ({ req }) => isAdmin(req.user),
   },
   hooks: {
-    beforeOperation: [onlyDraftsOrPublish],
+    beforeOperation: [onlyDraftsOrPublish, noSortOnCalculated],
     beforeValidate: [oneOwner],
     beforeChange: [ownerNeverChanges, datesFollowApproval],
   },
