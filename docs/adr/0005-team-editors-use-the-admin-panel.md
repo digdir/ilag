@@ -51,10 +51,15 @@ them, nobody's team memberships can be found from their session.
 
 **How ilag knows who may edit a team**
 
-- **By the roles named Teameier and Teamleder (chosen).** The memberships
-  already hold who has which role in a team, so no new data is needed. The names
-  are one constant in code (`TEAM_EDITOR_ROLES`); renaming the roles in Roller
-  removes the rights, which the constant's comment says.
+- **By a fixed code on the roles Teameier and Teamleder (chosen).** The
+  memberships already hold who has which role in a team. Each role gets a
+  `code`, such as `teameier` and `teamleder`: made from the name when the role
+  is created, unique, and never changed after that. The codes that give edit
+  rights are one constant in code (`TEAM_EDITOR_ROLES`). The name is text for
+  people, and can be changed or translated without changing anyone's rights.
+- **By the roles' names.** No new field, but renaming a role in Roller would
+  silently take the rights away from everyone who has it (suggested against in
+  the review of #58).
 - **A flag on the role, «Kan redigere teamet».** Administrators decide which
   roles edit without a code change, but it is one more setting that grants
   access and has to be understood. Easy to move to later if the list of roles
@@ -95,7 +100,11 @@ them, nobody's team memberships can be found from their session.
    else. A membership can't be moved to another team. Creating and deleting teams
    stays with administrators.
 4. **Teameier and teamleder have the same rights** within the team, including
-   giving and taking away these two roles.
+   giving and taking away these two roles. They are recognised by the roles'
+   codes, `teameier` and `teamleder`, never by their names. Roller gets a
+   `code`, made from the name when a role is created and read-only after
+   that. The lookup takes a list of codes, so later rules can ask for one role
+   alone, such as only the teameier.
 5. **Users get a `person`**, set on each login from the active person with the
    same email, and settable by administrators.
 
@@ -105,8 +114,8 @@ them, nobody's team memberships can be found from their session.
 are where we start, so the solution can be tried out. Which roles should get
 access, such as produkteier, prosjektleder or enhetsleder, and whether anyone
 besides administrators may create teams (TO-08), will be discussed further.
-Changing the roles is a change to `TEAM_EDITOR_ROLES`, or a move to a flag on
-the role; the rest of this decision stays the same.
+Changing the roles is a change to the codes in `TEAM_EDITOR_ROLES`, or a move
+to a flag on the role; the rest of this decision stays the same.
 
 ## Consequences
 
