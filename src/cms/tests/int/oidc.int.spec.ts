@@ -84,6 +84,8 @@ describe('Login with Entra ID', () => {
     process.env = savedEnv
     await provider.stop()
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
+    await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
   })
 
   it('creates the user on the first login and sends them back with a session', async () => {
@@ -137,6 +139,35 @@ describe('Login with Entra ID', () => {
 
     expect(user?.id).toBe(existing.id)
     expect(user?.roles).toEqual(['admin'])
+  })
+
+  it('TO-08: links the user to the active person with the same email', async () => {
+    const { code } = await payload.create({
+      collection: 'lokasjoner',
+      data: { code: `${prefix}-LEI`, name: 'Leikanger' },
+    })
+    const person = (n: number, active: boolean) =>
+      payload.create({
+        collection: 'personer',
+        data: {
+          firstName: 'Kari',
+          lastName: 'Nordmann',
+          email: email('person'),
+          externalId: `${prefix}-person-${n}`,
+          employeeNumber: `${prefix}-${n}`,
+          locationCode: code,
+          active,
+        },
+      })
+    // A contractor who became an employee: the old person is closed.
+    await person(1, false)
+    const current = await person(2, true)
+    claims = { ...claims, oid: `${prefix}-oid-person`, email: email('person') }
+
+    const user = await sessionUser(await logIn())
+
+    const linked = user?.person
+    expect(typeof linked === 'object' && linked ? linked.id : linked).toBe(current.id)
   })
 
   it('refuses accounts from another tenant', async () => {

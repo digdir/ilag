@@ -3,13 +3,14 @@ import Tag from '../../../components/Tag.astro'
 import MemberList from '../../../components/team/MemberList.astro'
 import TeamOwner from '../../../components/team/TeamOwner.astro'
 import Layout from '../../../layouts/Layout.astro'
+import { ROLE_CODES } from '../../../lib/cms/roles'
 import { getTeam } from '../../../lib/cms/teams'
 
 const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!team) Astro.response.status = 404
 
 // The owner has a box of their own; everyone else is in «Hvem er vi?».
-const isOwner = (m: { roles: string[] }) => m.roles.includes('Teameier')
+const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.teamOwner)
 ---
 
 <Layout title={team ? `${team.name} — ilag` : 'Fant ikke teamet — ilag'} wide>

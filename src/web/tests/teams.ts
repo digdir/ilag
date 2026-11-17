@@ -3,7 +3,8 @@
 const membership = (id: number, fullName: string, roles: string[], person = {}) => ({
   id,
   person: { id: 100 + id, fullName, active: true, ...person },
-  roles: roles.map((name, i) => ({ id: i + 1, name })),
+  // The seeded roles' codes are their names in lower case.
+  roles: roles.map((name, i) => ({ id: i + 1, name, code: name.toLowerCase() })),
 })
 
 export const skjemabygger = {

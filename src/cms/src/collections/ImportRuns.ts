@@ -1,6 +1,7 @@
 import { APIError, type CollectionConfig, type FieldAccess } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors } from '../access/teamEditor'
 
 // One file from the authoritative source, from the time it arrived until it
 // was applied (ADR-0003). The import endpoints create runs and the import jobs
@@ -23,6 +24,8 @@ export const ImportRuns: CollectionConfig = {
     interface: 'ImportRun',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'id',
     defaultColumns: ['kind', 'status', 'createdAt', 'rows', 'sender'],
   },

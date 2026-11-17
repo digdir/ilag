@@ -37,6 +37,24 @@ export default buildConfig({
     components: {
       afterLogin: ['/components/ProviderLoginButtons#ProviderLoginButtons'],
     },
+    // Teameiere and teamledere see only their own teams on the dashboard
+    // (TO-08, RO-06); administrators see Payload's cards for all collections.
+    // Each user can change their own layout, which Payload then keeps.
+    dashboard: {
+      widgets: [
+        {
+          slug: 'my-teams',
+          Component: '/components/MyTeams#MyTeams',
+          label: { nb: 'Dine team', en: 'Your teams' },
+          minWidth: 'full',
+        },
+      ],
+      defaultLayout: ({ req }) =>
+        isAdmin(req.user) ? [{ widgetSlug: 'collections', width: 'full' }] : [{ widgetSlug: 'my-teams', width: 'full' }],
+    },
+    meta: {
+      titleSuffix: ' – ilag',
+    },
   },
   // The admin panel uses the language a user picked under Account. Otherwise
   // it takes the first language in the browser's Accept-Language that Payload

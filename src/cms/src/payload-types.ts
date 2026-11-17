@@ -130,6 +130,7 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'my-teams': MyTeamsWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -173,6 +174,10 @@ export interface User {
   firstName?: string | null;
   lastName?: string | null;
   roles?: ('admin' | 'integration')[] | null;
+  /**
+   * Settes ved innlogging fra personen med samme e-post.
+   */
+  person?: (number | null) | Person;
   identities?:
     | {
         provider: 'entra';
@@ -203,25 +208,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'brukere';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medier".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -306,12 +292,32 @@ export interface Unit {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medier".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "teammedlemskap".
  */
 export interface TeamMembership {
   id: number;
   team: number | Team;
   person: number | Person;
+  personName?: string | null;
   roles: (number | Role)[];
   updatedAt: string;
   createdAt: string;
@@ -357,6 +363,10 @@ export interface TeamType {
 export interface Role {
   id: number;
   name: string;
+  /**
+   * Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.
+   */
+  code?: string | null;
   role?: string | null;
   responsibility?: string | null;
   authority?: string | null;
@@ -614,6 +624,7 @@ export interface BrukereSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   roles?: T;
+  person?: T;
   identities?:
     | T
     | {
@@ -723,6 +734,7 @@ export interface EnheterSelect<T extends boolean = true> {
  */
 export interface RollerSelect<T extends boolean = true> {
   name?: T;
+  code?: T;
   role?: T;
   responsibility?: T;
   authority?: T;
@@ -762,6 +774,7 @@ export interface TeamSelect<T extends boolean = true> {
 export interface TeammedlemskapSelect<T extends boolean = true> {
   team?: T;
   person?: T;
+  personName?: T;
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -887,6 +900,16 @@ export interface PayloadJobsStatsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "my-teams_widget".
+ */
+export interface MyTeamsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
