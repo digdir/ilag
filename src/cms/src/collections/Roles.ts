@@ -3,20 +3,7 @@ import type { CollectionConfig, FieldHook, Validate } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
-
-// A code from a name: «KI-agent Æøå» → «ki-agent-aeoa».
-export const codeFromName = (name: string): string =>
-  name
-    .toLowerCase()
-    .replace(/æ/g, 'ae')
-    .replace(/ø/g, 'o')
-    .replace(/å/g, 'a')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-const CODE = /^[a-z0-9]+(-[a-z0-9]+)*$/
+import { codeFromName, isCode } from '../utils/codes'
 
 // A new role without a code gets one from its name. Runs on the server before
 // validation, so the admin form may leave the code empty.
@@ -25,7 +12,7 @@ const codeFromNameIfEmpty: FieldHook = ({ siblingData, value }) =>
 
 // Empty passes: the admin form validates before the hook above has filled it.
 const validCode: Validate = (value) =>
-  !value || (typeof value === 'string' && CODE.test(value))
+  !value || isCode(value)
     ? true
     : 'Koden kan bare ha små bokstaver a–z, tall og bindestrek, som «teamleder».'
 
