@@ -1,46 +1,40 @@
 ---
 import Layout from '../../../layouts/Layout.astro'
-import { getTeamTypeWizard, lines } from '../../../lib/cms/teamTypeWizard'
+import { follow, getTeamTypeWizard, lines } from '../../../lib/cms/teamTypeWizard'
 
 // The team type wizard (TK-03, TK-04): one question at a time, with the
 // answers so far in `?svar=1.2.1`, so back, refresh and links work without
 // JavaScript. Administrators edit the questions in the admin panel.
-const { start, byId } = await getTeamTypeWizard(Astro.request.headers.get('cookie'))
+const { startQuestion, questionsById } = await getTeamTypeWizard(Astro.request.headers.get('cookie'))
 const svar = Astro.url.searchParams.get('svar')
 let path = svar ? svar.split('.').map(Number) : []
 
-// Follow the answers from the start question. The last one may lead to a team
-// type, the result, or nowhere, which ends with the answer itself as advice.
-let question = start
-let result: { kicker: string; title: string; text?: string | null; listTitle?: string; points: string[] } | undefined
-for (const [i, n] of path.entries()) {
-  const answer = question?.answers?.[n - 1]
-  const to = answer?.leadsTo
-  if (to?.relationTo === 'teamtype-veiviser' && typeof to.value === 'object') {
-    question = byId.get(to.value.id)
-  } else if (answer && i === path.length - 1) {
-    question = undefined
-    result =
-      to?.relationTo === 'teamtyper' && typeof to.value === 'object'
-        ? {
-            kicker: 'Teamtype',
-            title: to.value.name,
-            text: to.value.description,
-            listTitle: 'Dette må på plass:',
-            points: lines(to.value.requirements),
-          }
-        : { kicker: 'Anbefaling', title: answer.label, text: answer.hint, points: [] }
-  } else {
-    question = undefined
-  }
-}
-// A path that doesn't fit the questions as they are now starts over.
-if (!question && !result) {
+// Where the answers lead. A path that no longer fits starts over.
+let step = startQuestion ? follow(startQuestion, questionsById, path) : null
+if (startQuestion && !step) {
   path = []
-  question = start
+  step = { question: startQuestion }
 }
+const { question, ending } = step ?? {}
 
-const href = (to: number[]) => (to.length ? `?svar=${to.join('.')}` : Astro.url.pathname)
+// The answer that ended the wizard leads to a team type, which is the result,
+// or nowhere, which makes the answer itself the advice.
+const teamType =
+  ending?.leadsTo?.relationTo === 'teamtyper' && typeof ending.leadsTo.value === 'object'
+    ? ending.leadsTo.value
+    : undefined
+const result = teamType
+  ? {
+      kicker: 'Teamtype',
+      title: teamType.name,
+      text: teamType.description,
+      listTitle: 'Dette må på plass:',
+      points: lines(teamType.requirements),
+    }
+  : ending && { kicker: 'Anbefaling', title: ending.label, text: ending.hint, points: [] }
+
+const href = (answerNumbers: number[]) =>
+  answerNumbers.length ? `?svar=${answerNumbers.join('.')}` : Astro.url.pathname
 const back = path.length ? href(path.slice(0, -1)) : null
 ---
 
@@ -54,7 +48,7 @@ const back = path.length ? href(path.slice(0, -1)) : null
       </p>
     </header>
 
-    {!start && <p class="ds-paragraph">Veiviseren er ikke satt opp ennå.</p>}
+    {!startQuestion && <p class="ds-paragraph">Veiviseren er ikke satt opp ennå.</p>}
 
     {
       question && (
