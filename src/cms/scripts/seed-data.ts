@@ -390,13 +390,128 @@ export const wizardQuestions = [
     },
 ] as const
 
-// Team types by name, and members by employeeNumber with their roles by name,
-// following the roles recommended for each team type (RO-03).
+// The toolbox in the prototype (TOOLS), with team types by name from its «For
+// hvem»: none for tools every team can use. Links only where the prototype
+// names a real site.
+export const tools = [
+  {
+    name: 'Teammandat',
+    toolType: 'mal',
+    teamTypes: ['Produktteam', 'Leveranseteam', 'Støtteteam', 'Fagnettverk'],
+    description:
+      'Sier hvorfor teamet finnes, hva det har ansvar for, hvilket handlingsrom det har og hvordan det skal skape verdi over tid.',
+    resources: [],
+  },
+  {
+    name: 'Prosjektmandat',
+    toolType: 'mal',
+    teamTypes: ['Prosjektteam'],
+    description: 'Beskriver formål, mål, rammer og myndighet for et prosjekt med definert start og slutt.',
+    resources: [{ label: 'Mal for prosjektmandat', url: 'https://www.prosjektveiviseren.no' }],
+  },
+  {
+    name: 'Teamkontrakt',
+    toolType: 'mal',
+    teamTypes: [],
+    description:
+      'Avklarer hvordan medlemmene skal samarbeide, kommunisere, ta beslutninger og håndtere uenighet.',
+    resources: [],
+  },
+  {
+    name: 'OKR',
+    toolType: 'metode',
+    teamTypes: [],
+    description:
+      'Målstyring som holder fokus på hva teamet vil oppnå og hvordan suksess måles. Fungerer best når strategisk retning ovenfra møter operativt eierskap i teamene.',
+    resources: [],
+  },
+  {
+    name: 'Prosjektveiviseren',
+    toolType: 'veileder',
+    teamTypes: ['Prosjektteam'],
+    description:
+      'Digdirs støtte for planlegging, organisering og gjennomføring av større eller mer komplekse prosjekter.',
+    resources: [{ label: 'prosjektveiviseren.no', url: 'https://www.prosjektveiviseren.no' }],
+  },
+  {
+    name: 'Produktorganisering i offentlig sektor',
+    toolType: 'veileder',
+    teamTypes: ['Produktteam'],
+    description:
+      'Anbefaling som gir veiledning om produktorganisering, og som bør brukes ved etablering og videreutvikling av produktteam.',
+    resources: [],
+  },
+  {
+    name: 'Retrospektiv',
+    toolType: 'metode',
+    teamTypes: [],
+    description: 'Fast øvelse der teamet ser tilbake på perioden og blir enige om hva som skal endres.',
+    resources: [],
+  },
+  {
+    name: 'DevOps',
+    toolType: 'metode',
+    teamTypes: ['Produktteam'],
+    description:
+      'Arbeidsmåte der utvikling og drift er samlet i samme team, med små og hyppige endringer, automatisert testing og utrulling, og tett oppfølging av løsningen i bruk.',
+    resources: [],
+  },
+  {
+    name: 'Helsesjekk for team',
+    toolType: 'metode',
+    teamTypes: [],
+    description: 'Jevnlig pulsmåling av samarbeid, mestring og retning i teamet.',
+    resources: [],
+  },
+  {
+    name: 'Produktstrategi',
+    toolType: 'mal',
+    teamTypes: ['Produktteam'],
+    description: 'Beskriver produktets retning, hvem brukerne er og hvilket problem produktet løser for dem.',
+    resources: [],
+  },
+  {
+    name: 'Team Restart',
+    toolType: 'metode',
+    teamTypes: [],
+    description:
+      'Opplegg for å starte et etablert team på nytt, for eksempel etter endringer i mandat, sammensetning eller retning.',
+    resources: [],
+  },
+  {
+    name: 'KI Skills Bibliotek',
+    toolType: 'verktoy',
+    teamTypes: [],
+    description: 'Samling av ferdige KI-ferdigheter som team kan ta i bruk og dele med hverandre.',
+    resources: [],
+  },
+  {
+    name: 'Begrepskatalogen',
+    toolType: 'verktoy',
+    teamTypes: [],
+    description: 'Nasjonal katalog for begrepsdefinisjoner. Begreper i ilag kan kobles til definisjoner her.',
+    toolUrl: 'https://data.norge.no/concepts',
+    resources: [],
+  },
+  {
+    name: 'Figma',
+    toolType: 'verktoy',
+    teamTypes: [],
+    description: 'Digdir har lisens. Brukes til design, skisser og samarbeid om grensesnitt.',
+    toolUrl: 'https://www.figma.com',
+    resources: [],
+  },
+] as const
+
+// Team types by name, members by employeeNumber with their roles by name,
+// following the roles recommended for each team type (RO-03), and the tools
+// the team uses by name (VK-06).
 export const teams = [
   {
     name: 'Team Skjemabygger',
     teamType: 'Produktteam',
     description: 'Utvikler og forvalter verktøyet for å lage digitale skjema.',
+    tools: ['Teammandat', 'OKR', 'DevOps', 'Figma'],
     members: [
       { person: '1005', roles: ['Teameier'] },
       { person: '1008', roles: ['Teamleder', 'Produkteier'] },
@@ -409,6 +524,7 @@ export const teams = [
     name: 'Team Innlogging',
     teamType: 'Leveranseteam',
     description: 'Leverer innloggingsløsningen til offentlige tjenester.',
+    tools: ['Teammandat', 'Teamkontrakt', 'Retrospektiv'],
     members: [
       { person: '1004', roles: ['Teameier'] },
       { person: '1007', roles: ['Teamleder'] },
@@ -422,6 +538,7 @@ export const teams = [
     name: 'Prosjekt Nytt intranett',
     teamType: 'Prosjektteam',
     description: 'Erstatter dagens intranett innen utgangen av 2027.',
+    tools: ['Prosjektmandat', 'Prosjektveiviseren'],
     members: [
       { person: '1003', roles: ['Prosjekteier'] },
       { person: '1006', roles: ['Prosjektleder'] },
@@ -434,6 +551,7 @@ export const teams = [
     name: 'Støtteteam Arbeidsflate',
     teamType: 'Støtteteam',
     description: 'Gir de andre teamene felles verktøy og arbeidsflater.',
+    tools: [],
     members: [
       { person: '1002', roles: ['Teameier'] },
       { person: '1016', roles: ['Teamleder'] },
@@ -444,6 +562,7 @@ export const teams = [
     name: 'Fagnettverk for universell utforming',
     teamType: 'Fagnettverk',
     description: 'Deler kunnskap om universell utforming på tvers av divisjonene.',
+    tools: [],
     members: [
       { person: '1006', roles: ['Teameier'] },
       { person: '1012', roles: ['Fagkoordinator'] },

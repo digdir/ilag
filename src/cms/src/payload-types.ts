@@ -77,6 +77,7 @@ export interface Config {
     'teamtype-veiviser': TeamTypeWizardQuestion;
     team: Team;
     teammedlemskap: TeamMembership;
+    verktoy: Tool;
     importkjoringer: ImportRun;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -101,6 +102,9 @@ export interface Config {
     team: {
       members: 'teammedlemskap';
     };
+    verktoy: {
+      teams: 'team';
+    };
   };
   collectionsSelect: {
     brukere: BrukereSelect<false> | BrukereSelect<true>;
@@ -113,6 +117,7 @@ export interface Config {
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    verktoy: VerktoySelect<false> | VerktoySelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -334,6 +339,7 @@ export interface Team {
   description?: string | null;
   teamType: number | TeamType;
   active: boolean;
+  tools?: (number | Tool)[] | null;
   members?: {
     docs?: (number | TeamMembership)[];
     hasNextPage?: boolean;
@@ -378,6 +384,44 @@ export interface Role {
   authority?: string | null;
   tasks?: string | null;
   teamTypes?: (number | TeamType)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "verktoy".
+ */
+export interface Tool {
+  id: number;
+  name: string;
+  toolType: 'mal' | 'metode' | 'veileder' | 'verktoy';
+  /**
+   * Hva verktøyet er og hva det brukes til, i noen få setninger.
+   */
+  description: string;
+  /**
+   * Teamtypene verktøyet passer for. La feltet stå tomt hvis det passer for alle.
+   */
+  teamTypes?: (number | TeamType)[] | null;
+  /**
+   * Bare for verktøy Digdir har lisens på, som Figma.
+   */
+  toolUrl?: string | null;
+  /**
+   * Lenker til veiledning, maler og anbefalinger om bruk.
+   */
+  resources?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  teams?: {
+    docs?: (number | Team)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -617,6 +661,10 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
+        relationTo: 'verktoy';
+        value: number | Tool;
+      } | null)
+    | ({
         relationTo: 'importkjoringer';
         value: number | ImportRun;
       } | null);
@@ -830,6 +878,7 @@ export interface TeamSelect<T extends boolean = true> {
   description?: T;
   teamType?: T;
   active?: T;
+  tools?: T;
   members?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -843,6 +892,27 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
   person?: T;
   personName?: T;
   roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "verktoy_select".
+ */
+export interface VerktoySelect<T extends boolean = true> {
+  name?: T;
+  toolType?: T;
+  description?: T;
+  teamTypes?: T;
+  toolUrl?: T;
+  resources?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  teams?: T;
   updatedAt?: T;
   createdAt?: T;
 }

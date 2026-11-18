@@ -41,6 +41,7 @@ export async function getTeam(id: string, cookie: string | null): Promise<TeamWi
           roller: { name: true, code: true },
           lokasjoner: { name: true },
           enheter: { name: true },
+          verktoy: { name: true, toolType: true },
         },
       },
       { headers: authHeaders(cookie) },
@@ -58,9 +59,12 @@ export const withRole = (members: Member[], code: string) =>
 
 // The generated types allow a relationship to be either the document or just
 // its ID, whatever depth was asked for, so the IDs are left out.
-const withMembers = ({ members, teamType, ...team }: Team): TeamWithMembers => ({
+const withMembers = ({ members, teamType, tools, ...team }: Team): TeamWithMembers => ({
   ...team,
   teamType: typeof teamType === 'object' ? teamType : null,
+  tools: (tools ?? [])
+    .flatMap((t) => (typeof t === 'object' ? [{ id: t.id, name: t.name, toolType: t.toolType }] : []))
+    .sort((a, b) => a.name.localeCompare(b.name, 'nb')),
   members: (members?.docs ?? [])
     .filter((m) => typeof m === 'object')
     .map(toMember)
