@@ -79,7 +79,7 @@ describe('team type wizard', () => {
     expect(html).toContain('Spørsmål 2')
     expect(html).toContain('Har oppgaven en definert avslutning?')
     expect(html).toContain('href="?svar=1.1"')
-    expect(html).toMatch(/href="\/verktoy\/veiviser"[^>]*>\s*Forrige spørsmål/)
+    expect(html).toMatch(/href="\/verktoy\/veiviser"[^>]*>[\s\S]{0,80}Forrige spørsmål/)
   })
 
   it('TK-04: ends at a team type with what must be in place', async () => {
@@ -94,7 +94,7 @@ describe('team type wizard', () => {
     expect(html).toMatch(/<li[^>]*>Et tydelig prosjektmandat<\/li>/)
     expect(html).toMatch(/<li[^>]*>En teamkontrakt<\/li>/)
     expect(html).toMatch(/href="\/verktoy\/veiviser"[^>]*>\s*Start på nytt/)
-    expect(html).toMatch(/href="\?svar=1"[^>]*>\s*Forrige spørsmål/)
+    expect(html).toMatch(/href="\?svar=1"[^>]*>[\s\S]{0,80}Forrige spørsmål/)
   })
 
   it('TK-03: an answer that leads nowhere ends with the answer as advice', async () => {

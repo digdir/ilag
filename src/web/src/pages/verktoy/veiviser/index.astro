@@ -50,94 +50,94 @@ const back = path.length ? href(path.slice(0, -1)) : null
 
     {!startQuestion && <p class="ds-paragraph">Veiviseren er ikke satt opp ennå.</p>}
 
-    {
-      question && (
-        <section class="ds-card" data-color="neutral" aria-labelledby="sporsmal">
-          <div class="column">
-            <p class="ds-paragraph subtle" data-size="sm">
-              Spørsmål {path.length + 1}
-            </p>
-            <h2 class="ds-heading" data-size="md" id="sporsmal">
-              {question.title}
-            </h2>
-            {question.intro && <p class="ds-paragraph">{question.intro}</p>}
-            {lines(question.considerations).length > 0 && (
-              <div>
-                <p class="ds-paragraph">
-                  <strong>Vurder:</strong>
-                </p>
+    <div class="step">
+      {
+        back && (
+          <p class="ds-paragraph" data-size="sm">
+            <a class="ds-link" href={back}>
+              <span aria-hidden="true">←</span> Forrige spørsmål
+            </a>
+          </p>
+        )
+      }
+
+      {
+        question && (
+          <section class="ds-card" data-color="neutral" aria-labelledby="sporsmal">
+            <div class="column">
+              <p class="ds-paragraph subtle" data-size="xs">
+                Spørsmål {path.length + 1}
+              </p>
+              <h2 class="ds-heading" data-size="sm" id="sporsmal">
+                {question.title}
+              </h2>
+              {question.intro && <p class="ds-paragraph" data-size="sm">{question.intro}</p>}
+              {lines(question.considerations).length > 0 && (
+                <div>
+                  <p class="ds-paragraph" data-size="sm">
+                    <strong>Vurder:</strong>
+                  </p>
+                  <ul>
+                    {lines(question.considerations).map((c) => (
+                      <li class="ds-paragraph" data-size="sm">{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <div class="column">
+              {(question.answers ?? []).map((answer, i) => (
+                <a class="ds-card answer" data-color="accent" href={href([...path, i + 1])}>
+                  <span class="ds-heading" data-size="2xs">
+                    {answer.label}
+                  </span>
+                  {answer.hint && (
+                    <span class="ds-paragraph" data-size="sm">
+                      {answer.hint}
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      {
+        result && (
+          <section class="ds-card" data-color="accent" aria-labelledby="resultat">
+            <div class="column">
+              <p class="ds-paragraph kicker" data-size="xs">
+                {result.kicker}
+              </p>
+              <h2 class="ds-heading" data-size="md" id="resultat">
+                {result.title}
+              </h2>
+              {result.text && <p class="ds-paragraph text" data-size="sm">{result.text}</p>}
+            </div>
+            {result.points.length > 0 && (
+              <div class="column">
+                {result.listTitle && (
+                  <p class="ds-paragraph" data-size="sm">
+                    <strong>{result.listTitle}</strong>
+                  </p>
+                )}
                 <ul>
-                  {lines(question.considerations).map((c) => (
-                    <li class="ds-paragraph">{c}</li>
+                  {result.points.map((p) => (
+                    <li class="ds-paragraph" data-size="sm">{p}</li>
                   ))}
                 </ul>
               </div>
             )}
-          </div>
-          <div class="column">
-            {(question.answers ?? []).map((answer, i) => (
-              <a class="ds-card answer" data-color="accent" href={href([...path, i + 1])}>
-                <span class="ds-heading" data-size="2xs">
-                  {answer.label}
-                </span>
-                {answer.hint && (
-                  <span class="ds-paragraph" data-size="sm">
-                    {answer.hint}
-                  </span>
-                )}
+            <div class="actions">
+              <a class="ds-button" data-variant="primary" data-size="sm" href={href([])}>
+                Start på nytt
               </a>
-            ))}
-            {back && (
-              <p class="ds-paragraph">
-                <a class="ds-link" href={back}>
-                  Forrige spørsmål
-                </a>
-              </p>
-            )}
-          </div>
-        </section>
-      )
-    }
-
-    {
-      result && (
-        <section class="ds-card" data-color="accent" aria-labelledby="resultat">
-          <div class="column">
-            <p class="ds-paragraph kicker" data-size="sm">
-              {result.kicker}
-            </p>
-            <h2 class="ds-heading" data-size="lg" id="resultat">
-              {result.title}
-            </h2>
-            {result.text && <p class="ds-paragraph text">{result.text}</p>}
-          </div>
-          {result.points.length > 0 && (
-            <div class="column">
-              {result.listTitle && (
-                <p class="ds-paragraph">
-                  <strong>{result.listTitle}</strong>
-                </p>
-              )}
-              <ul>
-                {result.points.map((p) => (
-                  <li class="ds-paragraph">{p}</li>
-                ))}
-              </ul>
             </div>
-          )}
-          <div class="actions">
-            <a class="ds-button" data-variant="primary" href={href([])}>
-              Start på nytt
-            </a>
-            {back && (
-              <a class="ds-button" data-variant="secondary" href={back}>
-                Forrige spørsmål
-              </a>
-            )}
-          </div>
-        </section>
-      )
-    }
+          </section>
+        )
+      }
+    </div>
   </div>
 </Layout>
 
@@ -145,7 +145,14 @@ const back = path.length ? href(path.slice(0, -1)) : null
   .page {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-size-6);
+    gap: var(--ds-size-5);
+  }
+
+  /* «Forrige spørsmål» just above the card, in the same place on every step. */
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
   }
 
   header {
@@ -156,9 +163,11 @@ const back = path.length ? href(path.slice(0, -1)) : null
   }
 
   /* Two columns on wide screens, so a whole step fits on one screen. */
+  /* The cards' text is a size smaller than the page's (data-size="sm"), so a
+     whole step fits on one screen. */
   section {
     display: grid;
-    gap: var(--ds-size-6);
+    gap: var(--ds-size-5);
   }
 
   @media (min-width: 56rem) {
