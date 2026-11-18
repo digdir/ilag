@@ -19,8 +19,21 @@ try {
   <p class="ds-paragraph"><a class="ds-link" href="/organisering/team">Teamoversikt</a></p>
   <p class="ds-paragraph"><a class="ds-link" href="/organisering/linjeorganisasjon">Linjeorganisasjon</a></p>
   <p class="ds-paragraph"><a class="ds-link" href="/folk">Folk</a></p>
+  <section class="ds-card" data-color="accent" aria-labelledby="etablere">
+    <h2 class="ds-heading" data-size="sm" id="etablere">Skal du etablere et team?</h2>
+    <p class="ds-paragraph">
+      Veiviseren tar deg gjennom noen spørsmål og foreslår arbeidsform og hva som må på plass.
+    </p>
+    <p><a class="ds-button" data-variant="primary" href="/verktoy/veiviser">Start veiviseren</a></p>
+  </section>
   <h2 class="ds-heading" data-size="md">Payload CMS</h2>
   <p class="ds-paragraph">{cmsURL}</p>
   <p class="ds-paragraph">{status}</p>
   <p class="ds-paragraph"><a class="ds-link" href={`${cmsURL}/admin`}>Open the admin panel</a></p>
 </Layout>
+
+<style>
+  section {
+    margin-block: var(--ds-size-6);
+  }
+</style>

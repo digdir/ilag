@@ -1,0 +1,219 @@
+---
+import Layout from '../../../layouts/Layout.astro'
+import { getTeamTypeWizard, lines } from '../../../lib/cms/teamTypeWizard'
+
+// The team type wizard (TK-03, TK-04): one question at a time, with the
+// answers so far in `?svar=1.2.1`, so back, refresh and links work without
+// JavaScript. Administrators edit the questions in the admin panel.
+const { start, byId } = await getTeamTypeWizard(Astro.request.headers.get('cookie'))
+const svar = Astro.url.searchParams.get('svar')
+let path = svar ? svar.split('.').map(Number) : []
+
+// Follow the answers from the start question. The last one may lead to a team
+// type, the result, or nowhere, which ends with the answer itself as advice.
+let question = start
+let result: { kicker: string; title: string; text?: string | null; listTitle?: string; points: string[] } | undefined
+for (const [i, n] of path.entries()) {
+  const answer = question?.answers?.[n - 1]
+  const to = answer?.leadsTo
+  if (to?.relationTo === 'teamtype-veiviser' && typeof to.value === 'object') {
+    question = byId.get(to.value.id)
+  } else if (answer && i === path.length - 1) {
+    question = undefined
+    result =
+      to?.relationTo === 'teamtyper' && typeof to.value === 'object'
+        ? {
+            kicker: 'Teamtype',
+            title: to.value.name,
+            text: to.value.description,
+            listTitle: 'Dette må på plass:',
+            points: lines(to.value.requirements),
+          }
+        : { kicker: 'Anbefaling', title: answer.label, text: answer.hint, points: [] }
+  } else {
+    question = undefined
+  }
+}
+// A path that doesn't fit the questions as they are now starts over.
+if (!question && !result) {
+  path = []
+  question = start
+}
+
+const href = (to: number[]) => (to.length ? `?svar=${to.join('.')}` : Astro.url.pathname)
+const back = path.length ? href(path.slice(0, -1)) : null
+---
+
+<Layout title="Veiviser for teamtype — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Veiviser for teamtype</h1>
+      <p class="ds-paragraph">
+        Spørsmål som hjelper deg å finne riktig arbeidsform, og riktig teamtype hvis det er et team du
+        trenger. Valget avgjør hvilke prinsipper, roller og verktøy som anbefales videre.
+      </p>
+    </header>
+
+    {!start && <p class="ds-paragraph">Veiviseren er ikke satt opp ennå.</p>}
+
+    {
+      question && (
+        <section class="ds-card" data-color="neutral" aria-labelledby="sporsmal">
+          <div class="column">
+            <p class="ds-paragraph subtle" data-size="sm">
+              Spørsmål {path.length + 1}
+            </p>
+            <h2 class="ds-heading" data-size="md" id="sporsmal">
+              {question.title}
+            </h2>
+            {question.intro && <p class="ds-paragraph">{question.intro}</p>}
+            {lines(question.considerations).length > 0 && (
+              <div>
+                <p class="ds-paragraph">
+                  <strong>Vurder:</strong>
+                </p>
+                <ul>
+                  {lines(question.considerations).map((c) => (
+                    <li class="ds-paragraph">{c}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div class="column">
+            {(question.answers ?? []).map((answer, i) => (
+              <a class="ds-card answer" data-color="accent" href={href([...path, i + 1])}>
+                <span class="ds-heading" data-size="2xs">
+                  {answer.label}
+                </span>
+                {answer.hint && (
+                  <span class="ds-paragraph" data-size="sm">
+                    {answer.hint}
+                  </span>
+                )}
+              </a>
+            ))}
+            {back && (
+              <p class="ds-paragraph">
+                <a class="ds-link" href={back}>
+                  Forrige spørsmål
+                </a>
+              </p>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      result && (
+        <section class="ds-card" data-color="accent" aria-labelledby="resultat">
+          <div class="column">
+            <p class="ds-paragraph kicker" data-size="sm">
+              {result.kicker}
+            </p>
+            <h2 class="ds-heading" data-size="lg" id="resultat">
+              {result.title}
+            </h2>
+            {result.text && <p class="ds-paragraph text">{result.text}</p>}
+          </div>
+          {result.points.length > 0 && (
+            <div class="column">
+              {result.listTitle && (
+                <p class="ds-paragraph">
+                  <strong>{result.listTitle}</strong>
+                </p>
+              )}
+              <ul>
+                {result.points.map((p) => (
+                  <li class="ds-paragraph">{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div class="actions">
+            <a class="ds-button" data-variant="primary" href={href([])}>
+              Start på nytt
+            </a>
+            {back && (
+              <a class="ds-button" data-variant="secondary" href={back}>
+                Forrige spørsmål
+              </a>
+            )}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+    max-width: 45rem;
+  }
+
+  /* Two columns on wide screens, so a whole step fits on one screen. */
+  section {
+    display: grid;
+    gap: var(--ds-size-6);
+  }
+
+  @media (min-width: 56rem) {
+    section {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .answer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-1);
+    text-decoration: none;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+    margin-block: var(--ds-size-2) 0;
+    padding-inline-start: var(--ds-size-6);
+  }
+
+  .subtle {
+    color: var(--ds-color-text-subtle);
+  }
+
+  .kicker {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ds-color-accent-text-subtle);
+  }
+
+  .text {
+    white-space: pre-line;
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+</style>
