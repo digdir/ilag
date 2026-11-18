@@ -201,34 +201,194 @@ export const roles = [
   },
 ]
 
-// The team types in TK-01, described as in the prototype.
+// Lists that editors write one point per line.
+const lines = (...points: string[]) => points.join('\n')
+
+// The team types in TK-01, described as in the prototype, with what must be
+// in place for each (TK-04) from the prototype's wizard results.
 export const teamTypes = [
   {
     name: 'Prosjektteam',
     description:
       'Et prosjektteam etableres for å løse en avgrenset oppgave med et definert mål og en tydelig avslutning. Når målet er nådd og oppgaven er løst, kan teamet oppløses.',
+    requirements: lines(
+      'Et tydelig prosjektmandat som beskriver formål, mål, rammer og myndighet',
+      'Prosjekteier, prosjektleder og medlemmer registrert i teamoversikten',
+      'En teamkontrakt om samarbeid, kommunikasjon og beslutninger',
+      'For større prosjekter: Digdirs prosjektveiviser som støtte',
+    ),
   },
   {
     name: 'Støtteteam',
     description:
       'Et støtteteam har et varig ansvar for å skape verdi internt i Digdir, slik at medarbeidere, ledere og andre team kan løse sine oppgaver på en effektiv og god måte.',
+    requirements: lines(
+      'Et tydelig mandat som beskriver formål, ansvar, mål og handlingsrom',
+      'Teameier, teamleder og medlemmer registrert i teamoversikten',
+      'En teamkontrakt om samarbeid, kommunikasjon og beslutninger',
+    ),
   },
   {
     name: 'Leveranseteam',
     description:
       'Et leveranseteam har et varig og helhetlig ansvar for en definert leveranse som skaper verdi utenfor Digdir. Teamet skal kjenne behovene til brukerne og bruke innsikten til å utvikle, levere og forbedre leveransen over tid.',
+    requirements: lines(
+      'Et tydelig mandat som beskriver formål, ansvar, mål og handlingsrom',
+      'Teameier, teamleder og medlemmer registrert i teamoversikten',
+      'En teamkontrakt om samarbeid, kommunikasjon og beslutninger',
+    ),
   },
   {
     name: 'Produktteam',
     description:
       'Et produktteam er et leveranseteam med varig og helhetlig ansvar for ett eller flere produkter. Teamet skal ha tilstrekkelig kompetanse, myndighet og handlingsrom til å prioritere ut fra brukerbehov, mål og ønskede effekter.',
+    requirements: lines(
+      'En produkteier med tydelig ansvar for produktet',
+      'Et mandat som beskriver formål, mål, ansvar, rammer og handlingsrom',
+      'En produktstrategi: retning, hvem brukerne er og hvilket problem produktet løser',
+      'Teameier, teamleder og medlemmer registrert i teamoversikten',
+      'En teamkontrakt som avklarer hvordan teamet skal fungere i praksis',
+    ),
   },
   {
     name: 'Fagnettverk',
     description:
       'Et fagnettverk samler personer som har et felles fagområde, kompetanse, interesse eller profesjonell bakgrunn, og som ønsker å dele kunnskap, lære av hverandre og utvikle fagområdet. Nettverket kan for eksempel organiseres som et fagforum, nettverk eller laug — eller med et helt annet navn.\n\nI motsetning til et team har et fagnettverk vanligvis ikke ansvar for en felles leveranse eller et felles resultat, og medlemmene har normalt sitt ansvar og sine oppgaver andre steder i organisasjonen.\n\nEt tydelig formål gjør det enklere å skape relevant aktivitet og verdi for deltakerne, samtidig som nettverket beholder den fleksible formen som skiller det fra et team.',
+    requirements: lines(
+      'Et tydelig formål som beskriver hvorfor nettverket finnes og hva det skal bidra til',
+      'Avklart hvem nettverket er for, og hvordan deltakelse og medlemskap fungerer',
+      'Én eller flere personer som koordinerer og legger til rette for aktivitet, registrert i Digdirs teamoversikt',
+      'Avklart hvordan nettverket skal dele kunnskap, erfaringer og praksis',
+    ),
   },
 ]
+
+// The team type wizard (TK-03): Vedlegg 1 as the prototype's WIZARD has it.
+// The prototype adds the question «fellesskap» after «Hovedsakelig nei», so
+// Fagnettverk can be reached, and «Vurder» points to «verdi» and «produkt».
+// Answers lead to a question by its `key`, which is only for the seed, or to
+// a team type by name; one that leads to neither ends the wizard with its own
+// hint as advice. Leaves first, so each answer's question exists when it is
+// created.
+export const wizardQuestions = [
+    {
+      key: 'produkt',
+      title: 'Leveranseteam eller produktteam?',
+      intro:
+        'Noen leveranser har egenskaper som gjør det hensiktsmessig å organisere og styre dem som produkter. Produktteam kan derfor ses som en særskilt type leveranseteam.',
+      considerations: lines(
+        'Har leveransen et tydelig problemområde eller behov den løser?',
+        'Har den brukere med målbare behov?',
+        'Er den levende og endres løpende basert på innsikt, data og tilbakemeldinger?',
+        'Har den forretningsmessig betydning, for eksempel gjennom effektivisering, inntekter eller brukeropplevelse?',
+      ),
+      answers: [
+        {
+          label: 'Ja, dette har egenskapene til et produkt',
+          hint: 'Leveransen bør eies og utvikles av et tverrfaglig team med produkteier.',
+          to: { teamType: 'Produktteam' },
+        },
+        {
+          label: 'Nei, men leveransen skaper verdi utenfor Digdir',
+          hint: 'En digital løsning, tjeneste, kunnskap eller sammenhengende brukerreise.',
+          to: { teamType: 'Leveranseteam' },
+        },
+      ],
+    },
+    {
+      key: 'verdi',
+      title: 'Hvem skal teamet først og fremst skape verdi for?',
+      intro: 'Når oppgaven krever et varig team, er neste spørsmål hvem teamet primært skal skape verdi for.',
+      considerations: lines(
+        'Er mottakerne innbyggere, virksomheter eller offentlig sektor utenfor Digdir?',
+        'Eller er de medarbeidere, ledere og andre team i Digdir?',
+      ),
+      answers: [
+        {
+          label: 'Primært utenfor Digdir',
+          hint: 'Arbeidet er rettet mot innbyggere, virksomheter, offentlig sektor eller andre aktører utenfor Digdir.',
+          to: { question: 'produkt' },
+        },
+        {
+          label: 'Primært internt i Digdir',
+          hint: 'Arbeidet er rettet mot medarbeidere, ledere eller andre team og enheter i Digdir.',
+          to: { teamType: 'Støtteteam' },
+        },
+      ],
+    },
+    {
+      key: 'slutt',
+      title: 'Har oppgaven en definert avslutning?',
+      intro: 'Noen oppgaver har et tydelig sluttpunkt, mens andre krever et kontinuerlig ansvar over tid.',
+      considerations: lines(
+        'Skal teamet nå et definert mål eller levere et bestemt resultat?',
+        'Er det mulig å si når oppgaven er ferdig?',
+        'Kan teamet oppløses når målet eller resultatet er nådd?',
+      ),
+      answers: [
+        {
+          label: 'Ja, oppgaven har en definert avslutning',
+          hint: 'Teamet etableres for å løse en avgrenset oppgave og kan oppløses når den er løst.',
+          to: { teamType: 'Prosjektteam' },
+        },
+        {
+          label: 'Nei, oppgaven krever kontinuerlig ansvar',
+          hint: 'Det vil fortsatt være behov for å utvikle, forvalte, forbedre eller levere noe over tid.',
+          to: { question: 'verdi' },
+        },
+      ],
+    },
+    {
+      key: 'fellesskap',
+      title: 'Er formålet å dele kunnskap og utvikle et fagområde?',
+      intro:
+        'Noen behov handler ikke om å levere noe sammen, men om å lære av hverandre og utvikle faget. Da kan et fagnettverk være riktig form.',
+      considerations: lines(
+        'Samler dette personer med felles fagområde, kompetanse, interesse eller profesjonell bakgrunn?',
+        'Er hovedformålet å dele kunnskap, lære av hverandre og utvikle fagområdet?',
+        'Har deltakerne sitt ansvar og sine oppgaver andre steder i organisasjonen?',
+        'Er det ingen felles leveranse eller felles resultat de skal svare for?',
+      ),
+      answers: [
+        {
+          label: 'Ja, dette handler om fag og læring',
+          hint: 'Deltakerne deler fagområde, men har ikke ansvar for en felles leveranse.',
+          to: { teamType: 'Fagnettverk' },
+        },
+        {
+          label: 'Nei, ingen av formene passer',
+          hint: 'Verken team eller fagnettverk treffer behovet. Vurder om oppgaven kan løses gjennom individuelt ansvar eller enklere koordinering i linjen.',
+          to: null,
+        },
+      ],
+    },
+    {
+      key: 'team',
+      isStart: true,
+      title: 'Egner oppgaven seg for teamarbeid?',
+      intro:
+        'Team er en egnet arbeidsform når oppgaven løses bedre gjennom tett samarbeid og felles ansvar enn ved at enkeltpersoner arbeider hver for seg og koordinerer ved behov.',
+      considerations: lines(
+        'Krever oppgaven at flere personer samarbeider tett for å lykkes?',
+        'Er personene gjensidig avhengige av hverandres arbeid, kompetanse eller perspektiver?',
+        'Har de et felles mål eller resultat som de sammen kan ta ansvar for?',
+        'Krever oppgaven løpende koordinering, problemløsning eller prioritering?',
+        'Er det en fordel at de som utfører arbeidet lærer, tilpasser seg og tar beslutninger sammen?',
+      ),
+      answers: [
+        {
+          label: 'Hovedsakelig ja',
+          hint: 'Oppgaven kan egne seg godt for teamarbeid. Gå videre og vurder hva slags team som trengs.',
+          to: { question: 'slutt' },
+        },
+        {
+          label: 'Hovedsakelig nei',
+          hint: 'Det er ikke sikkert team er den mest hensiktsmessige arbeidsformen. Vurder om oppgaven kan løses gjennom individuelt ansvar, enklere koordinering i linjen, eller som et fagnettverk.',
+          to: { question: 'fellesskap' },
+        },
+      ],
+    },
+] as const
 
 // Team types by name, and members by employeeNumber with their roles by name,
 // following the roles recommended for each team type (RO-03).

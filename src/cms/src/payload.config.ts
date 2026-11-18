@@ -15,6 +15,7 @@ import { Units } from './collections/Units'
 import { Roles } from './collections/Roles'
 import { Teams } from './collections/Teams'
 import { TeamTypes } from './collections/TeamTypes'
+import { TeamTypeWizard } from './collections/TeamTypeWizard'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { ImportRuns } from './collections/ImportRuns'
 import { isAdmin } from './access/isAdmin'
@@ -64,7 +65,7 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, Teams, TeamMemberships, ImportRuns],
+  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, TeamTypeWizard, Teams, TeamMemberships, ImportRuns],
   // The imports from the authoritative source (ADR-0003). Only administrators
   // may queue, run or cancel jobs through the API; the import endpoints queue
   // them through the Local API.
