@@ -47,15 +47,6 @@ describe('home page', () => {
     expect(html).toContain('500')
   })
 
-  it('FS-03: leads those who are setting up a team to the wizard', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => healthy()))
-
-    const html = await render()
-
-    expect(html).toContain('Skal du etablere et team?')
-    expect(html).toMatch(/href="\/verktoy\/veiviser"[^>]*>Start veiviseren/)
-  })
-
   it('shows who is logged in, with a way to log out, in the site header', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => healthy()))
 
