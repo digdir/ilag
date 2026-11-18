@@ -74,6 +74,7 @@ export interface Config {
     enheter: Unit;
     roller: Role;
     teamtyper: TeamType;
+    'teamtype-veiviser': TeamTypeWizardQuestion;
     team: Team;
     teammedlemskap: TeamMembership;
     importkjoringer: ImportRun;
@@ -109,6 +110,7 @@ export interface Config {
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
+    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
@@ -348,6 +350,10 @@ export interface TeamType {
   id: number;
   name: string;
   description?: string | null;
+  /**
+   * Vist som en punktliste. Ett punkt per linje.
+   */
+  requirements?: string | null;
   roles?: {
     docs?: (number | Role)[];
     hasNextPage?: boolean;
@@ -372,6 +378,42 @@ export interface Role {
   authority?: string | null;
   tasks?: string | null;
   teamTypes?: (number | TeamType)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser".
+ */
+export interface TeamTypeWizardQuestion {
+  id: number;
+  title: string;
+  /**
+   * Veiviseren begynner her.
+   */
+  isStart?: boolean | null;
+  intro?: string | null;
+  /**
+   * Ett punkt per linje.
+   */
+  considerations?: string | null;
+  answers: {
+    label: string;
+    hint?: string | null;
+    /**
+     * Et nytt spørsmål eller en teamtype. La stå tomt hvis svaret avslutter veiviseren; da vises svaret og forklaringen som råd.
+     */
+    leadsTo?:
+      | ({
+          relationTo: 'teamtype-veiviser';
+          value: number | TeamTypeWizardQuestion;
+        } | null)
+      | ({
+          relationTo: 'teamtyper';
+          value: number | TeamType;
+        } | null);
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -563,6 +605,10 @@ export interface PayloadLockedDocument {
         value: number | TeamType;
       } | null)
     | ({
+        relationTo: 'teamtype-veiviser';
+        value: number | TeamTypeWizardQuestion;
+      } | null)
+    | ({
         relationTo: 'team';
         value: number | Team;
       } | null)
@@ -750,7 +796,28 @@ export interface RollerSelect<T extends boolean = true> {
 export interface TeamtyperSelect<T extends boolean = true> {
   name?: T;
   description?: T;
+  requirements?: T;
   roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser_select".
+ */
+export interface TeamtypeVeiviserSelect<T extends boolean = true> {
+  title?: T;
+  isStart?: T;
+  intro?: T;
+  considerations?: T;
+  answers?:
+    | T
+    | {
+        label?: T;
+        hint?: T;
+        leadsTo?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
