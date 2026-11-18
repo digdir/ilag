@@ -28,6 +28,7 @@ type Slug =
   | 'personer'
   | 'roller'
   | 'teamtyper'
+  | 'teamtype-veiviser'
   | 'team'
   | 'teammedlemskap'
 
@@ -145,6 +146,29 @@ const seed = async (payload: Payload) => {
     teamTypeIds.set(teamType.name, id)
   }
 
+  // The team type wizard's questions, leaves first, so each answer's
+  // question exists when it is created.
+  const questionIds = new Map<string, number>()
+  for (const { key, answers, ...question } of data.wizardQuestions) {
+    let id = await findId(payload, 'teamtype-veiviser', { title: { equals: question.title } })
+    if (!id) {
+      const data = {
+        ...question,
+        answers: answers.map(({ to, ...answer }) => ({
+          ...answer,
+          leadsTo: !to
+            ? null
+            : 'question' in to
+              ? { relationTo: 'teamtype-veiviser' as const, value: questionIds.get(to.question)! }
+              : { relationTo: 'teamtyper' as const, value: teamTypeIds.get(to.teamType)! },
+        })),
+      }
+      id = (await payload.create({ collection: 'teamtype-veiviser', data })).id
+      count('teamtype-veiviser')
+    }
+    questionIds.set(key, id)
+  }
+
   const roleIds = new Map<string, number>()
   for (const role of data.roles) {
     let id = await findId(payload, 'roller', { code: { equals: role.code } })
@@ -224,6 +248,7 @@ const removeSeed = async (payload: Payload) => {
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['roller', { code: { in: data.roles.map((r) => r.code) } }],
+    ['teamtype-veiviser', { title: { in: data.wizardQuestions.map((q) => q.title) } }],
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.
