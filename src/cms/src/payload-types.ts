@@ -338,6 +338,7 @@ export interface Mandate {
    * Dagens dato hvis tomt når mandatet godkjennes.
    */
   approvedAt?: string | null;
+  approvedBy?: (number | null) | Person;
   /**
    * Når mandatet ikke lenger gjelder: sett datoen og publiser. Mandatet vises fortsatt, merket som utgått.
    */
@@ -927,6 +928,7 @@ export interface MandaterSelect<T extends boolean = true> {
   expectations?: T;
   collaboration?: T;
   approvedAt?: T;
+  approvedBy?: T;
   expiredAt?: T;
   status?: T;
   complete?: T;

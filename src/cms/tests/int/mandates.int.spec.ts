@@ -7,20 +7,20 @@ import {
 } from 'payload'
 import config from '@/payload.config'
 
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { MandateOwners } from '@/access/findMandateOwners'
-import type { Mandate, Team, Unit, User } from '@/payload-types'
+import type { Mandate, Person, Role, Team, Unit, User } from '@/payload-types'
 
-// Who is teamleder and teameier of which team comes from the memberships once
-// users are linked to people (#58). Until then the tests say it directly.
-const owners = vi.hoisted(() => new Map<number, MandateOwners>())
-vi.mock('@/access/findMandateOwners', () => ({
-  findMandateOwners: async (req: { user?: { id: number } | null }) =>
-    owners.get(req.user?.id ?? -1) ?? { edit: { teams: [], units: [] }, approve: { teams: [], units: [] } },
-}))
+// Who is teamleder and teameier of which team comes from the team's
+// memberships, through the user's person (ADR-0005).
 
 let payload: Payload
+let location: string
+let leadRole: Role
+let ownerRole: Role
+const createdRoles: number[] = []
+let ownerPerson: Person
+let leadPerson: Person
 let admin: User
 let reader: User
 let teamLead: User
@@ -41,11 +41,46 @@ const content = {
   collaboration: 'Samarbeider med [Team Innlogging](https://example.com).',
 }
 
-const user = (name: string, roles: ('admin' | 'integration')[] = []) =>
+const user = (name: string, roles: ('admin' | 'integration')[] = [], person?: Person) =>
   payload.create({
     collection: 'brukere',
-    data: { email: `${prefix}-${name}@example.com`, password: 'test-password', roles },
+    data: { email: `${prefix}-${name}@example.com`, password: 'test-password', roles, person: person?.id },
   })
+
+const person = (name: string) =>
+  payload.create({
+    collection: 'personer',
+    data: {
+      firstName: 'Kari',
+      lastName: name,
+      email: `${prefix}-person-${name}@example.com`,
+      externalId: `${prefix}-person-${name}`,
+      employeeNumber: `${prefix}-${name}`,
+      locationCode: location,
+    } as RequiredDataFromCollectionSlug<'personer'>,
+  })
+
+// The roles that give rights over a mandate are found by their fixed code.
+const roleWithCode = async (code: string, name: string) => {
+  const { docs } = await payload.find({ collection: 'roller', where: { code: { equals: code } } })
+  if (docs[0]) return docs[0]
+  const role = await payload.create({ collection: 'roller', data: { name, code } })
+  createdRoles.push(role.id)
+  return role
+}
+
+const join = (t: Team, p: Person, roles: Role[]) =>
+  payload.create({
+    collection: 'teammedlemskap',
+    data: { team: t.id, person: p.id, roles: roles.map((r) => r.id) },
+  })
+
+// A signed-in user linked to a new person with these roles in a team.
+const member = async (name: string, t: Team, roles: Role[]) => {
+  const p = await person(name)
+  await join(t, p, roles)
+  return { user: await user(name, [], p), person: p }
+}
 
 // A mandate for a fresh team, through the API as `who`.
 const newTeam = async (n: string) => {
@@ -80,6 +115,10 @@ const restore = async (versionId: string, who: User, draft: boolean) =>
     req: await createLocalReq({ user: { ...who, collection: 'brukere' } }, payload),
   })
 
+const idOf = (value: unknown) => (value && typeof value === 'object' ? (value as { id: number }).id : value)
+
+const reqAs = (who: User) => createLocalReq({ user: { ...who, collection: 'brukere' } }, payload)
+
 const today = () => {
   const d = new Date()
   d.setUTCHours(0, 0, 0, 0)
@@ -90,13 +129,19 @@ describe('Mandates', () => {
   beforeAll(async () => {
     payload = await getPayload({ config: await config })
     admin = await user('admin', ['admin'])
-    reader = await user('reader')
-    teamLead = await user('teamleder')
-    teamOwner = await user('teameier')
-    otherLead = await user('annen-teamleder')
+    location = (await payload.create({ collection: 'lokasjoner', data: { code: `${prefix}-LEI`, name: 'Leikanger' } }))
+      .code
+    ;[leadRole, ownerRole] = await Promise.all([
+      roleWithCode('teamleder', 'Teamleder'),
+      roleWithCode('teameier', 'Teameier'),
+    ])
     await payload.create({ collection: 'teamtyper', data: { name: `${prefix} Produktteam` } })
     team = await newTeam('Skjema')
     otherTeam = await newTeam('Annet')
+    reader = await user('reader')
+    ;({ user: teamLead, person: leadPerson } = await member('teamleder', team, [leadRole]))
+    ;({ user: teamOwner, person: ownerPerson } = await member('teameier', team, [ownerRole]))
+    otherLead = (await member('annen-teamleder', otherTeam, [leadRole])).user
     unit = await payload.create({
       collection: 'enheter',
       data: {
@@ -106,13 +151,6 @@ describe('Mandates', () => {
         active: true,
       } as RequiredDataFromCollectionSlug<'enheter'>,
     })
-    const only = (teams: number[], approveTeams: number[] = []): MandateOwners => ({
-      edit: { teams, units: [] },
-      approve: { teams: approveTeams, units: [] },
-    })
-    owners.set(teamLead.id, only([team.id]))
-    owners.set(teamOwner.id, only([team.id], [team.id]))
-    owners.set(otherLead.id, only([otherTeam.id]))
   })
 
   afterAll(async () => {
@@ -122,6 +160,9 @@ describe('Mandates', () => {
     await payload.delete({ collection: 'enheter', where: { externalUnitId: { like: prefix } } })
     await payload.delete({ collection: 'teamtyper', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
+    await payload.delete({ collection: 'personer', where: { externalId: { like: prefix } } })
+    if (createdRoles.length) await payload.delete({ collection: 'roller', where: { id: { in: createdRoles } } })
+    await payload.delete({ collection: 'lokasjoner', where: { code: { like: prefix } } })
   })
 
   it('TO-17: keeps every version, not only the last 100', () => {
@@ -180,12 +221,15 @@ describe('Mandates', () => {
       ).rejects.toThrow()
     })
 
-    it('TO-16: lets the teameier approve, which makes the mandate current and dated today', async () => {
-      const approved = await approve(mandate.id, teamOwner)
+    it('TO-16: lets the teameier approve, which makes the mandate current, dated today and signed by them', async () => {
+      // Who approved is recorded by the CMS, whatever the request says.
+      const approved = await approve(mandate.id, teamOwner, { approvedBy: leadPerson.id })
       expect(approved._status).toBe('published')
       expect(approved.status).toBe('current')
       expect(approved.approvedAt).toBe(today())
+      expect(idOf(approved.approvedBy)).toBe(ownerPerson.id)
       expect(approved.complete).toBe(true)
+      expect(idOf((await read(mandate.id, reader)).approvedBy)).toBe(ownerPerson.id)
     })
 
     it('TO-04: shows the approved mandate to everyone, also on the team', async () => {
@@ -213,6 +257,7 @@ describe('Mandates', () => {
       expect(draft.problem).toBe('Et nytt problem.')
       expect(draft.status).toBe('draft')
       expect(draft.approvedAt).toBeFalsy()
+      expect(draft.approvedBy).toBeFalsy()
     })
 
     it('TO-16: lets the teameier approve the new version with an earlier date', async () => {
@@ -270,6 +315,7 @@ describe('Mandates', () => {
       expect(expired.status).toBe('expired')
       expect(expired.expiredAt).toBe('2026-11-16T00:00:00.000Z')
       expect(expired.approvedAt).toBe('2026-11-02T00:00:00.000Z')
+      expect(idOf(expired.approvedBy)).toBe(ownerPerson.id)
       const seen = await read(mandate.id, reader)
       expect(seen.status).toBe('expired')
       expect(seen.expiredAt).toBe('2026-11-16T00:00:00.000Z')
@@ -333,7 +379,7 @@ describe('Mandates', () => {
 
     it('refuses a teamleder who creates a mandate as approved', async () => {
       const t = await newTeam('Snarvei')
-      owners.set(teamLead.id, { edit: { teams: [team.id, t.id], units: [] }, approve: { teams: [], units: [] } })
+      await join(t, leadPerson, [leadRole])
       await expect(
         payload.create({
           collection: 'mandater',
@@ -341,7 +387,36 @@ describe('Mandates', () => {
           ...as(teamLead),
         }),
       ).rejects.toThrow()
-      owners.set(teamLead.id, { edit: { teams: [team.id], units: [] }, approve: { teams: [], units: [] } })
+      // As a draft, the same mandate is fine.
+      expect((await draftFor(t.id, teamLead)).status).toBe('draft')
+    })
+
+    it('TO-16: lets a teamleder not set who approved a draft', async () => {
+      const draft = await saveDraft(mandate.id, otherLead, { approvedBy: leadPerson.id })
+      expect(draft.approvedBy).toBeFalsy()
+    })
+
+    it('records no approver when an administrator without a person approves', async () => {
+      const t = await newTeam('Admin')
+      const draft = await draftFor(t.id, admin)
+      const approved = await approve(draft.id, admin)
+      expect(approved.status).toBe('current')
+      expect(approved.approvedBy).toBeFalsy()
+    })
+
+    it("lists only their own teams' mandates to team editors in the admin panel, and offers only those teams", async () => {
+      const { baseFilter } = payload.collections.mandater.config.admin
+      const where = await baseFilter!({ req: await reqAs(otherLead), limit: 10, page: 1, sort: '' })
+      const { docs } = await payload.find({ collection: 'mandater', where: where ?? {}, draft: true, depth: 0 })
+      expect(docs.map((d) => idOf(d.team))).toEqual([otherTeam.id])
+      expect(await baseFilter!({ req: await reqAs(admin), limit: 10, page: 1, sort: '' })).toBeNull()
+
+      const field = payload.collections.mandater.config.fields.find((f) => 'name' in f && f.name === 'team')
+      const filterOptions = (field as unknown as { filterOptions: (args: { req: unknown }) => Promise<unknown> })
+        .filterOptions
+      expect(await filterOptions({ req: await reqAs(otherLead) })).toEqual({ id: { in: [otherTeam.id] } })
+      expect(await filterOptions({ req: await reqAs(reader) })).toEqual({ id: { in: [] } })
+      expect(await filterOptions({ req: await reqAs(admin) })).toBe(true)
     })
 
     it('refuses to approve an incomplete mandate', async () => {

@@ -8,6 +8,7 @@ import {
   type PayloadRequest,
   type TextareaField,
   ValidationError,
+  type Where,
 } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
@@ -100,6 +101,14 @@ const oneOwner: CollectionBeforeValidateHook<Mandate> = ({ data, operation }) =>
   return data
 }
 
+// The picker offers team editors only the teams whose mandate they may edit.
+// Validation runs this too, so without a user (the Local API, the seed) all
+// go.
+const ownersToPick = async (req: PayloadRequest, kind: 'teams' | 'units'): Promise<boolean | Where> => {
+  if (!req.user || isAdmin(req.user)) return true
+  return { id: { in: (await mandateOwners(req)).edit[kind] } }
+}
+
 const today = () => {
   const date = new Date()
   date.setUTCHours(0, 0, 0, 0)
@@ -126,36 +135,40 @@ const ownerNeverChanges: CollectionBeforeChangeHook<Mandate> = ({ data, operatio
 
 // Payload's `_status` says whether a version is a draft or approved
 // (published); `expiredAt` says whether an approved mandate has expired
-// (TO-16). The dates follow the approval. A draft has neither: approving it
-// is a new approval, which clears an expiry. Approving is dated today unless
-// the approver gives an earlier date. Expiring is publishing with
-// `expiredAt`, and keeps the date of the approval that ends. Only approvers
-// publish, so only they set the dates.
-const datesFollowApproval: CollectionBeforeChangeHook<Mandate> = async ({ data, originalDoc, req }) => {
+// (TO-16). The dates and the approver follow the approval. A draft has none
+// of them: approving it is a new approval, which clears an expiry. Approving
+// is dated today unless the approver gives an earlier date. Expiring is
+// publishing with `expiredAt`, and keeps the date and the approver of the
+// approval that ends. Only approvers publish, so only they set the dates.
+//
+// `approvedBy` is the approving user's person, since Payload's versions don't
+// record who saved them; empty for an administrator who isn't linked to a
+// person. It is always set here, whatever the request sends: a field access
+// rule would run after this hook and undo it.
+const approvalFollowsPublishing: CollectionBeforeChangeHook<Mandate> = async ({ data, originalDoc, req }) => {
   // A restored version arrives with its old `_status`, but is always saved as
   // a draft (onlyDraftsOrPublish).
   const publishing = data._status === 'published' && !req.context.isRestoringVersion
   if (!publishing) {
     data.approvedAt = null
+    data.approvedBy = null
     data.expiredAt = null
     return data
   }
   if (data.expiredAt) {
-    // Also when the form was opened on a draft, which has no approval date.
-    if (!data.approvedAt && originalDoc?.id) {
-      const published = await req.payload.findByID({
-        collection: 'mandater',
-        id: originalDoc.id,
-        depth: 0,
-        draft: false,
-        req,
-      })
-      data.approvedAt = published._status === 'published' ? published.approvedAt : null
-    }
+    // The approval that ends, read from the published mandate: the form may
+    // have been opened on a draft, which has no approval.
+    const published = originalDoc?.id
+      ? await req.payload.findByID({ collection: 'mandater', id: originalDoc.id, depth: 0, draft: false, req })
+      : null
+    const approval = published?._status === 'published' ? published : null
+    data.approvedAt = data.approvedAt || approval?.approvedAt || null
+    data.approvedBy = idOf(approval?.approvedBy)
     return data
   }
   data.expiredAt = null
   data.approvedAt = data.approvedAt || today()
+  data.approvedBy = idOf(req.user?.person)
   return data
 }
 
@@ -194,6 +207,12 @@ export const Mandates: CollectionConfig = {
   admin: {
     // The first column links to the mandate, so it names the owner.
     defaultColumns: ['title', '_status', 'approvedAt', 'updatedAt'],
+    // Team editors see the mandates of their own teams, as they do with teams
+    // and memberships (ADR-0005). Only the list; read access is unchanged.
+    baseFilter: async ({ req }) => {
+      if (isAdmin(req.user)) return null
+      return ownedBy((await mandateOwners(req)).edit) || { id: { in: [] } }
+    },
     description:
       'Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).',
     components: {
@@ -263,7 +282,7 @@ export const Mandates: CollectionConfig = {
   hooks: {
     beforeOperation: [onlyDraftsOrPublish, noSortOnCalculated],
     beforeValidate: [oneOwner],
-    beforeChange: [ownerNeverChanges, datesFollowApproval],
+    beforeChange: [ownerNeverChanges, approvalFollowsPublishing],
   },
   fields: [
     {
@@ -291,6 +310,7 @@ export const Mandates: CollectionConfig = {
       relationTo: 'team',
       unique: true,
       access: { update: ownerOnlyOnCreate },
+      filterOptions: ({ req }) => ownersToPick(req, 'teams'),
       admin: {
         position: 'sidebar',
         description: 'Teamet mandatet hører til. Kan ikke endres etterpå.',
@@ -304,6 +324,7 @@ export const Mandates: CollectionConfig = {
       label: 'Enhet',
       unique: true,
       access: { update: ownerOnlyOnCreate },
+      filterOptions: ({ req }) => ownersToPick(req, 'units'),
       admin: {
         position: 'sidebar',
         description: 'Enheten mandatet hører til. Kan ikke endres etterpå.',
@@ -331,8 +352,17 @@ export const Mandates: CollectionConfig = {
       },
     },
     {
+      // Who approved the mandate (TO-16). Set by approvalFollowsPublishing,
+      // never by hand.
+      name: 'approvedBy',
+      type: 'relationship',
+      relationTo: 'personer',
+      label: 'Godkjent av',
+      admin: { position: 'sidebar', readOnly: true },
+    },
+    {
       // Set by an approver, by publishing with it. Empty while the mandate
-      // applies. Cleared by datesFollowApproval when a new version is
+      // applies. Cleared by approvalFollowsPublishing when a new version is
       // approved.
       name: 'expiredAt',
       type: 'date',
