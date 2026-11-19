@@ -6,7 +6,12 @@ import { toolTypeLabel } from '../../../lib/tools'
 
 const tool = await getTool(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!tool) Astro.response.status = 404
-const resources = tool?.resources ?? []
+// All the tool's links in one list under «Ressurser»: the tool itself first,
+// where Digdir has a licence (VK-08), then the guidance about it (VK-07).
+const links = [
+  ...(tool?.toolUrl ? [{ label: `Åpne ${tool.name}`, url: tool.toolUrl }] : []),
+  ...(tool?.resources ?? []).map(({ label, url }) => ({ label, url })),
+]
 ---
 
 <Layout title={tool ? `${tool.name} — ilag` : 'Fant ikke verktøyet — ilag'} wide current={tool?.name}>
@@ -20,14 +25,6 @@ const resources = tool?.resources ?? []
               {tool.name}
             </h1>
             <p class="ds-paragraph description">{tool.description}</p>
-            {/* A plain link, like the resources: it leaves ilag (VK-08). */}
-            {tool.toolUrl && (
-              <p class="ds-paragraph">
-                <a class="ds-link" href={tool.toolUrl}>
-                  Åpne verktøyet
-                </a>
-              </p>
-            )}
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">
@@ -50,12 +47,12 @@ const resources = tool?.resources ?? []
               <h2 class="ds-heading" data-size="sm">
                 Ressurser
               </h2>
-              {resources.length ? (
+              {links.length ? (
                 <ul class="resources">
-                  {resources.map((resource) => (
+                  {links.map((link) => (
                     <li>
-                      <a class="ds-link" href={resource.url}>
-                        {resource.label}
+                      <a class="ds-link" href={link.url}>
+                        {link.label}
                       </a>
                     </li>
                   ))}
