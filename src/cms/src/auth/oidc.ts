@@ -98,6 +98,22 @@ const redirect = (location: string, cookies: string[] = []) => {
 const loginFailed = (provider: OidcProvider, cookies: string[] = []) =>
   redirect(`${webURL}/logg-inn?feil=${encodeURIComponent(provider.id)}`, cookies)
 
+// The active person with the user's email, if there is exactly one. Email
+// isn't unique among people: a contractor who becomes an employee keeps the
+// address, and the old person is closed.
+async function personWithEmail(req: PayloadRequest, email: string): Promise<number | undefined> {
+  const { docs } = await req.payload.find({
+    collection: 'personer',
+    where: { email: { equals: email.toLowerCase() }, active: { equals: true } },
+    limit: 2,
+    depth: 0,
+    req,
+  })
+  return docs.length === 1 ? docs[0]!.id : undefined
+}
+
+const idOf = (value: User['person']) => (typeof value === 'object' && value ? value.id : value)
+
 // Finds the user the provider identified, by the provider's ID for them.
 // Someone logging in for the first time is matched on email, so an existing
 // account (such as an administrator's) gets the identity added, or a new user
@@ -116,6 +132,10 @@ async function findOrCreateUser(
       ([, value]) => value !== undefined,
     ),
   ) as Pick<User, 'firstName' | 'lastName'>
+  // The person is linked again on every login, so the link follows the email.
+  // Without a match, a link an administrator set is kept.
+  const person = await personWithEmail(req, identity.email)
+  const linkedPerson = person === undefined ? {} : { person }
 
   const { docs: linked } = await payload.find({
     collection: COLLECTION,
@@ -125,8 +145,13 @@ async function findOrCreateUser(
   })
   const user = linked.find(hasIdentity)
   if (user) {
-    const data = { email: identity.email, ...names }
-    if (Object.entries(data).every(([key, value]) => user[key as keyof User] === value)) return user
+    const data = { email: identity.email, ...names, ...linkedPerson }
+    if (
+      Object.entries(data).every(([key, value]) =>
+        key === 'person' ? idOf(user.person) === value : user[key as keyof User] === value,
+      )
+    )
+      return user
     return payload.update({
       collection: COLLECTION,
       id: user.id,
@@ -149,6 +174,7 @@ async function findOrCreateUser(
       id: byEmail[0].id,
       data: {
         ...names,
+        ...linkedPerson,
         identities: [...(byEmail[0].identities ?? []), newIdentity],
       },
       depth: 0,
@@ -161,6 +187,7 @@ async function findOrCreateUser(
     data: {
       email: identity.email,
       ...names,
+      ...linkedPerson,
       identities: [newIdentity],
       // Payload requires a password. Nobody knows this one, so the user can
       // only use the password login (NF-12) if an administrator sets one.

@@ -470,7 +470,9 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Team** – jobber sammen om leveranser. Har én teamtype.
 
-- **Teamtype** – type team, med navn og kjennetegn (jf. TK-01): prosjektteam, støtteteam, leveranseteam, produktteam og fagnettverk. Teamtypene vedlikeholdes i ilag av en administrator.
+- **Teamtype** – type team, med navn, kjennetegn (jf. TK-01) og hva som må på plass for teamtypen (jf. TK-04): prosjektteam, støtteteam, leveranseteam, produktteam og fagnettverk. Teamtypene vedlikeholdes i ilag av en administrator.
+
+- **Veiviserspørsmål** – et spørsmål i veiviseren for teamtype (jf. TK-03), med forklaring, punkter å vurdere og svar. Hvert svar leder til et nytt spørsmål, til en teamtype, eller avslutter veiviseren med svaret som råd. Ett spørsmål er startspørsmålet. Spørsmålene vedlikeholdes i ilag av en administrator.
 
 - **Teammedlemskap** – at en person er med i et team, og hvilke roller personen har i teamet. En person har høyst ett medlemskap per team, med én eller flere roller.
 
@@ -504,6 +506,7 @@ Den logiske datamodell viser entitetene og relasjonene imellom dem, samt hva rel
 ```mermaid
 erDiagram
     Verktoy["Verktøy"]
+    Veiviserspormal["Veiviserspørsmål"]
 
     Enhet }o--o| Enhet : "hører til"
     Lokasjon ||--|{ Person : "hører til"
@@ -512,6 +515,8 @@ erDiagram
     Team ||--o{ Teammedlemskap : "har"
     Teamtype ||--o{ Team : "har"
     Rolle }o--o{ Teamtype : "er relevant for"
+    Veiviserspormal }o--o{ Veiviserspormal : "leder til"
+    Veiviserspormal }o--o{ Teamtype : "leder til"
     Teammedlemskap }o--|{ Rolle : "med"
     Rolle }o--o{ Prinsipp : "hører til"
     Prinsipp }o--o{ Enhet : "hører til"

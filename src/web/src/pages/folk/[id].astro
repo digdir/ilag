@@ -15,11 +15,8 @@ if (!person) Astro.response.status = 404
   only the person, their team leads and owners and their manager may see it
   (AL-04), and it awaits a privacy assessment.
 -->
-<Layout title={person ? `${person.name} — ilag` : 'Fant ikke personen — ilag'} wide>
+<Layout title={person ? `${person.name} — ilag` : 'Fant ikke personen — ilag'} wide current={person?.name}>
   <div class="page">
-    <p class="ds-paragraph">
-      <a class="ds-link" href="/folk">Tilbake til Folk</a>
-    </p>
     {
       person ? (
         <>

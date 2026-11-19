@@ -2,6 +2,14 @@ import { authHeaders, PayloadSDKError, type Role, sdk } from '@ilag/shared'
 
 import type { RoleWithTypes } from '../../types/role'
 
+// The codes of the roles the pages pick out, such as the team's owner. The
+// same codes as ROLE_CODES in the CMS (access/teamEditor.ts); the names are
+// for people and can change.
+export const ROLE_CODES = {
+  teamOwner: 'teameier',
+  teamLead: 'teamleder',
+} as const
+
 // The role queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. Depth 1 brings each role's team types;
 // `populate` keeps only their names, not the roles they join back to.

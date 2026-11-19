@@ -15,6 +15,7 @@ import { Units } from './collections/Units'
 import { Roles } from './collections/Roles'
 import { Teams } from './collections/Teams'
 import { TeamTypes } from './collections/TeamTypes'
+import { TeamTypeWizard } from './collections/TeamTypeWizard'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { ImportRuns } from './collections/ImportRuns'
 import { isAdmin } from './access/isAdmin'
@@ -36,6 +37,25 @@ export default buildConfig({
     },
     components: {
       afterLogin: ['/components/ProviderLoginButtons#ProviderLoginButtons'],
+      actions: ['/components/GoToWebsite#GoToWebsite'],
+    },
+    // Teameiere and teamledere see only their own teams on the dashboard
+    // (TO-08, RO-06); administrators see Payload's cards for all collections.
+    // Each user can change their own layout, which Payload then keeps.
+    dashboard: {
+      widgets: [
+        {
+          slug: 'my-teams',
+          Component: '/components/MyTeams#MyTeams',
+          label: { nb: 'Dine team', en: 'Your teams' },
+          minWidth: 'full',
+        },
+      ],
+      defaultLayout: ({ req }) =>
+        isAdmin(req.user) ? [{ widgetSlug: 'collections', width: 'full' }] : [{ widgetSlug: 'my-teams', width: 'full' }],
+    },
+    meta: {
+      titleSuffix: ' – ilag',
     },
   },
   // The admin panel uses the language a user picked under Account. Otherwise
@@ -45,7 +65,7 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, Teams, TeamMemberships, ImportRuns],
+  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, TeamTypeWizard, Teams, TeamMemberships, ImportRuns],
   // The imports from the authoritative source (ADR-0003). Only administrators
   // may queue, run or cancel jobs through the API; the import endpoints queue
   // them through the Local API.

@@ -11,6 +11,11 @@ USER root
 # and resolves short image names such as `postgres:17-alpine` on Docker Hub, as Docker does.
 RUN agent-feature install containers
 
+# The desktop feature, with the browser feature it requires: an X11 desktop on display :1 with a VNC server and a noVNC
+# viewer, the `desktop` helper for screenshots, input and recordings, and Chromium with playwright-cli. Its VNC units
+# stay off until agent.yaml declares `access: [{type: vnc}]`, which lets the developer watch and share the desktop.
+RUN agent-feature install desktop
+
 ARG PNPM_VERSION=12.11.2
 
 # Agent Sandboxes mount their CA bundle here; this step's Node downloads trust it. HOME is /home/agent in every stage,
@@ -24,8 +29,9 @@ RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
     && rm -rf "${scratch}" /tmp/node-compile-cache
 
 # The system libraries Playwright's Chromium needs for `pnpm test:e2e`, as CI installs them with `--with-deps`.
-# Without them the browser fails to start (libnspr4.so missing). Only the libraries: the browser itself goes in
-# /home/agent/.cache, so the agent installs it per checkout with `pnpm --filter cms exec playwright install chromium`.
+# Without them the browser fails to start (libnspr4.so missing). Only the libraries: the agent installs the browser
+# per checkout with `pnpm --filter cms exec playwright install chromium`, into PLAYWRIGHT_BROWSERS_PATH below, which the
+# browser feature shares with its own pinned Chromium.
 # Keep the version in step with @playwright/test in src/cms/package.json.
 ARG PLAYWRIGHT_VERSION=1.64.1
 RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
@@ -49,3 +55,11 @@ COPY workspace.list /etc/agent-workspace.d/ilag.list
 RUN agent-image-check
 
 USER agent
+
+# What the browser and desktop features need set, as `agent-feature env browser desktop` prints it.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+ENV DISPLAY=:1
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+ENV ACCESSIBILITY_ENABLED=1
+ENV PLAYWRIGHT_MCP_EXECUTABLE_PATH=/usr/local/libexec/agent-playwright-chromium
+ENV XDG_CURRENT_DESKTOP=X-Openbox:XFCE
