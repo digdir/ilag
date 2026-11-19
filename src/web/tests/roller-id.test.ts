@@ -38,6 +38,9 @@ describe('role page', () => {
     for (const label of ['Rolle', 'Ansvar', 'Myndighet', 'Oppgaver']) {
       expect(html).toMatch(new RegExp(`<h2[^>]*>\\s*${label}\\s*</h2>`))
     }
+    // Each part of RAMO in its own card, as on the other detail pages.
+    const cards = [...html.matchAll(/<section class="ds-card"[^>]*>\s*<h2[^>]*>\s*(\S+)\s*<\/h2>/g)]
+    expect(cards.map((match) => match[1])).toEqual(['Rolle', 'Ansvar', 'Myndighet', 'Oppgaver'])
     expect(html).toContain('Definere mål og forventninger.\nTett dialog med teamleder.')
     expect(trail(html)).toEqual([
       ['Roller', '/organisering/roller'],
