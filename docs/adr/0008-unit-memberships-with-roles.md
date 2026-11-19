@@ -1,7 +1,7 @@
 # ADR-0008: Unit memberships with roles
 
 - **Status:** Proposed
-- **Requirements:** FO-02, LO-02, LO-03, RO-01, RO-03, NF-07
+- **Requirements:** FO-02, LO-02, LO-03, RO-01, RO-03, RO-06, TO-03, NF-07
 - **Related:** [ADR-0003](0003-imports-from-the-authoritative-source.md),
   [ADR-0005](0005-team-editors-use-the-admin-panel.md)
 
@@ -142,7 +142,12 @@ for now. Open question 6 may change that.
    - The picker on each kind of membership offers only matching roles, and
      saving a membership with a role that doesn't match is refused.
      Administrators maintain both links in Roller (RO-07).
-6. **People and units read memberships through joins**, as people read team
+6. **A new team membership gets the role Teammedlem by default**, found by
+   its code, `teammedlem`, as Medarbeider is in units. Whoever adds the person
+   may change it (TO-03, RO-06). The default is only given when Teammedlem is
+   linked to the team's type (decision 5). Today that is every type except
+   Prosjektteam. In a prosjektteam the roles start empty and have to be chosen.
+7. **People and units read memberships through joins**, as people read team
    memberships today. `personer.units` becomes a join on `enhetsmedlemskap`,
    and `enheter.people` a join on the same collection. The frontend reads the
    unit through the membership, in Folk, the person page, the team page and the
@@ -171,9 +176,6 @@ for now. Open question 6 may change that.
   membership disappear when the person leaves the unit in the source. If they
   come back, they get Medarbeider again, and any other role has to be set
   again.
-- Medarbeider is the default only in units. It is not linked to any team
-  type, so team memberships keep having their roles chosen when the person is
-  added (TO-03).
 - If the source later gives leaders or roles (open question 6), the import can
   set them on its own memberships without changing the model.
 - The specification changes with the implementation, in its own commit with
