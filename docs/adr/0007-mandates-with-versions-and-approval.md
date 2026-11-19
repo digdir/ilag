@@ -1,4 +1,4 @@
-# ADR-0006: Mandates as a versioned collection with approval
+# ADR-0007: Mandates as a versioned collection with approval
 
 - **Status:** Proposed
 - **Requirements:** TO-04, TO-09, TO-10, TO-16, TO-17, LO-02, LO-03, LO-04
