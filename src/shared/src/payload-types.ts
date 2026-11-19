@@ -74,6 +74,7 @@ export interface Config {
     enheter: Unit;
     roller: Role;
     teamtyper: TeamType;
+    'teamtype-veiviser': TeamTypeWizardQuestion;
     team: Team;
     teammedlemskap: TeamMembership;
     mandater: Mandate;
@@ -112,6 +113,7 @@ export interface Config {
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
+    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     mandater: MandaterSelect<false> | MandaterSelect<true>;
@@ -134,6 +136,7 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'my-teams': MyTeamsWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -177,6 +180,10 @@ export interface User {
   firstName?: string | null;
   lastName?: string | null;
   roles?: ('admin' | 'integration')[] | null;
+  /**
+   * Settes ved innlogging fra personen med samme e-post.
+   */
+  person?: (number | null) | Person;
   identities?:
     | {
         provider: 'entra';
@@ -207,25 +214,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'brukere';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medier".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -392,6 +380,10 @@ export interface TeamType {
   id: number;
   name: string;
   description?: string | null;
+  /**
+   * Vist som en punktliste. Ett punkt per linje.
+   */
+  requirements?: string | null;
   roles?: {
     docs?: (number | Role)[];
     hasNextPage?: boolean;
@@ -407,6 +399,10 @@ export interface TeamType {
 export interface Role {
   id: number;
   name: string;
+  /**
+   * Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.
+   */
+  code?: string | null;
   role?: string | null;
   responsibility?: string | null;
   authority?: string | null;
@@ -423,7 +419,63 @@ export interface TeamMembership {
   id: number;
   team: number | Team;
   person: number | Person;
+  personName?: string | null;
   roles: (number | Role)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medier".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser".
+ */
+export interface TeamTypeWizardQuestion {
+  id: number;
+  title: string;
+  /**
+   * Veiviseren begynner her.
+   */
+  isStart?: boolean | null;
+  intro?: string | null;
+  /**
+   * Ett punkt per linje.
+   */
+  considerations?: string | null;
+  answers: {
+    label: string;
+    hint?: string | null;
+    /**
+     * Et nytt spørsmål eller en teamtype. La stå tomt hvis svaret avslutter veiviseren; da vises svaret og forklaringen som råd.
+     */
+    leadsTo?:
+      | ({
+          relationTo: 'teamtype-veiviser';
+          value: number | TeamTypeWizardQuestion;
+        } | null)
+      | ({
+          relationTo: 'teamtyper';
+          value: number | TeamType;
+        } | null);
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -615,6 +667,10 @@ export interface PayloadLockedDocument {
         value: number | TeamType;
       } | null)
     | ({
+        relationTo: 'teamtype-veiviser';
+        value: number | TeamTypeWizardQuestion;
+      } | null)
+    | ({
         relationTo: 'team';
         value: number | Team;
       } | null)
@@ -680,6 +736,7 @@ export interface BrukereSelect<T extends boolean = true> {
   firstName?: T;
   lastName?: T;
   roles?: T;
+  person?: T;
   identities?:
     | T
     | {
@@ -790,6 +847,7 @@ export interface EnheterSelect<T extends boolean = true> {
  */
 export interface RollerSelect<T extends boolean = true> {
   name?: T;
+  code?: T;
   role?: T;
   responsibility?: T;
   authority?: T;
@@ -805,7 +863,28 @@ export interface RollerSelect<T extends boolean = true> {
 export interface TeamtyperSelect<T extends boolean = true> {
   name?: T;
   description?: T;
+  requirements?: T;
   roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser_select".
+ */
+export interface TeamtypeVeiviserSelect<T extends boolean = true> {
+  title?: T;
+  isStart?: T;
+  intro?: T;
+  considerations?: T;
+  answers?:
+    | T
+    | {
+        label?: T;
+        hint?: T;
+        leadsTo?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -830,6 +909,7 @@ export interface TeamSelect<T extends boolean = true> {
 export interface TeammedlemskapSelect<T extends boolean = true> {
   team?: T;
   person?: T;
+  personName?: T;
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -976,6 +1056,16 @@ export interface PayloadJobsStatsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "my-teams_widget".
+ */
+export interface MyTeamsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

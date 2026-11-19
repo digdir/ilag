@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Unit from '../src/pages/organisering/linjeorganisasjon/[id].astro'
+import { backLink, trail } from './breadcrumbs'
 import { cookie, json } from './teams'
 
 const render = async (id: string) => {
@@ -92,6 +93,8 @@ describe('unit page', () => {
     expect(unit.auth).toBe('JWT visitor-token')
     expect(found.auth).toBe('JWT visitor-token')
     expect(unit.url.searchParams.get('populate[personer][email]')).toBe('true')
+    expect(unit.url.searchParams.get('populate[enheter][parent]')).toBe('true')
+    expect(Number(unit.url.searchParams.get('depth'))).toBeGreaterThanOrEqual(4)
     expect(found.url.searchParams.get('where[units][in][0]')).toBe('2')
     expect(found.url.searchParams.get('where[active][equals]')).toBe('true')
     const under = calls.find((c) => c.url.pathname === '/api/enheter')!
@@ -109,8 +112,12 @@ describe('unit page', () => {
     expect(res.status).toBe(200)
     expect(html).toContain('FEL · Divisjon')
     expect(html).toMatch(/<h1[^>]*>\s*Fellesløsninger\s*<\/h1>/)
-    expect(html).toContain('href="/organisering/linjeorganisasjon"')
-    expect(html).toMatch(/href="\/organisering\/linjeorganisasjon\/1"[^>]*>\s*Digitaliseringsdirektoratet/)
+    expect(trail(html)).toEqual([
+      ['Linjeorganisasjon', '/organisering/linjeorganisasjon'],
+      ['Digitaliseringsdirektoratet', '/organisering/linjeorganisasjon/1'],
+      ['Fellesløsninger', '/organisering/linjeorganisasjon/2'],
+    ])
+    expect(backLink(html)).toEqual(['Digitaliseringsdirektoratet', '/organisering/linjeorganisasjon/1'])
     expect(html).not.toContain('Bistår og rådgir hele Digdir')
   })
 
@@ -229,6 +236,34 @@ describe('unit page', () => {
     expect(await (await render('2')).text()).toContain('Bistår og rådgir hele Digdir')
   })
 
+  it('shows every unit above it in the breadcrumbs, from the directorate down', async () => {
+    const digdir = { id: 1, name: 'Digitaliseringsdirektoratet', parent: null }
+    const division = { id: 2, name: 'Fellesløsninger', parent: digdir }
+    const department = { id: 3, name: 'FEL - Utvikling', parent: division }
+    vi.stubGlobal('fetch', cms({ ...fel, id: 9, name: 'Team Plattform', level: 'section', parent: department }))
+
+    const html = await (await render('9')).text()
+
+    expect(trail(html).map(([label]) => label)).toEqual([
+      'Linjeorganisasjon',
+      'Digitaliseringsdirektoratet',
+      'Fellesløsninger',
+      'FEL - Utvikling',
+      'Team Plattform',
+    ])
+    expect(backLink(html)).toEqual(['FEL - Utvikling', '/organisering/linjeorganisasjon/3'])
+  })
+
+  it('stops the breadcrumbs at a unit above that the visitor may not see', async () => {
+    // Payload leaves the id where it would not populate the unit.
+    const division = { id: 2, name: 'Fellesløsninger', parent: 1 }
+    vi.stubGlobal('fetch', cms({ ...fel, id: 3, name: 'FEL - Utvikling', level: 'department', parent: division }))
+
+    const html = await (await render('3')).text()
+
+    expect(trail(html).map(([label]) => label)).toEqual(['Linjeorganisasjon', 'Fellesløsninger', 'FEL - Utvikling'])
+  })
+
   it('answers 404 when the CMS has no such unit, or it is closed', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string) =>
       new URL(url).pathname.startsWith('/api/enheter/')
@@ -237,7 +272,9 @@ describe('unit page', () => {
     ))
     let res = await render('99999')
     expect(res.status).toBe(404)
-    expect(await res.text()).toContain('Fant ikke enheten')
+    const html = await res.text()
+    expect(html).toContain('Fant ikke enheten')
+    expect(backLink(html)).toEqual(['Linjeorganisasjon', '/organisering/linjeorganisasjon'])
 
     vi.stubGlobal('fetch', cms({ ...fel, active: false }))
     res = await render('2')

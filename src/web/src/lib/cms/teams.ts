@@ -38,7 +38,7 @@ export async function getTeam(id: string, cookie: string | null): Promise<TeamWi
           team: { name: true },
           teamtyper: { name: true },
           personer: { fullName: true, active: true, location: true, units: true },
-          roller: { name: true },
+          roller: { name: true, code: true },
           lokasjoner: { name: true },
           enheter: { name: true },
         },
@@ -52,9 +52,9 @@ export async function getTeam(id: string, cookie: string | null): Promise<TeamWi
   }
 }
 
-/** The names of the members with a role, such as «Teamleder». */
-export const withRole = (members: Member[], role: string) =>
-  members.filter((m) => m.roles.includes(role)).map((m) => m.name)
+/** The names of the members with a role, by its code (ROLE_CODES). */
+export const withRole = (members: Member[], code: string) =>
+  members.filter((m) => m.roleCodes.includes(code)).map((m) => m.name)
 
 // The generated types allow a relationship to be either the document or just
 // its ID, whatever depth was asked for, so the IDs are left out.
@@ -73,6 +73,7 @@ const toMember = ({ id, person, roles }: TeamMembership): Member => ({
   personId: typeof person === 'object' && person.active ? person.id : null,
   name: typeof person === 'object' ? (person.fullName ?? '') : '',
   roles: roles.flatMap((r) => (typeof r === 'object' ? [r.name] : [])),
+  roleCodes: roles.flatMap((r) => (typeof r === 'object' && r.code ? [r.code] : [])),
   location:
     typeof person === 'object' && typeof person.location === 'object'
       ? (person.location?.name ?? null)

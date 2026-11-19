@@ -1,4 +1,4 @@
-import { getPayload, type Payload } from 'payload'
+import { createLocalReq, getPayload, type Payload } from 'payload'
 import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -6,7 +6,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { User } from '@/payload-types'
 
 // Everyone in Digdir can log in, so only administrators manage users and
-// media, and the admin panel is for administrators only.
+// media. The admin panel is for administrators, and for team editors
+// (teamEditors.int.spec.ts).
 
 let payload: Payload
 let admin: User
@@ -34,12 +35,12 @@ describe('Users', () => {
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 
-  it('lets only administrators into the admin panel', async () => {
+  it('keeps employees who edit no team out of the admin panel', async () => {
     const access = payload.collections.brukere.config.access.admin!
-    const req = (user: User) => ({ req: { user: { ...user, collection: 'brukere' } } }) as never
+    const req = async (user: User) => ({ req: await createLocalReq({ user: { ...user, collection: 'brukere' } }, payload) })
 
-    expect(await access(req(admin))).toBe(true)
-    expect(await access(req(employee))).toBe(false)
+    expect(await access(await req(admin))).toBe(true)
+    expect(await access(await req(employee))).toBe(false)
   })
 
   it('lets an employee read only their own user', async () => {

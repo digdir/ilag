@@ -50,6 +50,8 @@ spec:
       login: default
   access:
     - type: ssh
+    # The desktop over VNC, and in a browser through noVNC, so the developer can watch or share it.
+    - type: vnc
   # All traffic passes through the host's network mediator. Narrow `allow` once the traffic is known.
   network:
     mode: mediated

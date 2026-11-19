@@ -103,6 +103,11 @@ export const levelLabels: Record<Unit['level'], string> = {
   section: 'Seksjon',
 }
 
+// How many units above a unit the page fetches: each level of depth populates
+// one more parent. The deepest unit today is a section, three below the
+// directorate; the rest is room to grow.
+const MAX_DEPTH = 5
+
 // What the unit page shows of a person.
 const contact = { fullName: true, title: true, email: true, mobile: true, active: true } as const
 
@@ -130,8 +135,10 @@ export async function getUnit(id: string, cookie: string | null): Promise<UnitDe
             advisesAllOfDigdir: true,
             active: true,
           },
-          populate: { enheter: { name: true }, personer: contact },
-          depth: 1,
+          // The parent's own parent, and so on up to the directorate, for the
+          // breadcrumbs.
+          populate: { enheter: { name: true, parent: true }, personer: contact },
+          depth: MAX_DEPTH,
         },
         { headers },
       ),
@@ -197,10 +204,16 @@ export function toDetail(
 ): UnitDetail {
   const leader =
     typeof unit.leader === 'object' && unit.leader?.active ? toPerson(unit.leader) : null
-  const parent =
-    typeof unit.parent === 'object' && unit.parent
-      ? { id: unit.parent.id, name: unit.parent.name }
-      : null
+  // Follow the populated parents up to the directorate, or until one is not
+  // populated (the visitor may not see it) or the chain loops.
+  const ancestors: { id: number; name: string }[] = []
+  const seen = new Set([unit.id])
+  let above = unit.parent
+  while (typeof above === 'object' && above && !seen.has(above.id)) {
+    seen.add(above.id)
+    ancestors.unshift({ id: above.id, name: above.name })
+    above = above.parent
+  }
   return {
     id: unit.id,
     name: unit.name,
@@ -211,7 +224,7 @@ export function toDetail(
       .split(/\n\s*\n/)
       .map((p) => p.trim())
       .filter(Boolean),
-    parent,
+    ancestors,
     advisesAllOfDigdir: unit.advisesAllOfDigdir,
     leader,
     employees: people

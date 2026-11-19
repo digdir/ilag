@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import Role from '../src/pages/organisering/roller/[id].astro'
 import { linjeleder, teameier } from './roles'
 import { cookie, json } from './teams'
+import { backLink, trail } from './breadcrumbs'
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
@@ -36,7 +37,18 @@ describe('role page', () => {
       expect(html).toMatch(new RegExp(`<h2[^>]*>\\s*${label}\\s*</h2>`))
     }
     expect(html).toContain('Definere mål og forventninger.\nTett dialog med teamleder.')
-    expect(html).toContain('href="/organisering/roller"')
+    expect(trail(html)).toEqual([
+      ['Roller', '/organisering/roller'],
+      ['Teameier', '/organisering/roller/1'],
+    ])
+  })
+
+  it('lines up with the other pages, in the wide column', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(teameier)))
+
+    const html = await (await render('1')).text()
+
+    expect(html).toMatch(/<main[^>]*class="wide[^"]*"/)
   })
 
   it('shows only the parts of RAMO that are written', async () => {
@@ -61,7 +73,9 @@ describe('role page', () => {
     const res = await render('99')
 
     expect(res.status).toBe(404)
-    expect(await res.text()).toContain('Fant ikke rollen')
+    const html = await res.text()
+    expect(html).toContain('Fant ikke rollen')
+    expect(backLink(html)).toEqual(['Roller', '/organisering/roller'])
   })
 
   it('answers 404 without asking the CMS when the id is not a number', async () => {

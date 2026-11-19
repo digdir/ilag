@@ -148,6 +148,12 @@ change the files, not the collections, and keep them in step with the contracts.
   admin panel and the REST/GraphQL API, and an English `dbName` for the table:
   `slug: 'lokasjoner', dbName: 'locations'`. Field names and the TypeScript
   interface (`typescript.interface`) stay in English.
+- Put small functions that can be reused and don't depend on a collection in
+  `src/cms/src/utils/`, one file per topic (such as `codes.ts` for making and
+  checking codes), not in the collection config. Hooks, validation messages and
+  access functions tied to one collection's fields stay with that collection;
+  access helpers go in `src/cms/src/access/`. Check `utils/` before writing a
+  helper that may already exist, and avoid a catch-all `utils.ts`.
 - `.env` files are per machine and never committed. `PAYLOAD_SECRET` is generated
   per environment; changing it logs everyone out and makes encrypted values and
   API keys unreadable.

@@ -3,12 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Team from '../src/pages/organisering/team/[id].astro'
 import { cookie, json, nettverk, skjemabygger } from './teams'
+import { backLink, trail } from './breadcrumbs'
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
   return container.renderToResponse(Team, {
     params: { id },
-    request: new Request(`http://localhost/team/${id}`, { headers: { cookie } }),
+    request: new Request(`http://localhost/organisering/team/${id}`, { headers: { cookie } }),
   })
 }
 
@@ -31,7 +32,10 @@ describe('team page', () => {
     expect(html).toContain('Team Skjemabygger')
     expect(html).toContain('Produktteam')
     expect(html).toContain('Teamleder, Produkteier')
-    expect(html).toContain('href="/organisering/team"')
+    expect(trail(html)).toEqual([
+      ['Team', '/organisering/team'],
+      ['Team Skjemabygger', '/organisering/team/7'],
+    ])
   })
 
   it('TO-03: shows the team owner in a box of their own, with location and unit', async () => {
@@ -46,12 +50,35 @@ describe('team page', () => {
     expect(owner).toContain('Organisasjonslæring')
   })
 
+  it('TO-03: finds the team owner by the role\'s code, whatever the role is called', async () => {
+    const renamed = {
+      ...skjemabygger,
+      members: {
+        docs: [
+          { id: 9, person: { id: 9, fullName: 'Kari Nordmann' }, roles: [{ id: 1, name: 'Eier', code: 'teameier' }] },
+          { id: 10, person: { id: 10, fullName: 'Ola Nordmann' }, roles: [{ id: 2, name: 'Teameier', code: 'annet' }] },
+        ],
+      },
+    }
+    vi.stubGlobal('fetch', vi.fn(async () => json(renamed)))
+
+    const [owner, members] = (await (await render('7')).text()).split('Hvem er vi?</h2>')
+
+    expect(owner).toContain('Kari Nordmann')
+    expect(owner).not.toContain('Ola Nordmann')
+    expect(members).toContain('Ola Nordmann')
+  })
+
   it('says when the owner has no location or unit, or there is no owner', async () => {
     const withOwner = {
       ...skjemabygger,
       members: {
         docs: [
-          { id: 9, person: { id: 9, fullName: 'Kari Nordmann' }, roles: [{ id: 1, name: 'Teameier' }] },
+          {
+            id: 9,
+            person: { id: 9, fullName: 'Kari Nordmann' },
+            roles: [{ id: 1, name: 'Teameier', code: 'teameier' }],
+          },
         ],
       },
     }
@@ -106,7 +133,9 @@ describe('team page', () => {
     const res = await render('99999')
 
     expect(res.status).toBe(404)
-    expect(await res.text()).toContain('Fant ikke teamet')
+    const html = await res.text()
+    expect(html).toContain('Fant ikke teamet')
+    expect(backLink(html)).toEqual(['Team', '/organisering/team'])
   })
 
   it('answers 404 without asking the CMS when the id is not a number', async () => {

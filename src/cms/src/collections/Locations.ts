@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 
 // Offices. Administrators register them in the admin panel; the source has
@@ -17,6 +18,8 @@ export const Locations: CollectionConfig = {
     interface: 'Location',
   },
   admin: {
+    // Team editors only see their teams in the admin panel.
+    hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name', 'code'],
   },

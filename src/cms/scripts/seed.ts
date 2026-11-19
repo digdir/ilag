@@ -28,6 +28,7 @@ type Slug =
   | 'personer'
   | 'roller'
   | 'teamtyper'
+  | 'teamtype-veiviser'
   | 'team'
   | 'teammedlemskap'
   | 'mandater'
@@ -146,9 +147,38 @@ const seed = async (payload: Payload) => {
     teamTypeIds.set(teamType.name, id)
   }
 
+  // The team type wizard's questions, leaves first, so each answer's
+  // question exists when it is created.
+  const questionIds = new Map<string, number>()
+  for (const { key, answers, ...question } of data.wizardQuestions) {
+    let id = await findId(payload, 'teamtype-veiviser', { title: { equals: question.title } })
+    if (!id) {
+      const data = {
+        ...question,
+        answers: answers.map(({ to, ...answer }) => ({
+          ...answer,
+          leadsTo: !to
+            ? null
+            : 'question' in to
+              ? { relationTo: 'teamtype-veiviser' as const, value: questionIds.get(to.question)! }
+              : { relationTo: 'teamtyper' as const, value: teamTypeIds.get(to.teamType)! },
+        })),
+      }
+      id = (await payload.create({ collection: 'teamtype-veiviser', data })).id
+      count('teamtype-veiviser')
+    }
+    questionIds.set(key, id)
+  }
+
   const roleIds = new Map<string, number>()
   for (const role of data.roles) {
-    let id = await findId(payload, 'roller', { name: { equals: role.name } })
+    let id = await findId(payload, 'roller', { code: { equals: role.code } })
+    // A role seeded before roles had codes gets its code.
+    const uncoded = !id && (await findId(payload, 'roller', { name: { equals: role.name }, code: { exists: false } }))
+    if (uncoded) {
+      await payload.update({ collection: 'roller', id: uncoded, data: { code: role.code } })
+      id = uncoded
+    }
     if (!id) {
       const { teamTypes, ...fields } = role
       id = (
@@ -219,6 +249,18 @@ const seed = async (payload: Payload) => {
     count('mandater')
   }
 
+  // Users for some of the people, to try the admin panel as a team editor or
+  // as someone who may not edit, linked the way an Entra ID login links them.
+  for (const { person, email } of data.users) {
+    if (!(await findId(payload, 'brukere', { email: { equals: email } }))) {
+      await payload.create({
+        collection: 'brukere',
+        data: { email, password: ADMIN.password, person: personIds.get(person) },
+      })
+      count('brukere')
+    }
+  }
+
   return created
 }
 
@@ -234,7 +276,8 @@ const removeSeed = async (payload: Payload) => {
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
-    ['roller', { name: { in: data.roles.map((r) => r.name) } }],
+    ['roller', { code: { in: data.roles.map((r) => r.code) } }],
+    ['teamtype-veiviser', { title: { in: data.wizardQuestions.map((q) => q.title) } }],
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.
@@ -243,7 +286,7 @@ const removeSeed = async (payload: Payload) => {
     ),
     ['lokasjoner', { code: { in: data.locations.map((l) => l.code) } }],
     ['importkjoringer', { 'sender.email': { equals: ADMIN.email } }],
-    ['brukere', { email: { equals: ADMIN.email } }],
+    ['brukere', { email: { in: [ADMIN.email, ...data.users.map((u) => u.email)] } }],
   ]
   for (const [collection, where] of deletes) {
     const { docs, errors } = await payload.delete({ collection, where })
@@ -267,6 +310,7 @@ if (command !== 'clear') {
   const summary = Object.entries(created).map(([collection, n]) => `${n} ${collection}`)
   console.log(summary.length ? `Created ${summary.join(', ')}.` : 'Nothing else to create; the test data is already there.')
   console.log(`Log in to the admin panel as ${ADMIN.email} with the password «${ADMIN.password}».`)
+  for (const { email, description } of data.users) console.log(`  ${email}: ${description}, same password.`)
 }
 
 await payload.destroy()
