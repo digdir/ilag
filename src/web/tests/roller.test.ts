@@ -101,8 +101,8 @@ describe('roles page', () => {
     expect(html).toMatch(/value checked[^>]*>\s*Alle/)
     expect(html).toMatch(/value="1"[^>]*>\s*Produktteam/)
     expect(html).toMatch(/value="none"[^>]*>\s*Andre roller/)
-    expect(html).toContain('data-search="teameier" data-filter="3 1 4"')
-    expect(html).toContain('data-search="linjeleder" data-filter="none"')
+    expect(html).toContain('data-search="teameier" data-filter-type="3 1 4"')
+    expect(html).toContain('data-search="linjeleder" data-filter-type="none"')
     expect(html).toContain('Ingen roller passer søket.')
   })
 

@@ -127,6 +127,23 @@ describe('team page', () => {
     expect(await (await render('8')).text()).toContain('Ingen medlemmer registrert ennå.')
   })
 
+  it('TO-07: lists the tools the team uses by name, linking to the toolbox', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(skjemabygger)))
+
+    const html = await (await render('7')).text()
+    const [, tools] = html.split('Verktøy teamet bruker</h2>')
+
+    expect(tools).toMatch(/href="\/verktoy\/verktoykasse\/1"[^>]*>\s*Figma/)
+    expect(tools).toMatch(/href="\/verktoy\/verktoykasse\/4"[^>]*>\s*OKR/)
+    expect(tools.indexOf('Figma')).toBeLessThan(tools.indexOf('OKR'))
+  })
+
+  it('TO-07: says so when the team has registered no tools', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(nettverk)))
+
+    expect(await (await render('8')).text()).toContain('Ingen verktøy registrert ennå.')
+  })
+
   it('answers 404 when the CMS has no such team', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json({ errors: [{ message: 'Not Found' }] }, 404)))
 

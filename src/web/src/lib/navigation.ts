@@ -45,7 +45,7 @@ export const NAV: NavGroup[] = [
     label: 'Verktøy',
     path: '/verktoy',
     pages: [
-      { label: 'Verktøykasse', href: '/verktoy/verktoykasse', built: false },
+      { label: 'Verktøykasse', href: '/verktoy/verktoykasse', built: true },
       { label: 'Begreper', href: '/verktoy/begreper', built: false },
       { label: 'Veiviser', href: '/verktoy/veiviser', built: true },
     ],

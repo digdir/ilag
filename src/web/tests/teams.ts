@@ -12,6 +12,10 @@ export const skjemabygger = {
   name: 'Team Skjemabygger',
   description: 'Utvikler og forvalter verktøyet for å lage digitale skjema.',
   teamType: { id: 1, name: 'Produktteam' },
+  tools: [
+    { id: 4, name: 'OKR', toolType: 'metode' },
+    { id: 1, name: 'Figma', toolType: 'verktoy' },
+  ],
   members: {
     docs: [
       membership(1, 'Magnus Johansen', ['Teameier'], {

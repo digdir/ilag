@@ -1,5 +1,7 @@
 import type { Team, TeamType } from '@ilag/shared'
 
+import type { ToolSummary } from './tool'
+
 // The shapes the team pages and components work with. src/lib/cms/teams.ts
 // builds them from Payload's generated types.
 
@@ -19,7 +21,9 @@ export type Member = {
   units: string[]
 }
 
-export type TeamWithMembers = Omit<Team, 'members' | 'teamType'> & {
+export type TeamWithMembers = Omit<Team, 'members' | 'teamType' | 'tools'> & {
   teamType: TeamType | null
   members: Member[]
+  /** The tools the team uses (TO-07), by name. */
+  tools: ToolSummary[]
 }

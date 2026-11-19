@@ -1,0 +1,136 @@
+---
+import Tag from '../../../components/Tag.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getTool } from '../../../lib/cms/tools'
+import { toolTypeLabel } from '../../../lib/tools'
+
+const tool = await getTool(Astro.params.id!, Astro.request.headers.get('cookie'))
+if (!tool) Astro.response.status = 404
+const resources = tool?.resources ?? []
+---
+
+<Layout title={tool ? `${tool.name} — ilag` : 'Fant ikke verktøyet — ilag'} wide current={tool?.name}>
+  <div class="page">
+    {
+      tool ? (
+        <>
+          <header>
+            <Tag>{toolTypeLabel(tool.toolType)}</Tag>
+            <h1 class="ds-heading" data-size="lg">
+              {tool.name}
+            </h1>
+            <p class="ds-paragraph description">{tool.description}</p>
+          </header>
+          <div class="sections">
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">
+                Passer for
+              </h2>
+              {tool.teamTypes.length ? (
+                <ul class="team-types">
+                  {tool.teamTypes.map((type) => (
+                    <li>
+                      <Tag>{type.name}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="ds-paragraph">Alle teamtyper</p>
+              )}
+            </section>
+            {/* The tool itself, where Digdir has a licence (VK-08). Only for
+                tools with a link, so most tools don't get an empty card. */}
+            {tool.toolUrl && (
+              <section class="ds-card" data-color="neutral">
+                <h2 class="ds-heading" data-size="sm">
+                  Lenke til verktøyet
+                </h2>
+                <p class="ds-paragraph">
+                  <a class="ds-link" href={tool.toolUrl}>
+                    Åpne {tool.name}
+                  </a>
+                </p>
+              </section>
+            )}
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">
+                Ressurser
+              </h2>
+              {resources.length ? (
+                <ul class="resources">
+                  {resources.map((resource) => (
+                    <li>
+                      <a class="ds-link" href={resource.url}>
+                        {resource.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="ds-paragraph">Ingen ressurser er lenket opp ennå.</p>
+              )}
+            </section>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 class="ds-heading" data-size="lg">Fant ikke verktøyet</h1>
+          <p class="ds-paragraph">Verktøyet finnes ikke, eller du har ikke tilgang til det.</p>
+        </>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  /* As on the team page: the header on the page, each part below in a card. */
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-8);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+    max-width: 48rem;
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  /* Designsystemet's card isn't a flex container, so it is made one here for
+     even space between the heading and what is under it. */
+  .ds-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .description {
+    text-wrap: pretty;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .team-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+
+  .resources {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+</style>

@@ -10,11 +10,14 @@ const [teams, types] = await Promise.all([getTeams(cookie), getTeamTypes(cookie)
 
 // Search by name and filter by type (TO-05), like the prototype's
 // «2 team av typen produktteam».
-const chips = {
-  legend: 'Teamtype',
-  options: types.map((type) => ({ value: String(type.id), label: type.name })),
-  countSuffix: 'av typen',
-}
+const chips = [
+  {
+    key: 'type',
+    legend: 'Teamtype',
+    options: types.map((type) => ({ value: String(type.id), label: type.name })),
+    countSuffix: 'av typen',
+  },
+]
 ---
 
 <Layout title="Teamoversikt — ilag" wide>
@@ -39,7 +42,7 @@ const chips = {
           />
           <ul class="teams" id="team">
             {teams.map((team) => (
-              <li data-search={team.name.toLowerCase()} data-filter={team.teamType?.id}>
+              <li data-search={team.name.toLowerCase()} data-filter-type={team.teamType?.id}>
                 <TeamCard team={team} />
               </li>
             ))}

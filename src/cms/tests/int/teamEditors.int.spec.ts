@@ -116,6 +116,7 @@ describe('Team editors', () => {
 
   afterAll(async () => {
     await payload.delete({ collection: 'team', where: { name: { like: prefix } } })
+    await payload.delete({ collection: 'verktoy', where: { name: { like: prefix } } })
     await payload.delete({ collection: 'roller', where: { name: { like: prefix } } })
     if (createdRoles.length) await payload.delete({ collection: 'roller', where: { id: { in: createdRoles } } })
     await payload.delete({ collection: 'teamtyper', where: { name: { like: prefix } } })
@@ -145,6 +146,29 @@ describe('Team editors', () => {
         payload.update({ collection: 'team', id: ownTeam.id, data: { description: 'Nei' }, ...as(u) }),
       ).rejects.toThrow()
     }
+  })
+
+  it('VK-06: lets the teamleder register the tools their own team uses, and no other team\'s', async () => {
+    const tool = await payload.create({
+      collection: 'verktoy',
+      data: { name: `${prefix} Retrospektiv`, toolType: 'metode', description: 'Fast øvelse.' },
+    })
+
+    const updated = await payload.update({
+      collection: 'team',
+      id: ownTeam.id,
+      data: { tools: [tool.id] },
+      depth: 0,
+      ...as(leadUser),
+    })
+    expect(updated.tools).toEqual([tool.id])
+
+    await expect(
+      payload.update({ collection: 'team', id: otherTeam.id, data: { tools: [tool.id] }, ...as(leadUser) }),
+    ).rejects.toThrow()
+    await expect(
+      payload.update({ collection: 'team', id: ownTeam.id, data: { tools: [] }, ...as(memberUser) }),
+    ).rejects.toThrow()
   })
 
   it('TO-08: leaves creating and deleting teams to administrators', async () => {

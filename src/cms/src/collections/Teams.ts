@@ -76,6 +76,15 @@ export const Teams: CollectionConfig = {
       defaultValue: true,
     },
     {
+      // VK-06, shown on the team's page (TO-07). The teameier and teamleder
+      // may change it, like the rest of the team.
+      name: 'tools',
+      label: 'Verktøy teamet bruker',
+      type: 'relationship',
+      relationTo: 'verktoy',
+      hasMany: true,
+    },
+    {
       // The members and their roles (TO-03).
       name: 'members',
       type: 'join',
