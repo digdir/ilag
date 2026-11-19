@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
+import { collectionGroups } from './groups'
 
 export const Media: CollectionConfig = {
   slug: 'medier',
@@ -18,6 +19,7 @@ export const Media: CollectionConfig = {
   // are only for signed-in users. Everyone who works in Digdir can log in, so
   // only administrators change them.
   admin: {
+    group: collectionGroups.system,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
   },

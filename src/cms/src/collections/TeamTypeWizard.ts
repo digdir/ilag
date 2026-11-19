@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
+import { collectionGroups } from './groups'
 
 // The questions in the team type wizard (TK-03). Each answer leads to another
 // question, to a team type, which is the result, or nowhere, which ends the
@@ -19,6 +20,7 @@ export const TeamTypeWizard: CollectionConfig = {
     interface: 'TeamTypeWizardQuestion',
   },
   admin: {
+    group: collectionGroups.team,
     hidden: hiddenFromEditors,
     useAsTitle: 'title',
     defaultColumns: ['title', 'isStart'],

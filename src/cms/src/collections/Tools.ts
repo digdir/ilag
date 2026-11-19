@@ -4,6 +4,7 @@ import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { validHttpUrl } from '../utils/links'
+import { collectionGroups } from './groups'
 
 // The tool types in the toolbox (VK-02). Only the tools use them, so they are
 // a fixed list rather than a collection. The value is stored and stays the
@@ -29,6 +30,7 @@ export const Tools: CollectionConfig = {
     interface: 'Tool',
   },
   admin: {
+    group: collectionGroups.team,
     // Team editors pick tools on their team, which reads them; they don't
     // need the collection in the menu.
     hidden: hiddenFromEditors,

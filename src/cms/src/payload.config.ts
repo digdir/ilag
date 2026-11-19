@@ -66,19 +66,20 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
+  // In the order of their groups in the admin panel's navigation (collections/groups.ts).
   collections: [
-    Users,
-    Media,
-    People,
-    Locations,
-    Units,
-    Roles,
-    TeamTypes,
-    TeamTypeWizard,
     Teams,
     TeamMemberships,
+    TeamTypes,
+    TeamTypeWizard,
     Tools,
+    People,
+    Units,
+    Locations,
+    Roles,
+    Users,
     ImportRuns,
+    Media,
   ],
   // The imports from the authoritative source (ADR-0003). Only administrators
   // may queue, run or cancel jobs through the API; the import endpoints queue
