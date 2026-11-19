@@ -52,7 +52,8 @@ describe('tool page', () => {
   it('VK-08: links to the tool itself only when it has a link', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(figma)))
     const withLink = await (await render('1')).text()
-    expect(withLink).toMatch(/href="https:\/\/www.figma.com"[^>]*>\s*Åpne verktøyet/)
+    expect(withLink).toMatch(/<a class="ds-link" href="https:\/\/www.figma.com"[^>]*>\s*Åpne verktøyet/)
+    expect(withLink).not.toContain('ds-button')
 
     vi.stubGlobal('fetch', vi.fn(async () => json(prosjektmandat)))
     const without = await (await render('2')).text()

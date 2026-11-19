@@ -20,10 +20,13 @@ const resources = tool?.resources ?? []
               {tool.name}
             </h1>
             <p class="ds-paragraph description">{tool.description}</p>
+            {/* A plain link, like the resources: it leaves ilag (VK-08). */}
             {tool.toolUrl && (
-              <a class="ds-button" data-variant="primary" href={tool.toolUrl}>
-                Åpne verktøyet
-              </a>
+              <p class="ds-paragraph">
+                <a class="ds-link" href={tool.toolUrl}>
+                  Åpne verktøyet
+                </a>
+              </p>
             )}
           </header>
           <section>
