@@ -3,6 +3,7 @@ import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { ownTeams } from '../access/teamEditor'
+import { collectionGroups } from './groups'
 
 // A team's memberships mean nothing without the team, and point at it with a
 // required relationship, so they go first.
@@ -28,6 +29,7 @@ export const Teams: CollectionConfig = {
     interface: 'Team',
   },
   admin: {
+    group: collectionGroups.team,
     useAsTitle: 'name',
     defaultColumns: ['name', 'teamType', 'active'],
     // Only the list in the admin panel. Not access control: read is open to
