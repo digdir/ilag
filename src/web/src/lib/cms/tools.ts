@@ -18,6 +18,23 @@ export async function getTools(cookie: string | null): Promise<ToolWithTypes[]> 
   return docs.map(withTypes)
 }
 
+/** The tools in the toolbox meant for a team type (VK-05), by name; not those that suit all. */
+export async function getToolsForTeamType(teamTypeId: number, cookie: string | null): Promise<ToolWithTypes[]> {
+  const { docs } = await sdk.find(
+    {
+      collection: 'verktoy',
+      where: { teamTypes: { in: [teamTypeId] } },
+      sort: 'name',
+      pagination: false,
+      depth: 1,
+      populate,
+      joins: { teams: false },
+    },
+    { headers: authHeaders(cookie) },
+  )
+  return docs.map(withTypes)
+}
+
 /** One tool, or null if it doesn't exist or the visitor may not see it. */
 export async function getTool(id: string, cookie: string | null): Promise<ToolWithTypes | null> {
   if (!/^\d+$/.test(id)) return null

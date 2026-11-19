@@ -2,20 +2,48 @@
 interface Props {
   /** Designsystemet colour: `info` for categories such as a team type, `neutral` for the rest. */
   color?: 'info' | 'neutral' | 'success' | 'warning' | 'danger'
+  /** The page about what the tag names, such as the team type's page. */
+  href?: string
 }
 
-const { color = 'info' } = Astro.props
+const { color = 'info', href } = Astro.props
 ---
 
 <!--
   A label that puts something in a category or tells its status, such as a
-  team's type: Designsystemet's Tag, not interactive. For something to click,
-  such as a filter, use a chip. One size and shape throughout ilag.
+  team's type: Designsystemet's Tag. With `href` it links to the page about
+  what it names; otherwise it is not interactive. Never give it `href` inside
+  something that is already a link, such as a card. For something to click
+  that changes the page, such as a filter, use a chip. One size and shape
+  throughout ilag.
 -->
-<span class="ds-tag" data-color={color} data-size="sm"><slot /></span>
+{
+  href ? (
+    <a class="ds-tag" data-color={color} data-size="sm" href={href}>
+      <slot />
+    </a>
+  ) : (
+    <span class="ds-tag" data-color={color} data-size="sm">
+      <slot />
+    </span>
+  )
+}
 
 <style>
   .ds-tag {
     --dsc-tag-border-radius: var(--ds-border-radius-full);
+  }
+
+  a.ds-tag {
+    text-decoration: none;
+  }
+
+  a.ds-tag:hover {
+    text-decoration: underline;
+  }
+
+  a.ds-tag:focus-visible {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    outline-offset: var(--ds-border-width-focus);
   }
 </style>

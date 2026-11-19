@@ -30,7 +30,8 @@ describe('team page', () => {
     expect(url.searchParams.get('depth')).toBe('3')
     expect(res.status).toBe(200)
     expect(html).toContain('Team Skjemabygger')
-    expect(html).toContain('Produktteam')
+    // The team type links to its page.
+    expect(html).toMatch(/<a class="ds-tag"[^>]*href="\/organisering\/team\/typer\/1"[^>]*>\s*Produktteam/)
     expect(html).toContain('Teamleder, Produkteier')
     expect(trail(html)).toEqual([
       ['Team', '/organisering/team'],

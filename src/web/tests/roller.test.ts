@@ -67,7 +67,7 @@ describe('roles page', () => {
 
     const html = await render()
 
-    const tags = [...html.matchAll(/<span class="ds-tag[^"]*"[^>]*>([^<]+)</g)].map((m) =>
+    const tags = [...html.matchAll(/class="ds-tag[^"]*"[^>]*>([^<]+)</g)].map((m) =>
       m[1]!.trim(),
     )
     expect(tags).toEqual([

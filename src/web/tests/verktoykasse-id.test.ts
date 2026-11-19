@@ -37,6 +37,8 @@ describe('tool page', () => {
     // In the info colour, like team types everywhere else.
     const colours = [...html.matchAll(/class="ds-tag[^"]*" data-color="(\w+)"/g)].map((m) => m[1])
     expect(colours).toEqual(['info', 'info', 'info'])
+    // The team types link to their pages.
+    expect(html).toMatch(/<a class="ds-tag"[^>]*href="\/organisering\/team\/typer\/1"[^>]*>\s*Produktteam/)
     expect(html).toContain('Beskriver formål, mål, rammer og myndighet')
     expect(trail(html)).toEqual([
       ['Verktøykasse', '/verktoy/verktoykasse'],

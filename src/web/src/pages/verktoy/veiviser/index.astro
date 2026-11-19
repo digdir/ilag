@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro'
 import { follow, getTeamTypeWizard, lines } from '../../../lib/cms/teamTypeWizard'
+import { teamTypeHref } from '../../../lib/teamTypes'
 
 // The team type wizard (TK-03, TK-04): one question at a time, with the
 // answers so far in `?svar=1.2.1`, so back, refresh and links work without
@@ -30,8 +31,9 @@ const result = teamType
       text: teamType.description,
       listTitle: 'Dette må på plass:',
       points: lines(teamType.requirements),
+      more: { href: teamTypeHref(teamType.id), label: `Les mer om ${teamType.name.toLowerCase()}` },
     }
-  : ending && { kicker: 'Anbefaling', title: ending.label, text: ending.hint, points: [] }
+  : ending && { kicker: 'Anbefaling', title: ending.label, text: ending.hint, points: [], more: null }
 
 const href = (answerNumbers: number[]) =>
   answerNumbers.length ? `?svar=${answerNumbers.join('.')}` : Astro.url.pathname
@@ -130,7 +132,17 @@ const back = path.length ? href(path.slice(0, -1)) : null
               </div>
             )}
             <div class="actions">
-              <a class="ds-button" data-variant="primary" data-size="sm" href={href([])}>
+              {result.more && (
+                <a class="ds-button" data-variant="primary" data-size="sm" href={result.more.href}>
+                  {result.more.label}
+                </a>
+              )}
+              <a
+                class="ds-button"
+                data-variant={result.more ? 'secondary' : 'primary'}
+                data-size="sm"
+                href={href([])}
+              >
                 Start på nytt
               </a>
             </div>
