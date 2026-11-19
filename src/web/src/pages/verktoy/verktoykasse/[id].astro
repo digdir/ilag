@@ -6,12 +6,7 @@ import { toolTypeLabel } from '../../../lib/tools'
 
 const tool = await getTool(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!tool) Astro.response.status = 404
-// All the tool's links in one list under «Ressurser»: the tool itself first,
-// where Digdir has a licence (VK-08), then the guidance about it (VK-07).
-const links = [
-  ...(tool?.toolUrl ? [{ label: `Åpne ${tool.name}`, url: tool.toolUrl }] : []),
-  ...(tool?.resources ?? []).map(({ label, url }) => ({ label, url })),
-]
+const resources = tool?.resources ?? []
 ---
 
 <Layout title={tool ? `${tool.name} — ilag` : 'Fant ikke verktøyet — ilag'} wide current={tool?.name}>
@@ -43,16 +38,30 @@ const links = [
                 <p class="ds-paragraph">Alle teamtyper</p>
               )}
             </section>
+            {/* The tool itself, where Digdir has a licence (VK-08). Only for
+                tools with a link, so most tools don't get an empty card. */}
+            {tool.toolUrl && (
+              <section class="ds-card" data-color="neutral">
+                <h2 class="ds-heading" data-size="sm">
+                  Lenke til verktøyet
+                </h2>
+                <p class="ds-paragraph">
+                  <a class="ds-link" href={tool.toolUrl}>
+                    Åpne {tool.name}
+                  </a>
+                </p>
+              </section>
+            )}
             <section class="ds-card" data-color="neutral">
               <h2 class="ds-heading" data-size="sm">
                 Ressurser
               </h2>
-              {links.length ? (
+              {resources.length ? (
                 <ul class="resources">
-                  {links.map((link) => (
+                  {resources.map((resource) => (
                     <li>
-                      <a class="ds-link" href={link.url}>
-                        {link.label}
+                      <a class="ds-link" href={resource.url}>
+                        {resource.label}
                       </a>
                     </li>
                   ))}

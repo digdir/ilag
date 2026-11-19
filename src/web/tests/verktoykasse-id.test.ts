@@ -62,20 +62,17 @@ describe('tool page', () => {
     expect(html).toMatch(/href="https:\/\/www.prosjektveiviseren.no"[^>]*>\s*Mal for prosjektmandat/)
   })
 
-  it('VK-08: links to the tool itself first under «Ressurser», only when it has a link', async () => {
+  it('VK-08: links to the tool itself in its own card above «Ressurser», only when it has a link', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json({ ...figma, resources: prosjektmandat.resources })))
     const withLink = await (await render('1')).text()
-    const [header, resources] = withLink.split('Ressurser')
-    expect(header).not.toContain('Åpne Figma')
-    const links = [...resources.matchAll(/<a class="ds-link" href="([^"]+)"[^>]*>\s*([^<]+?)\s*</g)].map((m) => [m[1], m[2]])
-    expect(links).toEqual([
-      ['https://www.figma.com', 'Åpne Figma'],
-      ['https://www.prosjektveiviseren.no', 'Mal for prosjektmandat'],
-    ])
+    const [, toolCard, resources] = withLink.split(/Lenke til verktøyet<\/h2>|Ressurser<\/h2>/)
+    expect(toolCard).toMatch(/<a class="ds-link" href="https:\/\/www.figma.com"[^>]*>\s*Åpne Figma/)
+    expect(resources).toContain('Mal for prosjektmandat')
+    expect(resources).not.toContain('Åpne Figma')
 
     vi.stubGlobal('fetch', vi.fn(async () => json(prosjektmandat)))
     const without = await (await render('2')).text()
-    expect(without).not.toContain('Åpne Prosjektmandat')
+    expect(without).not.toContain('Lenke til verktøyet')
   })
 
   it('says when the tool suits all team types', async () => {
@@ -84,12 +81,9 @@ describe('tool page', () => {
     expect(await (await render('1')).text()).toContain('Alle teamtyper')
   })
 
-  it('says there are no resources only when the tool has no links at all', async () => {
-    // Figma has a link to the tool but no resources.
+  it('says so when the tool has no resources', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(figma)))
-    expect(await (await render('1')).text()).not.toContain('Ingen ressurser er lenket opp ennå.')
 
-    vi.stubGlobal('fetch', vi.fn(async () => json({ ...figma, toolUrl: null })))
     expect(await (await render('1')).text()).toContain('Ingen ressurser er lenket opp ennå.')
   })
 
