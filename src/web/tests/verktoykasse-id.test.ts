@@ -59,7 +59,7 @@ describe('tool page', () => {
 
     const html = await (await render('2')).text()
 
-    expect(html).toMatch(/href="https:\/\/www.prosjektveiviseren.no"[^>]*>\s*Mal for prosjektmandat/)
+    expect(html).toMatch(/href="https:\/\/example.org\/mal"[^>]*>\s*Mal for prosjektmandat/)
   })
 
   it('VK-08: links to the tool itself in its own card above «Ressurser», only when it has a link', async () => {
