@@ -407,7 +407,7 @@ export const tools = [
     toolType: 'mal',
     teamTypes: ['Prosjektteam'],
     description: 'Beskriver formål, mål, rammer og myndighet for et prosjekt med definert start og slutt.',
-    resources: [{ label: 'Mal for prosjektmandat', url: 'https://www.prosjektveiviseren.no' }],
+    resources: [],
   },
   {
     name: 'Teamkontrakt',
@@ -431,7 +431,8 @@ export const tools = [
     teamTypes: ['Prosjektteam'],
     description:
       'Digdirs støtte for planlegging, organisering og gjennomføring av større eller mer komplekse prosjekter.',
-    resources: [{ label: 'prosjektveiviseren.no', url: 'https://www.prosjektveiviseren.no' }],
+    // The address the specification links to.
+    resources: [{ label: 'Prosjektveiviseren', url: 'https://prosjektveiviseren.digdir.no/' }],
   },
   {
     name: 'Produktorganisering i offentlig sektor',

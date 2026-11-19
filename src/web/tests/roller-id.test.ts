@@ -33,6 +33,8 @@ describe('role page', () => {
     expect(html).toMatch(/<h1[^>]*>\s*Teameier\s*<\/h1>/)
     const tags = [...html.matchAll(/class="ds-tag[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1])
     expect(tags).toEqual(['Leveranseteam', 'Produktteam', 'Støtteteam'])
+    // Each links to the team type's page.
+    expect(html).toMatch(/<a class="ds-tag"[^>]*href="\/organisering\/team\/typer\/\d+"[^>]*>\s*Leveranseteam/)
     for (const label of ['Rolle', 'Ansvar', 'Myndighet', 'Oppgaver']) {
       expect(html).toMatch(new RegExp(`<h2[^>]*>\\s*${label}\\s*</h2>`))
     }

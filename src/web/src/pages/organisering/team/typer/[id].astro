@@ -1,0 +1,173 @@
+---
+import TeamCard from '../../../../components/team/TeamCard.astro'
+import ToolList from '../../../../components/verktoy/ToolList.astro'
+import Layout from '../../../../layouts/Layout.astro'
+import { getTeamType } from '../../../../lib/cms/teamTypes'
+import { lines } from '../../../../lib/cms/teamTypeWizard'
+import { getTeamsOfType } from '../../../../lib/cms/teams'
+import { getToolsForTeamType } from '../../../../lib/cms/tools'
+
+// A team type (TK-01) with what characterises it, what must be in place for a
+// team of the type (TK-04), the roles relevant for it (RO-03), the teams of
+// the type and the tools meant for it (VK-05). Reached through the links on
+// the type's name elsewhere; there is no list of team types in the menu.
+const cookie = Astro.request.headers.get('cookie')
+const id = Astro.params.id!
+const teamType = await getTeamType(id, cookie)
+if (!teamType) Astro.response.status = 404
+
+const [teams, tools] = teamType
+  ? await Promise.all([getTeamsOfType(teamType.id, cookie), getToolsForTeamType(teamType.id, cookie)])
+  : [[], []]
+const requirements = lines(teamType?.requirements)
+---
+
+<Layout
+  title={teamType ? `${teamType.name} — ilag` : 'Fant ikke teamtypen — ilag'}
+  wide
+  current={teamType?.name}
+>
+  <div class="page">
+    {
+      teamType ? (
+        <>
+          <header>
+            <p class="ds-paragraph kicker" data-size="xs">
+              Teamtype
+            </p>
+            <h1 class="ds-heading" data-size="lg">
+              {teamType.name}
+            </h1>
+            {teamType.description && <p class="ds-paragraph description">{teamType.description}</p>}
+          </header>
+          <div class="sections">
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">
+                Dette må på plass
+              </h2>
+              {requirements.length ? (
+                <ul>
+                  {requirements.map((requirement) => (
+                    <li class="ds-paragraph" data-size="sm">
+                      {requirement}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="ds-paragraph" data-size="sm">
+                  Ikke beskrevet ennå.
+                </p>
+              )}
+            </section>
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">
+                Roller
+              </h2>
+              {teamType.roles.length ? (
+                <ul>
+                  {teamType.roles.map((role) => (
+                    <li>
+                      <a class="ds-link" href={`/organisering/roller/${role.id}`}>
+                        {role.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="ds-paragraph" data-size="sm">
+                  Ingen roller registrert ennå.
+                </p>
+              )}
+            </section>
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">
+                Anbefalte verktøy
+              </h2>
+              <ToolList tools={tools} />
+              <p class="ds-paragraph" data-size="sm">
+                Flere verktøy passer alle teamtyper. Se dem i{' '}
+                <a class="ds-link" href="/verktoy/verktoykasse">Verktøykassen</a>.
+              </p>
+            </section>
+            <section aria-labelledby="team-av-typen">
+              <h2 class="ds-heading" data-size="sm" id="team-av-typen">
+                Team av denne typen
+              </h2>
+              {teams.length ? (
+                <ul class="teams">
+                  {teams.map((team) => (
+                    <li>
+                      <TeamCard team={team} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="ds-paragraph" data-size="sm">
+                  Ingen aktive team av denne typen.
+                </p>
+              )}
+            </section>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1 class="ds-heading" data-size="lg">Fant ikke teamtypen</h1>
+          <p class="ds-paragraph">Teamtypen finnes ikke, eller du har ikke tilgang til den.</p>
+        </>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-8);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+    max-width: 48rem;
+  }
+
+  .kicker {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ds-color-text-subtle);
+  }
+
+  .description {
+    white-space: pre-line;
+    text-wrap: pretty;
+  }
+
+  .sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .teams {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+    gap: var(--ds-size-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .teams > li {
+    display: grid;
+  }
+</style>

@@ -2,6 +2,7 @@
 import Tag from '../../../components/Tag.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getTool } from '../../../lib/cms/tools'
+import { teamTypeHref } from '../../../lib/teamTypes'
 import { toolTypeLabel } from '../../../lib/tools'
 
 const tool = await getTool(Astro.params.id!, Astro.request.headers.get('cookie'))
@@ -30,7 +31,7 @@ const resources = tool?.resources ?? []
                 <ul class="team-types">
                   {tool.teamTypes.map((type) => (
                     <li>
-                      <Tag>{type.name}</Tag>
+                      <Tag href={teamTypeHref(type.id)}>{type.name}</Tag>
                     </li>
                   ))}
                 </ul>

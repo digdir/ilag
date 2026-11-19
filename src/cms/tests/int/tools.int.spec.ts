@@ -49,8 +49,8 @@ describe('Tools', () => {
       collection: 'verktoy',
       data: toolData('Prosjektmandat', {
         teamTypes: [projectTeam.id],
-        toolUrl: 'https://www.prosjektveiviseren.no',
-        resources: [{ label: 'Mal for prosjektmandat', url: 'https://www.prosjektveiviseren.no/mal' }],
+        toolUrl: 'https://example.org',
+        resources: [{ label: 'Mal for prosjektmandat', url: 'https://example.org/mal' }],
       }),
       ...as(admin),
     })
@@ -70,7 +70,7 @@ describe('Tools', () => {
     expect(found.toolType).toBe('mal')
     expect(found.description).toContain('rammer og myndighet')
     expect(found.teamTypes).toEqual([expect.objectContaining({ name: `${prefix} Prosjektteam` })])
-    expect(found.toolUrl).toBe('https://www.prosjektveiviseren.no')
+    expect(found.toolUrl).toBe('https://example.org')
     expect(found.resources).toEqual([expect.objectContaining({ label: 'Mal for prosjektmandat' })])
   })
 

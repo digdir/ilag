@@ -20,7 +20,7 @@ export const prosjektmandat = {
     { id: 1, name: 'Produktteam' },
   ],
   toolUrl: null,
-  resources: [{ id: 'a', label: 'Mal for prosjektmandat', url: 'https://www.prosjektveiviseren.no' }],
+  resources: [{ id: 'a', label: 'Mal for prosjektmandat', url: 'https://example.org/mal' }],
 }
 
 export const toolTeamTypes = {

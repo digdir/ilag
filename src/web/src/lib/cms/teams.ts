@@ -14,8 +14,21 @@ import type { Member, TeamWithMembers } from '../../types/team'
 
 /** All active teams by name, with their members (TO-01, TO-03). */
 export async function getTeams(cookie: string | null): Promise<TeamWithMembers[]> {
+  return findActiveTeams(cookie)
+}
+
+/** The active teams of a team type by name, with their members (TK-01). */
+export async function getTeamsOfType(teamTypeId: number, cookie: string | null): Promise<TeamWithMembers[]> {
+  return findActiveTeams(cookie, teamTypeId)
+}
+
+async function findActiveTeams(cookie: string | null, teamTypeId?: number): Promise<TeamWithMembers[]> {
+  const where = {
+    active: { equals: true },
+    ...(teamTypeId === undefined ? {} : { teamType: { equals: teamTypeId } }),
+  }
   const { docs } = await sdk.find(
-    { collection: 'team', where: { active: { equals: true } }, sort: 'name', pagination: false },
+    { collection: 'team', where, sort: 'name', pagination: false },
     { headers: authHeaders(cookie) },
   )
   return docs.map(withMembers)
