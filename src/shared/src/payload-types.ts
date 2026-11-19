@@ -77,6 +77,7 @@ export interface Config {
     'teamtype-veiviser': TeamTypeWizardQuestion;
     team: Team;
     teammedlemskap: TeamMembership;
+    mandater: Mandate;
     importkjoringer: ImportRun;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -94,12 +95,14 @@ export interface Config {
     enheter: {
       children: 'enheter';
       people: 'personer';
+      mandate: 'mandater';
     };
     teamtyper: {
       roles: 'roller';
     };
     team: {
       members: 'teammedlemskap';
+      mandate: 'mandater';
     };
   };
   collectionsSelect: {
@@ -113,6 +116,7 @@ export interface Config {
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    mandater: MandaterSelect<false> | MandaterSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -289,40 +293,62 @@ export interface Unit {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  mandate?: {
+    docs?: (number | Mandate)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medier".
+ * via the `definition` "mandater".
  */
-export interface Media {
+export interface Mandate {
   id: number;
-  alt: string;
+  title?: string | null;
+  /**
+   * Teamet mandatet hører til. Kan ikke endres etterpå.
+   */
+  team?: (number | null) | Team;
+  /**
+   * Enheten mandatet hører til. Kan ikke endres etterpå.
+   */
+  unit?: (number | null) | Unit;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  problem: string;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  outcomes: string;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  expectations: string;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  collaboration: string;
+  /**
+   * Dagens dato hvis tomt når mandatet godkjennes.
+   */
+  approvedAt?: string | null;
+  approvedBy?: (number | null) | Person;
+  /**
+   * Når mandatet ikke lenger gjelder: sett datoen og publiser. Mandatet vises fortsatt, merket som utgått.
+   */
+  expiredAt?: string | null;
+  status?: ('draft' | 'current' | 'expired') | null;
+  complete?: boolean | null;
+  missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teammedlemskap".
- */
-export interface TeamMembership {
-  id: number;
-  team: number | Team;
-  person: number | Person;
-  personName?: string | null;
-  roles: (number | Role)[];
-  updatedAt: string;
-  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -336,6 +362,11 @@ export interface Team {
   active: boolean;
   members?: {
     docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  mandate?: {
+    docs?: (number | Mandate)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -380,6 +411,38 @@ export interface Role {
   teamTypes?: (number | TeamType)[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap".
+ */
+export interface TeamMembership {
+  id: number;
+  team: number | Team;
+  person: number | Person;
+  personName?: string | null;
+  roles: (number | Role)[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medier".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -617,6 +680,10 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
+        relationTo: 'mandater';
+        value: number | Mandate;
+      } | null)
+    | ({
         relationTo: 'importkjoringer';
         value: number | ImportRun;
       } | null);
@@ -771,6 +838,7 @@ export interface EnheterSelect<T extends boolean = true> {
   active?: T;
   children?: T;
   people?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -831,6 +899,7 @@ export interface TeamSelect<T extends boolean = true> {
   teamType?: T;
   active?: T;
   members?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -845,6 +914,28 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater_select".
+ */
+export interface MandaterSelect<T extends boolean = true> {
+  title?: T;
+  team?: T;
+  unit?: T;
+  problem?: T;
+  outcomes?: T;
+  expectations?: T;
+  collaboration?: T;
+  approvedAt?: T;
+  approvedBy?: T;
+  expiredAt?: T;
+  status?: T;
+  complete?: T;
+  missingFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
