@@ -4,6 +4,7 @@ import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 import { importEndpoints } from '../imports/endpoints'
+import { collectionGroups } from './groups'
 
 // The directorate, its divisions, departments and sections, imported from
 // their own file from Digdir's authoritative source (NF-07). The import writes
@@ -30,6 +31,7 @@ export const Units: CollectionConfig = {
     interface: 'Unit',
   },
   admin: {
+    group: collectionGroups.organisation,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',

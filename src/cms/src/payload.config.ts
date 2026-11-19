@@ -65,7 +65,20 @@ export default buildConfig({
     supportedLanguages: { nb, en },
     fallbackLanguage: 'nb',
   },
-  collections: [Users, Media, People, Locations, Units, Roles, TeamTypes, TeamTypeWizard, Teams, TeamMemberships, ImportRuns],
+  // In the order of their groups in the admin panel's navigation (collections/groups.ts).
+  collections: [
+    Teams,
+    TeamMemberships,
+    People,
+    Units,
+    Locations,
+    Roles,
+    TeamTypes,
+    TeamTypeWizard,
+    Users,
+    ImportRuns,
+    Media,
+  ],
   // The imports from the authoritative source (ADR-0003). Only administrators
   // may queue, run or cancel jobs through the API; the import endpoints queue
   // them through the Local API.

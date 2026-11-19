@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
+import { collectionGroups } from './groups'
 
 // The team types in Digdir (TK-01), such as produktteam or fagnettverk, with
 // what characterises each. Every team has one (TO-02). Administrators
@@ -18,6 +19,7 @@ export const TeamTypes: CollectionConfig = {
     interface: 'TeamType',
   },
   admin: {
+    group: collectionGroups.teamSetup,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',

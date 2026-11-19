@@ -67,17 +67,17 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    brukere: User;
-    medier: Media;
+    team: Team;
+    teammedlemskap: TeamMembership;
     personer: Person;
-    lokasjoner: Location;
     enheter: Unit;
+    lokasjoner: Location;
     roller: Role;
     teamtyper: TeamType;
     'teamtype-veiviser': TeamTypeWizardQuestion;
-    team: Team;
-    teammedlemskap: TeamMembership;
+    brukere: User;
     importkjoringer: ImportRun;
+    medier: Media;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -85,35 +85,35 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    team: {
+      members: 'teammedlemskap';
+    };
     personer: {
       teams: 'teammedlemskap';
-    };
-    lokasjoner: {
-      people: 'personer';
     };
     enheter: {
       children: 'enheter';
       people: 'personer';
     };
+    lokasjoner: {
+      people: 'personer';
+    };
     teamtyper: {
       roles: 'roller';
     };
-    team: {
-      members: 'teammedlemskap';
-    };
   };
   collectionsSelect: {
-    brukere: BrukereSelect<false> | BrukereSelect<true>;
-    medier: MedierSelect<false> | MedierSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     personer: PersonerSelect<false> | PersonerSelect<true>;
-    lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
+    lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
-    team: TeamSelect<false> | TeamSelect<true>;
-    teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    brukere: BrukereSelect<false> | BrukereSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
+    medier: MedierSelect<false> | MedierSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -169,47 +169,73 @@ export interface BrukereAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brukere".
+ * via the `definition` "team".
  */
-export interface User {
+export interface Team {
   id: number;
-  firstName?: string | null;
-  lastName?: string | null;
-  roles?: ('admin' | 'integration')[] | null;
-  /**
-   * Settes ved innlogging fra personen med samme e-post.
-   */
-  person?: (number | null) | Person;
-  identities?:
-    | {
-        provider: 'entra';
-        subject: string;
-        id?: string | null;
-      }[]
-    | null;
+  name: string;
+  description?: string | null;
+  teamType: number | TeamType;
+  active: boolean;
+  members?: {
+    docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
-  enableAPIKey?: boolean | null;
-  apiKey?: string | null;
-  apiKeyIndex?: string | null;
-  hasAPIKey?: boolean | null;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'brukere';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper".
+ */
+export interface TeamType {
+  id: number;
+  name: string;
+  description?: string | null;
+  /**
+   * Vist som en punktliste. Ett punkt per linje.
+   */
+  requirements?: string | null;
+  roles?: {
+    docs?: (number | Role)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roller".
+ */
+export interface Role {
+  id: number;
+  name: string;
+  /**
+   * Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.
+   */
+  code?: string | null;
+  role?: string | null;
+  responsibility?: string | null;
+  authority?: string | null;
+  tasks?: string | null;
+  teamTypes?: (number | TeamType)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teammedlemskap".
+ */
+export interface TeamMembership {
+  id: number;
+  team: number | Team;
+  person: number | Person;
+  personName?: string | null;
+  roles: (number | Role)[];
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -313,76 +339,6 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teammedlemskap".
- */
-export interface TeamMembership {
-  id: number;
-  team: number | Team;
-  person: number | Person;
-  personName?: string | null;
-  roles: (number | Role)[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team".
- */
-export interface Team {
-  id: number;
-  name: string;
-  description?: string | null;
-  teamType: number | TeamType;
-  active: boolean;
-  members?: {
-    docs?: (number | TeamMembership)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teamtyper".
- */
-export interface TeamType {
-  id: number;
-  name: string;
-  description?: string | null;
-  /**
-   * Vist som en punktliste. Ett punkt per linje.
-   */
-  requirements?: string | null;
-  roles?: {
-    docs?: (number | Role)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "roller".
- */
-export interface Role {
-  id: number;
-  name: string;
-  /**
-   * Fast kode som ilag kjenner rollen igjen på. Lages fra navnet hvis du lar den stå tom, og kan ikke endres etter at rollen er lagret.
-   */
-  code?: string | null;
-  role?: string | null;
-  responsibility?: string | null;
-  authority?: string | null;
-  tasks?: string | null;
-  teamTypes?: (number | TeamType)[] | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "teamtype-veiviser".
  */
 export interface TeamTypeWizardQuestion {
@@ -416,6 +372,50 @@ export interface TeamTypeWizardQuestion {
   }[];
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "brukere".
+ */
+export interface User {
+  id: number;
+  firstName?: string | null;
+  lastName?: string | null;
+  roles?: ('admin' | 'integration')[] | null;
+  /**
+   * Settes ved innlogging fra personen med samme e-post.
+   */
+  person?: (number | null) | Person;
+  identities?:
+    | {
+        provider: 'entra';
+        subject: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'brukere';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -577,24 +577,24 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'brukere';
-        value: number | User;
+        relationTo: 'team';
+        value: number | Team;
       } | null)
     | ({
-        relationTo: 'medier';
-        value: number | Media;
+        relationTo: 'teammedlemskap';
+        value: number | TeamMembership;
       } | null)
     | ({
         relationTo: 'personer';
         value: number | Person;
       } | null)
     | ({
-        relationTo: 'lokasjoner';
-        value: number | Location;
-      } | null)
-    | ({
         relationTo: 'enheter';
         value: number | Unit;
+      } | null)
+    | ({
+        relationTo: 'lokasjoner';
+        value: number | Location;
       } | null)
     | ({
         relationTo: 'roller';
@@ -609,16 +609,16 @@ export interface PayloadLockedDocument {
         value: number | TeamTypeWizardQuestion;
       } | null)
     | ({
-        relationTo: 'team';
-        value: number | Team;
-      } | null)
-    | ({
-        relationTo: 'teammedlemskap';
-        value: number | TeamMembership;
+        relationTo: 'brukere';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'importkjoringer';
         value: number | ImportRun;
+      } | null)
+    | ({
+        relationTo: 'medier';
+        value: number | Media;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -664,59 +664,28 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "brukere_select".
+ * via the `definition` "team_select".
  */
-export interface BrukereSelect<T extends boolean = true> {
-  firstName?: T;
-  lastName?: T;
-  roles?: T;
-  person?: T;
-  identities?:
-    | T
-    | {
-        provider?: T;
-        subject?: T;
-        id?: T;
-      };
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  teamType?: T;
+  active?: T;
+  members?: T;
   updatedAt?: T;
   createdAt?: T;
-  enableAPIKey?: T;
-  apiKey?: T;
-  apiKeyIndex?: T;
-  hasAPIKey?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "medier_select".
+ * via the `definition` "teammedlemskap_select".
  */
-export interface MedierSelect<T extends boolean = true> {
-  alt?: T;
+export interface TeammedlemskapSelect<T extends boolean = true> {
+  team?: T;
+  person?: T;
+  personName?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -746,17 +715,6 @@ export interface PersonerSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lokasjoner_select".
- */
-export interface LokasjonerSelect<T extends boolean = true> {
-  code?: T;
-  name?: T;
-  people?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "enheter_select".
  */
 export interface EnheterSelect<T extends boolean = true> {
@@ -770,6 +728,17 @@ export interface EnheterSelect<T extends boolean = true> {
   advisesAllOfDigdir?: T;
   active?: T;
   children?: T;
+  people?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lokasjoner_select".
+ */
+export interface LokasjonerSelect<T extends boolean = true> {
+  code?: T;
+  name?: T;
   people?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -823,28 +792,41 @@ export interface TeamtypeVeiviserSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team_select".
+ * via the `definition` "brukere_select".
  */
-export interface TeamSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  teamType?: T;
-  active?: T;
-  members?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teammedlemskap_select".
- */
-export interface TeammedlemskapSelect<T extends boolean = true> {
-  team?: T;
-  person?: T;
-  personName?: T;
+export interface BrukereSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
   roles?: T;
+  person?: T;
+  identities?:
+    | T
+    | {
+        provider?: T;
+        subject?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -866,6 +848,24 @@ export interface ImportkjoringerSelect<T extends boolean = true> {
   fileRemovedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "medier_select".
+ */
+export interface MedierSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
