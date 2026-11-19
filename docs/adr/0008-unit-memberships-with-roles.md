@@ -56,9 +56,13 @@ for now. Open question 6 may change that.
 - **Only the import.** Memberships follow the file exactly. Nobody can add a
   unit that SAP doesn't have.
 - **Only in ilag.** Ignores the source for something it knows, against NF-07.
-- **The import gives every new membership a default role, such as
-  «medarbeider».** Shows a role on every membership, but stores a guess that
-  nobody made.
+
+**Which role a new membership gets**
+
+- **Medarbeider (chosen).** Almost everyone in a unit is a medarbeider there,
+  so every membership shows a role from the start. Administrators only change
+  the exceptions, such as the linjeleder.
+- **None.** Most memberships would have no role at all.
 
 **What the unit leader is**
 
@@ -93,14 +97,20 @@ for now. Open question 6 may change that.
 1. **A new collection, `enhetsmedlemskap`** (table `unit_memberships`, type
    `UnitMembership`). Each membership has a `unit`, a `person`, `roles` and a
    `source`. There is at most one membership per person and unit.
-   - `roles` may be empty. The import creates memberships without roles, and
-     most people have no role in their unit beyond being in it.
+   - `roles` defaults to **Medarbeider**, both for memberships the import
+     creates and for those an administrator adds. The role is found by its
+     code, `medarbeider`, not its name (ADR-0005). Administrators may change
+     or remove it, for example to make someone linjeleder instead.
+   - `roles` may still be empty. If no role has the code `medarbeider`, the
+     import creates the membership without roles and says so in its result,
+     rather than refusing the file.
    - `source` is `import` or `manual`. It is set when the membership is
      created and never changed.
 2. **The import manages only its own memberships.** For every person and unit
    in the file it makes sure there is a membership. If no membership exists, it
-   creates one with the source `import`. If one exists, whatever its source, it
-   leaves it alone. When a unit disappears from a person's lines, the import
+   creates one with the source `import` and the role Medarbeider. If one
+   exists, whatever its source, it leaves it alone, so a role an
+   administrator has changed is never put back. When a unit disappears from a person's lines, the import
    deletes that membership if its source is `import`, roles included. It never
    changes or deletes a membership with the source `manual`.
    - A person who leaves Digdir is marked inactive (ADR-0003) and keeps their
@@ -158,8 +168,12 @@ for now. Open question 6 may change that.
   leaders as memberships.
 - A membership that an administrator added by hand stays after the source
   stops listing it, until an administrator removes it. Roles on an import
-  membership disappear when the person leaves the unit in the source, and have
-  to be set again if they come back.
+  membership disappear when the person leaves the unit in the source. If they
+  come back, they get Medarbeider again, and any other role has to be set
+  again.
+- Medarbeider is the default only in units. It is not linked to any team
+  type, so team memberships keep having their roles chosen when the person is
+  added (TO-03).
 - If the source later gives leaders or roles (open question 6), the import can
   set them on its own memberships without changing the model.
 - The specification changes with the implementation, in its own commit with
