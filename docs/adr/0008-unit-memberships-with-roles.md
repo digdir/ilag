@@ -127,8 +127,8 @@ for now. Open question 6 may change that.
    - **Units:** roles get `unitLevels`, the unit levels the role applies to
      (the same values as `enheter.level`: direktorat, divisjon, stab, tilsyn,
      avdeling, seksjon). A unit membership accepts only roles linked to its
-     unit's level. Linjeleder gets every level, which is the only role in the
-     seed data that does.
+     unit's level. In the seed data, Linjeleder and Medarbeider are linked to
+     every level. Other roles are linked to none.
    - The picker on each kind of membership offers only matching roles, and
      saving a membership with a role that doesn't match is refused.
      Administrators maintain both links in Roller (RO-07).
