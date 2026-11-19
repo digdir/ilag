@@ -42,7 +42,7 @@ exploit a weakness that hasn't been fixed yet.
 | [0003](0003-imports-from-the-authoritative-source.md) | Imports from the authoritative source | Accepted |
 | [0004](0004-payload-sdk-for-cms-reads.md) | Payload's SDK for reading the CMS | Proposed |
 | [0005](0005-team-editors-use-the-admin-panel.md) | People who edit a team's content use the admin panel | Proposed |
-| [0006](0006-mandates-with-versions-and-approval.md) | Mandates as a versioned collection with approval | Proposed |
+| [0007](0007-mandates-with-versions-and-approval.md) | Mandates as a versioned collection with approval | Proposed |
 
 ## Template
 
