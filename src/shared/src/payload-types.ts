@@ -69,12 +69,12 @@ export interface Config {
   collections: {
     team: Team;
     teammedlemskap: TeamMembership;
+    teamtyper: TeamType;
+    'teamtype-veiviser': TeamTypeWizardQuestion;
     personer: Person;
     enheter: Unit;
     lokasjoner: Location;
     roller: Role;
-    teamtyper: TeamType;
-    'teamtype-veiviser': TeamTypeWizardQuestion;
     brukere: User;
     importkjoringer: ImportRun;
     medier: Media;
@@ -88,6 +88,9 @@ export interface Config {
     team: {
       members: 'teammedlemskap';
     };
+    teamtyper: {
+      roles: 'roller';
+    };
     personer: {
       teams: 'teammedlemskap';
     };
@@ -98,19 +101,16 @@ export interface Config {
     lokasjoner: {
       people: 'personer';
     };
-    teamtyper: {
-      roles: 'roller';
-    };
   };
   collectionsSelect: {
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
+    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     personer: PersonerSelect<false> | PersonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
-    teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
-    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     brukere: BrukereSelect<false> | BrukereSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     medier: MedierSelect<false> | MedierSelect<true>;
@@ -585,6 +585,14 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
+        relationTo: 'teamtyper';
+        value: number | TeamType;
+      } | null)
+    | ({
+        relationTo: 'teamtype-veiviser';
+        value: number | TeamTypeWizardQuestion;
+      } | null)
+    | ({
         relationTo: 'personer';
         value: number | Person;
       } | null)
@@ -599,14 +607,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'roller';
         value: number | Role;
-      } | null)
-    | ({
-        relationTo: 'teamtyper';
-        value: number | TeamType;
-      } | null)
-    | ({
-        relationTo: 'teamtype-veiviser';
-        value: number | TeamTypeWizardQuestion;
       } | null)
     | ({
         relationTo: 'brukere';
@@ -689,6 +689,38 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtyper_select".
+ */
+export interface TeamtyperSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  requirements?: T;
+  roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser_select".
+ */
+export interface TeamtypeVeiviserSelect<T extends boolean = true> {
+  title?: T;
+  isStart?: T;
+  intro?: T;
+  considerations?: T;
+  answers?:
+    | T
+    | {
+        label?: T;
+        hint?: T;
+        leadsTo?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "personer_select".
  */
 export interface PersonerSelect<T extends boolean = true> {
@@ -755,38 +787,6 @@ export interface RollerSelect<T extends boolean = true> {
   authority?: T;
   tasks?: T;
   teamTypes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teamtyper_select".
- */
-export interface TeamtyperSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  requirements?: T;
-  roles?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teamtype-veiviser_select".
- */
-export interface TeamtypeVeiviserSelect<T extends boolean = true> {
-  title?: T;
-  isStart?: T;
-  intro?: T;
-  considerations?: T;
-  answers?:
-    | T
-    | {
-        label?: T;
-        hint?: T;
-        leadsTo?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }

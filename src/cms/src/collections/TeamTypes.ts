@@ -19,7 +19,7 @@ export const TeamTypes: CollectionConfig = {
     interface: 'TeamType',
   },
   admin: {
-    group: collectionGroups.teamSetup,
+    group: collectionGroups.team,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',

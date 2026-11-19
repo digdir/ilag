@@ -4,6 +4,5 @@
 export const collectionGroups = {
   team: 'Team',
   organisation: 'Organisasjon',
-  teamSetup: 'Teamoppsett',
   system: 'System',
 } as const
