@@ -17,7 +17,7 @@ import type { Mandate } from '../payload-types'
 
 // A team's or a unit's mandate: the four core fields of Digdir's mandate
 // template (TO-09, Vedlegg 3), approved by the teameier (TO-16), with every
-// version kept (TO-17). The design is in ADR-0006.
+// version kept (TO-17). The design is in ADR-0007.
 //
 // Payload's drafts carry the approval. The published version is the approved
 // mandate, the one everyone reads. A draft is saved as a version beside it
@@ -28,7 +28,7 @@ import type { Mandate } from '../payload-types'
 type ID = number
 
 // The template's fields, in its order. Plain text in markdown; the frontend
-// renders it without raw HTML (ADR-0006).
+// renders it without raw HTML (ADR-0007).
 export const MANDATE_FIELDS = [
   { name: 'problem', label: 'Hva skal vi løse?' },
   { name: 'outcomes', label: 'Hva skal vi oppnå?' },
@@ -85,7 +85,7 @@ const noSortOnCalculated: CollectionBeforeOperationHook = ({ args, operation }) 
   return { ...args, sort: sort.length ? sort : undefined }
 }
 
-// Exactly one owner, a team or a unit (ADR-0006). On create only, since the
+// Exactly one owner, a team or a unit (ADR-0007). On create only, since the
 // owner can't change afterwards. Not a field validation: Payload skips those
 // for drafts.
 const oneOwner: CollectionBeforeValidateHook<Mandate> = ({ data, operation }) => {
@@ -106,7 +106,7 @@ const today = () => {
   return date.toISOString()
 }
 
-// The owner is set when the mandate is created, and never changes (ADR-0006):
+// The owner is set when the mandate is created, and never changes (ADR-0007):
 // a mandate can't be moved to a team or unit whose leaders didn't approve it.
 // The field access makes the owner read-only in the admin panel. A restore
 // builds its data from the old version and drops fields the user may not

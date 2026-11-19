@@ -147,7 +147,7 @@ export const Units: CollectionConfig = {
     },
     {
       // The unit's mandate (LO-02), at most one. Read access on mandates
-      // applies: drafts only reach those who may edit them (ADR-0006).
+      // applies: drafts only reach those who may edit them (ADR-0007).
       name: 'mandate',
       type: 'join',
       collection: 'mandater',

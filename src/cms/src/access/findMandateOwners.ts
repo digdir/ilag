@@ -2,7 +2,7 @@ import type { PayloadRequest } from 'payload'
 
 type ID = number
 
-// The teams and units whose mandate a user may work on (ADR-0006):
+// The teams and units whose mandate a user may work on (ADR-0007):
 // `edit` may save drafts, `approve` may also approve the mandate and make it
 // current, or mark it expired. Everyone who approves also edits.
 export type MandateOwners = {
