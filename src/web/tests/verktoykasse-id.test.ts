@@ -34,11 +34,24 @@ describe('tool page', () => {
     const tags = [...html.matchAll(/class="ds-tag[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1])
     // The team types by name.
     expect(tags).toEqual(['Mal', 'Produktteam', 'Prosjektteam'])
+    // In the info colour, like team types everywhere else.
+    const colours = [...html.matchAll(/class="ds-tag[^"]*" data-color="(\w+)"/g)].map((m) => m[1])
+    expect(colours).toEqual(['info', 'info', 'info'])
     expect(html).toContain('Beskriver formål, mål, rammer og myndighet')
     expect(trail(html)).toEqual([
       ['Verktøykasse', '/verktoy/verktoykasse'],
       ['Prosjektmandat', '/verktoy/verktoykasse/2'],
     ])
+  })
+
+  it('puts «Passer for» and «Ressurser» in cards, like the team page', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json(prosjektmandat)))
+
+    const html = await (await render('2')).text()
+
+    for (const heading of ['Passer for', 'Ressurser']) {
+      expect(html).toMatch(new RegExp(`<section class="ds-card"[^>]*>\\s*<h2[^>]*>\\s*${heading}`))
+    }
   })
 
   it('VK-07: links to the resources', async () => {
