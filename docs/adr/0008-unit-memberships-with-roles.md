@@ -71,10 +71,20 @@ for now. Open question 6 may change that.
 
 **Which roles can be picked where**
 
-- **Each role says whether it applies to teams, units or both (chosen).** The
-  team membership offers only team roles, and the unit membership offers only
-  unit roles. Both are checked when the membership is saved, not only in the
-  picker.
+- **Through the role's links: team types for teams, unit levels for units
+  (chosen).** Roles already list the team types they apply to (RO-03). A team
+  membership accepts only roles linked to its team's type. Roles get the same
+  kind of link to unit levels, and a unit membership accepts only roles linked
+  to its unit's level. Both are checked when the membership is saved, not only
+  in the picker. One link answers «where does this role apply» for both,
+  and it can say more than a team/unit flag, such as that produkteier belongs
+  in a produktteam but not in a prosjektteam.
+- **A field on the role, `appliesTo`: team, unit or both.** Simpler, but it
+  repeats what the team type link already says for teams, and it can disagree
+  with it.
+- **A role without team types can be used in units.** No new link, but
+  områdeansvarlig and KI-agent also have no team types, and are not roles in
+  a unit.
 - **One shared list.** Anyone could give a person the role produkteier in a
   section, or linjeleder in a team.
 
@@ -111,11 +121,17 @@ for now. Open question 6 may change that.
    removed, each existing leader becomes a membership with that role. The
    membership is manual if the import doesn't already have one for that
    person and unit.
-5. **Roles get `appliesTo`**: `team`, `unit` or both, required. Existing roles
-   get `team`, except linjeleder, which gets `unit`. The role picker on each
-   kind of membership offers only matching roles, and saving a membership with
-   a role that doesn't apply is refused. A team role keeps its team types
-   (RO-03). A unit role has none.
+5. **The links on the role decide where it can be used.**
+   - **Teams:** a team membership accepts only roles linked to the team's
+     type through `teamTypes` (RO-03), which roles already have.
+   - **Units:** roles get `unitLevels`, the unit levels the role applies to
+     (the same values as `enheter.level`: direktorat, divisjon, stab, tilsyn,
+     avdeling, seksjon). A unit membership accepts only roles linked to its
+     unit's level. Linjeleder gets every level, which is the only role in the
+     seed data that does.
+   - The picker on each kind of membership offers only matching roles, and
+     saving a membership with a role that doesn't match is refused.
+     Administrators maintain both links in Roller (RO-07).
 6. **People and units read memberships through joins**, as people read team
    memberships today. `personer.units` becomes a join on `enhetsmedlemskap`,
    and `enheter.people` a join on the same collection. The frontend reads the
@@ -124,6 +140,11 @@ for now. Open question 6 may change that.
 
 ## Consequences
 
+- Team memberships are now checked against the team type. A membership saved
+  before this, with a role that isn't linked to its team's type, stays until
+  someone changes it. Then the role has to be linked or removed. Changing a
+  team's type, or removing a type from a role, doesn't touch existing
+  memberships either.
 - Teams and units follow the same pattern: a membership per person, with the
   roles on it. Projects, when they come, can do the same.
 - Personalleder (`personer.manager`, from SAP) and linjeleder in a unit are
@@ -145,5 +166,6 @@ for now. Open question 6 may change that.
   an entry in `docs/specification/decisions.md`:
   - 4.1 gets **Enhetsmedlemskap**.
   - **Enhet** no longer says the leader is registered by an administrator.
-  - **Rolle** says a role applies to teams, units or both.
+  - **Rolle** says a role is linked to the unit levels it applies to, as it
+    is to team types (RO-03).
   - LO-02, LO-03 and 2.3 say linjeleder instead of enhetsleder.
