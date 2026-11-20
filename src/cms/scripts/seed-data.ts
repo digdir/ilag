@@ -390,9 +390,12 @@ export const wizardQuestions = [
     },
 ] as const
 
+// Every team type by name, for the tools that suit all of them.
+const allTeamTypes = teamTypes.map((type) => type.name)
+
 // The toolbox in the prototype (TOOLS), with team types by name from its «For
-// hvem»: none for tools every team can use. Links only where the prototype
-// names a real site.
+// hvem». A tool every team can use is linked to every team type, as the roles
+// are. Links only where the prototype names a real site.
 export const tools = [
   {
     name: 'Teammandat',
@@ -412,7 +415,7 @@ export const tools = [
   {
     name: 'Teamkontrakt',
     toolType: 'mal',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description:
       'Avklarer hvordan medlemmene skal samarbeide, kommunisere, ta beslutninger og håndtere uenighet.',
     resources: [],
@@ -420,7 +423,7 @@ export const tools = [
   {
     name: 'OKR',
     toolType: 'metode',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description:
       'Målstyring som holder fokus på hva teamet vil oppnå og hvordan suksess måles. Fungerer best når strategisk retning ovenfra møter operativt eierskap i teamene.',
     resources: [],
@@ -445,7 +448,7 @@ export const tools = [
   {
     name: 'Retrospektiv',
     toolType: 'metode',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description: 'Fast øvelse der teamet ser tilbake på perioden og blir enige om hva som skal endres.',
     resources: [],
   },
@@ -460,7 +463,7 @@ export const tools = [
   {
     name: 'Helsesjekk for team',
     toolType: 'metode',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description: 'Jevnlig pulsmåling av samarbeid, mestring og retning i teamet.',
     resources: [],
   },
@@ -474,7 +477,7 @@ export const tools = [
   {
     name: 'Team Restart',
     toolType: 'metode',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description:
       'Opplegg for å starte et etablert team på nytt, for eksempel etter endringer i mandat, sammensetning eller retning.',
     resources: [],
@@ -482,14 +485,14 @@ export const tools = [
   {
     name: 'KI Skills Bibliotek',
     toolType: 'verktoy',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description: 'Samling av ferdige KI-ferdigheter som team kan ta i bruk og dele med hverandre.',
     resources: [],
   },
   {
     name: 'Begrepskatalogen',
     toolType: 'verktoy',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description: 'Nasjonal katalog for begrepsdefinisjoner. Begreper i ilag kan kobles til definisjoner her.',
     toolUrl: 'https://data.norge.no/concepts',
     resources: [],
@@ -497,7 +500,7 @@ export const tools = [
   {
     name: 'Figma',
     toolType: 'verktoy',
-    teamTypes: [],
+    teamTypes: allTeamTypes,
     description: 'Digdir har lisens. Brukes til design, skisser og samarbeid om grensesnitt.',
     toolUrl: 'https://www.figma.com',
     resources: [],

@@ -243,7 +243,7 @@ export interface Tool {
    */
   description: string;
   /**
-   * Teamtypene verktøyet passer for. La feltet stå tomt hvis det passer for alle.
+   * Teamtypene verktøyet passer for. Velg alle hvis det passer for alle team.
    */
   teamTypes?: (number | TeamType)[] | null;
   /**

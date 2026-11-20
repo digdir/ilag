@@ -71,14 +71,15 @@ export const Tools: CollectionConfig = {
       },
     },
     {
-      // VK-05. Empty for a tool every type of team can use.
+      // VK-05. A tool every type of team can use is linked to each of them,
+      // as roles are (RO-03); one linked to none suits none.
       name: 'teamTypes',
       label: 'Teamtyper',
       type: 'relationship',
       relationTo: 'teamtyper',
       hasMany: true,
       admin: {
-        description: 'Teamtypene verktøyet passer for. La feltet stå tomt hvis det passer for alle.',
+        description: 'Teamtypene verktøyet passer for. Velg alle hvis det passer for alle team.',
       },
     },
     {

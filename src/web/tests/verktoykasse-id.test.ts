@@ -77,10 +77,14 @@ describe('tool page', () => {
     expect(without).not.toContain('Lenke til verktøyet')
   })
 
-  it('says when the tool suits all team types', async () => {
+  it('VK-05: leaves out «Passer for» when the tool is linked to no team type', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(figma)))
 
-    expect(await (await render('1')).text()).toContain('Alle teamtyper')
+    const html = await (await render('1')).text()
+
+    expect(html).not.toContain('Passer for')
+    expect(html).not.toContain('Alle teamtyper')
+    expect(html).toContain('Ressurser')
   })
 
   it('says so when the tool has no resources', async () => {
