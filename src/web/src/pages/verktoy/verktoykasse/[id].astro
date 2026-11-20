@@ -1,11 +1,15 @@
 ---
+import Prose from '../../../components/Prose.astro'
 import Tag from '../../../components/Tag.astro'
 import Layout from '../../../layouts/Layout.astro'
+import { getConceptMatcher } from '../../../lib/cms/concepts'
 import { getTool } from '../../../lib/cms/tools'
 import { teamTypeHref } from '../../../lib/teamTypes'
 import { toolTypeLabel } from '../../../lib/tools'
 
-const tool = await getTool(Astro.params.id!, Astro.request.headers.get('cookie'))
+const cookie = Astro.request.headers.get('cookie')
+const tool = await getTool(Astro.params.id!, cookie)
+const concepts = tool && (await getConceptMatcher(cookie))
 if (!tool) Astro.response.status = 404
 const resources = tool?.resources ?? []
 ---
@@ -20,7 +24,7 @@ const resources = tool?.resources ?? []
             <h1 class="ds-heading" data-size="lg">
               {tool.name}
             </h1>
-            <p class="ds-paragraph description">{tool.description}</p>
+            <Prose text={tool.description} concepts={concepts} />
           </header>
           <div class="sections">
             {/* The team types the tool suits (VK-05). A tool linked to none
@@ -111,10 +115,6 @@ const resources = tool?.resources ?? []
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-3);
-  }
-
-  .description {
-    text-wrap: pretty;
   }
 
   ul {
