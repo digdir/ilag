@@ -2,31 +2,20 @@
 import ListFilter from '../../../components/ListFilter.astro'
 import ToolCard from '../../../components/verktoy/ToolCard.astro'
 import Layout from '../../../layouts/Layout.astro'
-import { getTeamTypes } from '../../../lib/cms/teamTypes'
 import { getTools } from '../../../lib/cms/tools'
 import { TOOL_TYPE_LABELS } from '../../../lib/tools'
-import type { ToolWithTypes } from '../../../types/tool'
 
-const cookie = Astro.request.headers.get('cookie')
-const [tools, types] = await Promise.all([getTools(cookie), getTeamTypes(cookie)])
+const tools = await getTools(Astro.request.headers.get('cookie'))
 
-// Search by name and description, and filter by tool type (VK-04) and team
-// type (VK-05). A tool with no team types suits all of them, so it matches
-// every team type chip.
+// Search by name and description, and filter by tool type (VK-04). The tools
+// meant for a team type are on that type's page (VK-05), not a filter here.
 const chips = [
   {
     key: 'kind',
     legend: 'Verktøytype',
     options: Object.entries(TOOL_TYPE_LABELS).map(([value, label]) => ({ value, label })),
   },
-  {
-    key: 'type',
-    legend: 'Teamtype',
-    options: types.map((type) => ({ value: String(type.id), label: type.name })),
-  },
 ]
-const teamTypeValues = (tool: ToolWithTypes) =>
-  (tool.teamTypes.length ? tool.teamTypes : types).map((type) => type.id).join(' ')
 ---
 
 <Layout title="Verktøykasse — ilag" wide>
@@ -55,7 +44,6 @@ const teamTypeValues = (tool: ToolWithTypes) =>
               <li
                 data-search={`${tool.name} ${tool.description}`.toLowerCase()}
                 data-filter-kind={tool.toolType}
-                data-filter-type={teamTypeValues(tool)}
               >
                 <ToolCard tool={tool} />
               </li>

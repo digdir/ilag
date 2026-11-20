@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Toolbox from '../src/pages/verktoy/verktoykasse/index.astro'
 import { cookie, json } from './teams'
-import { figma, prosjektmandat, toolTeamTypes } from './tools'
+import { figma, prosjektmandat } from './tools'
 
 const render = async () => {
   const container = await AstroContainer.create()
@@ -12,11 +12,8 @@ const render = async () => {
   })
 }
 
-// The page asks for the tools and the team types.
-const cms = (tools: unknown[]) =>
-  vi.fn(async (url: string, _init?: RequestInit) =>
-    json(new URL(url).pathname === '/api/teamtyper' ? toolTeamTypes : { docs: tools }),
-  )
+// The page asks only for the tools.
+const cms = (tools: unknown[]) => vi.fn(async (_url: string, _init?: RequestInit) => json({ docs: tools }))
 
 describe('toolbox page', () => {
   afterEach(() => {
@@ -51,27 +48,27 @@ describe('toolbox page', () => {
     expect(html).toMatch(/<a class="ds-card"[^>]*href="\/verktoy\/verktoykasse\/2"[^>]*>[\s\S]*?Prosjektmandat/)
   })
 
-  it('VK-04, VK-05: filters by tool type and by team type, in two rows of chips', async () => {
+  it('VK-04: filters by tool type, in one row of chips', async () => {
     vi.stubGlobal('fetch', cms([figma, prosjektmandat]))
 
     const html = await render()
 
     expect(html).toContain('data-chip-row="kind"')
-    expect(html).toContain('data-chip-row="type"')
     for (const label of ['Mal', 'Metode', 'Veileder', 'Verktøy']) {
       expect(html).toMatch(new RegExp(`name="verktoy-kind" value="[a-z]+"[^>]*>\\s*${label}`))
     }
-    expect(html).toMatch(/name="verktoy-type" value="3"[^>]*>\s*Prosjektteam/)
     expect(html).toContain('data-filter-kind="mal"')
   })
 
-  it('VK-05: lets a tool with no team types match every team type', async () => {
-    vi.stubGlobal('fetch', cms([figma, prosjektmandat]))
+  it('VK-05: does not filter by team type, which the team type page covers', async () => {
+    const fetchMock = cms([figma, prosjektmandat])
+    vi.stubGlobal('fetch', fetchMock)
 
     const html = await render()
 
-    expect(html).toMatch(/data-filter-kind="verktoy" data-filter-type="1 3"/)
-    expect(html).toMatch(/data-filter-kind="mal" data-filter-type="1 3"/)
+    expect(html).not.toContain('data-chip-row="type"')
+    expect(html).not.toContain('data-filter-type')
+    expect(fetchMock.mock.calls.map(([url]) => new URL(url).pathname)).not.toContain('/api/teamtyper')
   })
 
   it('VK-04: searches the name and the description', async () => {

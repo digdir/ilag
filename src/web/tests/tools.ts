@@ -22,10 +22,3 @@ export const prosjektmandat = {
   toolUrl: null,
   resources: [{ id: 'a', label: 'Mal for prosjektmandat', url: 'https://example.org/mal' }],
 }
-
-export const toolTeamTypes = {
-  docs: [
-    { id: 1, name: 'Produktteam' },
-    { id: 3, name: 'Prosjektteam' },
-  ],
-}
