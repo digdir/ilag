@@ -1,0 +1,41 @@
+---
+import type { ConceptSummary } from '../../types/concept'
+
+// A concept in the list (BG-01): its name beside its definition (BG-02), as
+// in the prototype. Lists don't explain concepts in the text (ADR-0009).
+
+interface Props {
+  concept: ConceptSummary
+}
+
+const { concept } = Astro.props
+---
+
+<div class="row">
+  <h2 class="ds-heading" data-size="xs">{concept.name}</h2>
+  <p class="ds-paragraph">{concept.definition}</p>
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: var(--ds-size-2) var(--ds-size-7);
+    padding-block: var(--ds-size-5);
+    border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+  }
+
+  .row > * {
+    margin: 0;
+  }
+
+  .ds-paragraph {
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 40rem) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
