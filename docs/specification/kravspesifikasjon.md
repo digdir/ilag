@@ -534,6 +534,7 @@ erDiagram
     Team }|--|{ Leveranse : "skaper"
     Enhet }o--o{ Verktoy : "bruker"
     Team }o--o{ Verktoy : "bruker"
+    Verktoy }o--o{ Teamtype : "passer for"
 ```
 
 ## 5. Ikke funksjonelle krav
