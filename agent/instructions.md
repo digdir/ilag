@@ -20,6 +20,8 @@ against `main`.
   Playwright screenshot, run `pnpm --filter cms exec playwright install chromium` once; never use `--with-deps` or
   `install-deps`, which change the system with `sudo` and are lost when the Agent is created again. If the browser
   still fails to start over a missing library, report it rather than installing it.
+- The Chromium that Playwright 1.64 installs leaves links in `~/.cache/fontconfig` that make Firefox crash at
+  start. If Firefox fails to start after `pnpm test:e2e`, run `find ~/.cache/fontconfig -type l -delete`.
 - A desktop runs on display `:1`, which the developer can watch over VNC. The `desktop` command takes screenshots,
   sends input and records it, as the `recording` skill describes.
 - The developer reaches the dev servers on ports 3000 and 4321 with `agentctl port-forward` from the host.
