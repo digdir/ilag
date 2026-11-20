@@ -99,7 +99,7 @@ describe('team type page', () => {
     expect(section(html, 'Team av denne typen')).toContain('href="/organisering/team/7"')
   })
 
-  it('VK-05: recommends the tools meant for the type, and points to the toolbox for the rest', async () => {
+  it('VK-05: recommends the tools linked to the type', async () => {
     const fetchMock = cms()
     vi.stubGlobal('fetch', fetchMock)
 
@@ -108,7 +108,8 @@ describe('team type page', () => {
     const call = fetchMock.mock.calls.find(([url]) => new URL(url).pathname === '/api/verktoy')!
     expect(decodeURIComponent(new URL(call[0]).search)).toContain('where[teamTypes][in][0]=1')
     expect(tools).toMatch(/href="\/verktoy\/verktoykasse\/2"[^>]*>\s*Prosjektmandat/)
-    expect(tools).toContain('href="/verktoy/verktoykasse"')
+    // Every tool that suits the type is linked to it, so there is no «rest» to point to.
+    expect(tools).not.toContain('href="/verktoy/verktoykasse"')
   })
 
   it('says so when nothing is registered for the type yet', async () => {

@@ -23,11 +23,13 @@ const resources = tool?.resources ?? []
             <p class="ds-paragraph description">{tool.description}</p>
           </header>
           <div class="sections">
-            <section class="ds-card" data-color="neutral">
-              <h2 class="ds-heading" data-size="sm">
-                Passer for
-              </h2>
-              {tool.teamTypes.length ? (
+            {/* The team types the tool suits (VK-05). A tool linked to none
+                suits none, so it gets no card. */}
+            {tool.teamTypes.length > 0 && (
+              <section class="ds-card" data-color="neutral">
+                <h2 class="ds-heading" data-size="sm">
+                  Passer for
+                </h2>
                 <ul class="team-types">
                   {tool.teamTypes.map((type) => (
                     <li>
@@ -35,10 +37,8 @@ const resources = tool?.resources ?? []
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p class="ds-paragraph">Alle teamtyper</p>
-              )}
-            </section>
+              </section>
+            )}
             {/* The tool itself, where Digdir has a licence (VK-08). Only for
                 tools with a link, so most tools don't get an empty card. */}
             {tool.toolUrl && (

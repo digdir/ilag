@@ -18,7 +18,7 @@ export async function getTools(cookie: string | null): Promise<ToolWithTypes[]> 
   return docs.map(withTypes)
 }
 
-/** The tools in the toolbox meant for a team type (VK-05), by name; not those that suit all. */
+/** The tools in the toolbox linked to a team type (VK-05), by name. */
 export async function getToolsForTeamType(teamTypeId: number, cookie: string | null): Promise<ToolWithTypes[]> {
   const { docs } = await sdk.find(
     {
