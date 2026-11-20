@@ -43,6 +43,7 @@ exploit a weakness that hasn't been fixed yet.
 | [0004](0004-payload-sdk-for-cms-reads.md) | Payload's SDK for reading the CMS | Proposed |
 | [0005](0005-team-editors-use-the-admin-panel.md) | People who edit a team's content use the admin panel | Proposed |
 | [0006](0006-mandates-with-versions-and-approval.md) | Mandates as a versioned collection with approval | Proposed |
+| [0009](0009-automatic-concept-marking.md) | Concepts are explained automatically where they are used | Proposed |
 
 ## Template
 
