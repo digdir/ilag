@@ -1,7 +1,7 @@
 # The ilag Agent's image: the agentctl base image (Ubuntu 26.04, systemd, Node 24, Claude Code, Codex, gh) plus what
-# the repository's own scripts need. Pinned to the base image of agentctl v0.1.0-preview.14, the release this definition
+# the repository's own scripts need. Pinned to the base image of agentctl v0.1.0-preview.15, the release this definition
 # is written for; move to a later release by changing the tag and its digest, as `agentctl update` does.
-FROM ghcr.io/digdir/agentctl-base:ubuntu-26.04-v0.1.0-preview.14@sha256:4de3acc36600c2fba8e7e73c0de0ca812cbd32ae2286f1d7750f5394d5e90e72
+FROM ghcr.io/digdir/agentctl-base:ubuntu-26.04-v0.1.0-preview.15@sha256:dd96a8413e1890b58ae4cde092bfc8b97fcb9e221822fdcb8bb3dc26466be949
 
 # The base ends as the unprivileged Agent user; installing packages needs root again.
 USER root
@@ -52,10 +52,6 @@ RUN ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 # The repositories agent-workspace-init clones into /home/agent/code at boot.
 COPY workspace.list /etc/agent-workspace.d/ilag.list
 
-RUN agent-image-check
-
-USER agent
-
 # What the browser and desktop features need set, as `agent-feature env browser desktop` prints it.
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
 ENV DISPLAY=:1
@@ -63,3 +59,7 @@ ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 ENV ACCESSIBILITY_ENABLED=1
 ENV PLAYWRIGHT_MCP_EXECUTABLE_PATH=/usr/local/libexec/agent-playwright-chromium
 ENV XDG_CURRENT_DESKTOP=X-Openbox:XFCE
+
+RUN agent-image-check
+
+USER agent
