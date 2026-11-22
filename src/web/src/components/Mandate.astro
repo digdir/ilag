@@ -1,0 +1,85 @@
+---
+import type { MandateView } from '../types/mandate'
+import MandateStatus from './MandateStatus.astro'
+
+interface Props {
+  /** Null when the team or unit has no mandate the visitor may see. */
+  mandate: MandateView | null
+  /** Whose mandate it is, for the texts. */
+  owner: 'team' | 'unit'
+  /** The level of the fields' headings, one below the section's. */
+  headingLevel?: 3 | 4
+}
+
+const { mandate, owner, headingLevel = 3 } = Astro.props
+const Heading = `h${headingLevel}` as const
+const who = owner === 'team' ? 'Teamet' : 'Enheten'
+---
+
+<!--
+  A team's or a unit's mandate (TO-04, LO-02): its status (TO-16, LO-04), what
+  is missing (TO-10), and the four fields from the template (TO-09), from
+  markdown. The page gives the section and its heading.
+-->
+{
+  mandate ? (
+    <div class="mandate">
+      <MandateStatus mandate={mandate} />
+      {mandate.missing.length > 0 && (
+        <div class="ds-alert" data-color="warning">
+          <p class="ds-paragraph">Mandatet er ikke komplett. {who} fyller ut resten selv. Dette mangler:</p>
+          <ul class="ds-list">
+            {mandate.missing.map((label) => (
+              <li>{label}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {mandate.fields.map((field) => (
+        <div class="field">
+          <Heading class="ds-heading" data-size="2xs">
+            {field.label}
+          </Heading>
+          {field.html ? (
+            <div class="markdown" set:html={field.html} />
+          ) : (
+            <p class="ds-paragraph empty">Ikke registrert ennå</p>
+          )}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="ds-paragraph">Mandat ikke registrert.</p>
+  )
+}
+
+<style>
+  .mandate {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-5);
+    max-width: 48rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+  }
+
+  .ds-alert ul {
+    margin: var(--ds-size-2) 0 0;
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+
+  /* Room between the paragraphs and lists that markdown makes, which have no margins of their own. */
+  .markdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+</style>

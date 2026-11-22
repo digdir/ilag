@@ -3,7 +3,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Unit from '../src/pages/organisering/linjeorganisasjon/[id].astro'
 import { backLink, trail } from './breadcrumbs'
+import { approvedMandate, joined } from './mandates'
 import { cookie, json } from './teams'
+
+// The mandate section, from its heading to the end of the section.
+const mandateSection = (html: string) => html.match(/id="mandat"[\s\S]*?<\/section>/)?.[0] ?? ''
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
@@ -279,6 +283,36 @@ describe('unit page', () => {
     vi.stubGlobal('fetch', cms({ ...fel, active: false }))
     res = await render('2')
     expect(res.status).toBe(404)
+  })
+
+  it('LO-02, LO-04: shows the mandate first, with its status, and asks the CMS for it', async () => {
+    const fetchMock = cms({ ...fel, mandate: joined(approvedMandate({ approvedAt: '2026-08-20T00:00:00.000Z' })) })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const html = await (await render('2')).text()
+    const mandate = mandateSection(html)
+
+    const unitUrl = new URL(fetchMock.mock.calls.find(([url]) => new URL(url).pathname === '/api/enheter/2')![0])
+    expect(unitUrl.searchParams.get('select[mandate]')).toBe('true')
+    expect(html.indexOf('id="mandat"')).toBeLessThan(html.indexOf('id="leder"'))
+    expect(mandate).toMatch(/data-color="success"[^>]*>\s*Gjeldende/)
+    expect(mandate).toContain('Godkjent 20. august 2026')
+    expect(mandate).toContain('<strong>gode</strong>')
+  })
+
+  it('LO-04: says the unit\'s mandate is incomplete, and what is missing', async () => {
+    vi.stubGlobal('fetch', cms({ ...fel, mandate: joined(approvedMandate({ expectations: '' })) }))
+
+    const mandate = mandateSection(await (await render('2')).text())
+
+    expect(mandate).toContain('Mandatet er ikke komplett. Enheten fyller ut resten selv.')
+    expect(mandate).toMatch(/<li[^>]*>Hva forventes av oss\?<\/li>/)
+  })
+
+  it('says so when the unit has no mandate the visitor may see', async () => {
+    vi.stubGlobal('fetch', cms(fel))
+
+    expect(mandateSection(await (await render('2')).text())).toContain('Mandat ikke registrert.')
   })
 
   it('answers 404 without asking the CMS when the id is not a number', async () => {

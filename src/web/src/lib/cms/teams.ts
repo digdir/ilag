@@ -7,6 +7,7 @@ import {
 } from '@ilag/shared'
 
 import type { Member, TeamWithMembers } from '../../types/team'
+import { mandateFrom } from './mandates'
 
 // The team queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. The members join on Team brings each
@@ -28,7 +29,8 @@ async function findActiveTeams(cookie: string | null, teamTypeId?: number): Prom
     ...(teamTypeId === undefined ? {} : { teamType: { equals: teamTypeId } }),
   }
   const { docs } = await sdk.find(
-    { collection: 'team', where, sort: 'name', pagination: false },
+    // The overviews show no mandate, so it isn't fetched.
+    { collection: 'team', where, sort: 'name', pagination: false, joins: { mandate: false } },
     { headers: authHeaders(cookie) },
   )
   return docs.map(withMembers)
@@ -72,8 +74,9 @@ export const withRole = (members: Member[], code: string) =>
 
 // The generated types allow a relationship to be either the document or just
 // its ID, whatever depth was asked for, so the IDs are left out.
-const withMembers = ({ members, teamType, tools, ...team }: Team): TeamWithMembers => ({
+const withMembers = ({ members, teamType, tools, mandate, ...team }: Team): TeamWithMembers => ({
   ...team,
+  mandate: mandateFrom(mandate),
   teamType: typeof teamType === 'object' ? teamType : null,
   tools: (tools ?? [])
     .flatMap((t) => (typeof t === 'object' ? [{ id: t.id, name: t.name, toolType: t.toolType }] : []))

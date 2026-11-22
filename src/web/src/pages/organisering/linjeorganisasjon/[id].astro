@@ -1,4 +1,5 @@
 ---
+import Mandate from '../../../components/Mandate.astro'
 import Tag from '../../../components/Tag.astro'
 import SubUnits from '../../../components/linjeorganisasjon/SubUnits.astro'
 import UnitEmployees from '../../../components/linjeorganisasjon/UnitEmployees.astro'
@@ -19,8 +20,8 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
 ---
 
 <!--
-  The unit page (LO-02): the leader with contact information, the people who
-  work in the unit and the units under it. Mandate and OKR come later.
+  The unit page (LO-02): the mandate, the leader with contact information, the
+  people who work in the unit and the units under it. OKR comes later.
 -->
 <Layout
   title={unit ? `${unit.name} — ilag` : 'Fant ikke enheten — ilag'}
@@ -46,6 +47,12 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
               <Tag>Bistår og rådgir hele Digdir</Tag>
             )}
           </header>
+          <section aria-labelledby="mandat" data-color="neutral">
+            <h2 class="ds-heading" data-size="sm" id="mandat">
+              Mandat
+            </h2>
+            <Mandate mandate={unit.mandate} owner="unit" />
+          </section>
           <section aria-labelledby="leder" data-color="neutral">
             <h2 class="ds-heading" data-size="sm" id="leder">
               Leder
