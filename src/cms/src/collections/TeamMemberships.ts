@@ -3,6 +3,7 @@ import { Forbidden, type CollectionBeforeChangeHook, type CollectionConfig } fro
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { editableTeamIds, isTeamEditor, ownTeams } from '../access/teamEditor'
+import { collectionGroups } from './groups'
 
 // Create access can't be limited with a query, so a team editor's new
 // membership is checked here: it has to be in one of their teams.
@@ -31,6 +32,7 @@ export const TeamMemberships: CollectionConfig = {
     interface: 'TeamMembership',
   },
   admin: {
+    group: collectionGroups.team,
     useAsTitle: 'personName',
     defaultColumns: ['team', 'person', 'roles'],
     // Only the list in the admin panel; read is open to everyone signed in.

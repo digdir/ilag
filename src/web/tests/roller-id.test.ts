@@ -33,9 +33,14 @@ describe('role page', () => {
     expect(html).toMatch(/<h1[^>]*>\s*Teameier\s*<\/h1>/)
     const tags = [...html.matchAll(/class="ds-tag[^"]*"[^>]*>([^<]+)</g)].map((m) => m[1])
     expect(tags).toEqual(['Leveranseteam', 'Produktteam', 'Støtteteam'])
+    // Each links to the team type's page.
+    expect(html).toMatch(/<a class="ds-tag"[^>]*href="\/organisering\/team\/typer\/\d+"[^>]*>\s*Leveranseteam/)
     for (const label of ['Rolle', 'Ansvar', 'Myndighet', 'Oppgaver']) {
       expect(html).toMatch(new RegExp(`<h2[^>]*>\\s*${label}\\s*</h2>`))
     }
+    // Each part of RAMO in its own card, as on the other detail pages.
+    const cards = [...html.matchAll(/<section class="ds-card"[^>]*>\s*<h2[^>]*>\s*(\S+)\s*<\/h2>/g)]
+    expect(cards.map((match) => match[1])).toEqual(['Rolle', 'Ansvar', 'Myndighet', 'Oppgaver'])
     expect(html).toContain('Definere mål og forventninger.\nTett dialog med teamleder.')
     expect(trail(html)).toEqual([
       ['Roller', '/organisering/roller'],

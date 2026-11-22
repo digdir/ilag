@@ -4,6 +4,7 @@ import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 import { codeFromName, isCode } from '../utils/codes'
+import { collectionGroups } from './groups'
 
 // A new role without a code gets one from its name. Runs on the server before
 // validation, so the admin form may leave the code empty.
@@ -31,6 +32,7 @@ export const Roles: CollectionConfig = {
     interface: 'Role',
   },
   admin: {
+    group: collectionGroups.organisation,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',

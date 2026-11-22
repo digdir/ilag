@@ -1,0 +1,30 @@
+---
+import { toolHref, toolTypeLabel } from '../../lib/tools'
+import type { ToolWithTypes } from '../../types/tool'
+import Tag from '../Tag.astro'
+
+interface Props {
+  tool: ToolWithTypes
+}
+
+// A tool in the toolbox (VK-01): its type (VK-02), name and description
+// (VK-03). The whole card links to the tool's page, like the team cards.
+const { tool } = Astro.props
+---
+
+<a class="ds-card" data-color="neutral" href={toolHref(tool.id)}>
+  <Tag>{toolTypeLabel(tool.toolType)}</Tag>
+  <h2 class="ds-heading" data-size="xs">{tool.name}</h2>
+  <p class="ds-paragraph" data-size="sm">{tool.description}</p>
+</a>
+
+<style>
+  /* As on the team cards. */
+  .ds-card {
+    text-decoration: none;
+  }
+
+  .ds-heading {
+    text-decoration-line: none;
+  }
+</style>

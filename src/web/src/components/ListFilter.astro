@@ -4,6 +4,19 @@ interface Chip {
   label: string
 }
 
+/** A row of chips to filter by, with «Alle» first. */
+interface ChipRow {
+  /** Names the row. Items carry their values for it in `data-filter-<key>`. */
+  key: string
+  legend: string
+  options: Chip[]
+  /**
+   * With `countSuffix`, a chosen chip is named in the count after it, in lowercase, such as
+   * `'av typen'` for «2 team av typen produktteam».
+   */
+  countSuffix?: string
+}
+
 interface Props {
   /** The id of the list to filter. Its items to filter carry `data-search`. */
   list: string
@@ -15,23 +28,20 @@ interface Props {
   count: number
   /** The word for what is counted, such as `{ one: 'rolle', other: 'roller' }`. */
   noun: { one: string; other: string }
-  /**
-   * Optional chips to filter by, with «Alle» first. Items carry their values in `data-filter`.
-   * With `countSuffix`, a chosen chip is named in the count after it, in lowercase, such as
-   * `'av typen'` for «2 team av typen produktteam».
-   */
-  chips?: { legend: string; options: Chip[]; countSuffix?: string }
+  /** Optional rows of chips to filter by. An item must match the chosen chip in every row. */
+  chips?: ChipRow[]
 }
 
-const { list, empty, label, placeholder, count, noun, chips } = Astro.props
+const { list, empty, label, placeholder, count, noun, chips = [] } = Astro.props
 const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 ---
 
 <!--
   Search and filter a list the page has already rendered. The script hides the
   items in the list that don't match: an item shows when every word searched
-  for is in its data-search and, with a chip chosen, the chip's value is one of
-  the space-separated values in its data-filter. Without JavaScript, all show.
+  for is in its data-search and, in each row of chips where a chip is chosen,
+  the chip's value is one of the space-separated values in the item's
+  data-filter-<key>. Without JavaScript, all show.
 -->
 <div
   class="list-filter"
@@ -40,28 +50,27 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
   data-empty={empty}
   data-one={noun.one}
   data-other={noun.other}
-  data-count-suffix={chips?.countSuffix}
 >
   <ds-field class="ds-field">
     <label class="ds-label" for={`${list}-search`}>{label}</label>
     <input class="ds-input" id={`${list}-search`} type="search" placeholder={placeholder} />
   </ds-field>
   {
-    chips && (
-      <fieldset class="ds-fieldset">
+    chips.map((row) => (
+      <fieldset class="ds-fieldset" data-chip-row={row.key} data-count-suffix={row.countSuffix}>
         {/* The legend names the chips for screen readers; the same word shows,
             greyed, on the same line before them, where a legend can't be placed. */}
-        <legend class="ds-sr-only">{chips.legend}</legend>
+        <legend class="ds-sr-only">{row.legend}</legend>
         <div class="chips" data-size="sm">
           <span class="chips-label" aria-hidden="true">
-            {chips.legend}
+            {row.legend}
           </span>
-          {[{ value: '', label: 'Alle' }, ...chips.options].map((chip) => (
+          {[{ value: '', label: 'Alle' }, ...row.options].map((chip) => (
             <label class="ds-chip">
               <input
                 class="ds-input"
                 type="radio"
-                name={`${list}-chip`}
+                name={`${list}-${row.key}`}
                 value={chip.value}
                 checked={chip.value === ''}
               />
@@ -70,7 +79,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
           ))}
         </div>
       </fieldset>
-    )
+    ))
   }
   <p
     class="ds-paragraph count"
@@ -85,26 +94,33 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 
 <script>
   for (const filter of document.querySelectorAll<HTMLElement>('[data-list-filter]')) {
-    const { list, empty, one, other, countSuffix } = filter.dataset
+    const { list, empty, one, other } = filter.dataset
     const search = filter.querySelector<HTMLInputElement>('input[type=search]')!
     const count = filter.querySelector<HTMLElement>('[data-filter-count]')!
     const message = empty ? document.getElementById(empty) : null
     const items = [...document.getElementById(list!)!.querySelectorAll<HTMLElement>('[data-search]')]
 
+    const rows = [...filter.querySelectorAll<HTMLElement>('[data-chip-row]')]
+
     filter.addEventListener('input', () => {
       const words = search.value.trim().toLowerCase().split(/\s+/)
-      const chosen = filter.querySelector<HTMLInputElement>('input[type=radio]:checked')
-      const chip = chosen?.value ?? ''
+      const chosen = rows.flatMap((row) => {
+        const input = row.querySelector<HTMLInputElement>('input[type=radio]:checked')
+        return input?.value ? [{ row, input }] : []
+      })
       let shown = 0
       for (const item of items) {
         const matches = words.every((word) => item.dataset.search!.includes(word))
-        const inChip = !chip || (item.dataset.filter ?? '').split(' ').includes(chip)
-        item.hidden = !(matches && inChip)
+        const inChips = chosen.every(({ row, input }) =>
+          (item.getAttribute(`data-filter-${row.dataset.chipRow}`) ?? '').split(' ').includes(input.value),
+        )
+        item.hidden = !(matches && inChips)
         if (!item.hidden) shown++
       }
-      const chipName = countSuffix && chip ? chosen!.parentElement!.textContent!.trim().toLowerCase() : ''
-      count.textContent =
-        `${shown} ${shown === 1 ? one : other}` + (chipName ? ` ${countSuffix} ${chipName}` : '')
+      const chipNames = chosen
+        .filter(({ row }) => row.dataset.countSuffix)
+        .map(({ row, input }) => ` ${row.dataset.countSuffix} ${input.parentElement!.textContent!.trim().toLowerCase()}`)
+      count.textContent = `${shown} ${shown === 1 ? one : other}${chipNames.join('')}`
       if (message) message.hidden = shown > 0
     })
   }

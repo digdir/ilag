@@ -192,7 +192,26 @@ const seed = async (payload: Payload) => {
     roleIds.set(role.name, id)
   }
 
-  for (const { members, teamType, ...team } of data.teams) {
+  const toolIds = new Map<string, number>()
+  for (const { teamTypes, ...tool } of data.tools) {
+    let id = await findId(payload, 'verktoy', { name: { equals: tool.name } })
+    if (!id) {
+      id = (
+        await payload.create({
+          collection: 'verktoy',
+          data: {
+            ...tool,
+            resources: tool.resources.map((resource) => ({ ...resource })),
+            teamTypes: teamTypes.map((name) => teamTypeIds.get(name)!),
+          },
+        })
+      ).id
+      count('verktoy')
+    }
+    toolIds.set(tool.name, id)
+  }
+
+  for (const { members, teamType, tools, ...team } of data.teams) {
     let teamId = await findId(payload, 'team', { name: { equals: team.name } })
     if (!teamId) {
       teamId = (
@@ -201,6 +220,7 @@ const seed = async (payload: Payload) => {
           data: {
             ...team,
             teamType: teamTypeIds.get(teamType)!,
+            tools: tools.map((name) => toolIds.get(name)!),
           } as RequiredDataFromCollectionSlug<'team'>,
         })
       ).id
@@ -276,6 +296,7 @@ const removeSeed = async (payload: Payload) => {
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
+    ['verktoy', { name: { in: data.tools.map((t) => t.name) } }],
     ['roller', { code: { in: data.roles.map((r) => r.code) } }],
     ['teamtype-veiviser', { title: { in: data.wizardQuestions.map((q) => q.title) } }],
     ['teamtyper', { name: { in: data.teamTypes.map((t) => t.name) } }],

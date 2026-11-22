@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
+import { collectionGroups } from './groups'
 
 // Offices. Administrators register them in the admin panel; the source has
 // no list of locations. People come from the source with the location's
@@ -18,6 +19,7 @@ export const Locations: CollectionConfig = {
     interface: 'Location',
   },
   admin: {
+    group: collectionGroups.organisation,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'name',

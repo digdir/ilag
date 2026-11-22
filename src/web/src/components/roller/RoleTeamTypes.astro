@@ -1,5 +1,6 @@
 ---
 import type { RoleWithTypes } from '../../types/role'
+import { teamTypeHref } from '../../lib/teamTypes'
 import Tag from '../Tag.astro'
 
 interface Props {
@@ -18,7 +19,7 @@ const { teamTypes } = Astro.props.role
       <ul>
         {teamTypes.map((type) => (
           <li>
-            <Tag>{type.name}</Tag>
+            <Tag href={teamTypeHref(type.id)}>{type.name}</Tag>
           </li>
         ))}
       </ul>

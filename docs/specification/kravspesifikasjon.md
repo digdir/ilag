@@ -262,7 +262,7 @@ Verktøykasse skal gi et samlet og filtrerbart bibliotek over anbefalte metoder,
 | VK-02 | Systemet skal for hvert verktøy vise hvilken verktøytype det tilhører.                                            | Må        |
 | VK-03 | Systemet skal for hvert verktøy vise en kort beskrivelse og formål.                                               | Må        |
 | VK-04 | Systemet skal la brukeren søke og filtrere verktøy etter verktøytype.                                             | Bør       |
-| VK-05 | Systemet skal la brukeren filtrere verktøy etter teamtype.                                                        | Kan       |
+| VK-05 | Systemet skal vise hvilke verktøy som passer for en teamtype på teamtypens side.                                  | Kan       |
 | VK-06 | Systemet skal la en teamleder registrere hvilke verktøy teamet bruker.                                            | Må        |
 | VK-07 | Systemet skal lenke til eksterne ressurser for verktøyet for mer detaljerte beskrivelser og anbefalinger om bruk. | Bør       |
 | VK-08 | Systemet skal lenke til faktiske verktøy der Digdir har lisens.                                                   | Må        |
@@ -534,6 +534,7 @@ erDiagram
     Team }|--|{ Leveranse : "skaper"
     Enhet }o--o{ Verktoy : "bruker"
     Team }o--o{ Verktoy : "bruker"
+    Verktoy }o--o{ Teamtype : "passer for"
 ```
 
 ## 5. Ikke funksjonelle krav

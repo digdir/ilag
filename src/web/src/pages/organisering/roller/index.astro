@@ -10,13 +10,16 @@ const [roles, types] = await Promise.all([getRoles(cookie), getTeamTypes(cookie)
 
 // A chip per team type (RO-04), and one for the roles teams work with that
 // belong to no team type, such as linjeleder.
-const chips = {
-  legend: 'Teamtype',
-  options: [
-    ...types.map((type) => ({ value: String(type.id), label: type.name })),
-    { value: 'none', label: 'Andre roller' },
-  ],
-}
+const chips = [
+  {
+    key: 'type',
+    legend: 'Teamtype',
+    options: [
+      ...types.map((type) => ({ value: String(type.id), label: type.name })),
+      { value: 'none', label: 'Andre roller' },
+    ],
+  },
+]
 const filterValues = (role: (typeof roles)[number]) =>
   role.teamTypes.length ? role.teamTypes.map((t) => t.id).join(' ') : 'none'
 ---
@@ -44,7 +47,7 @@ const filterValues = (role: (typeof roles)[number]) =>
           />
           <ul class="roles" id="roller">
             {roles.map((role) => (
-              <li data-search={role.name.toLowerCase()} data-filter={filterValues(role)}>
+              <li data-search={role.name.toLowerCase()} data-filter-type={filterValues(role)}>
                 <RoleCard role={role} />
               </li>
             ))}

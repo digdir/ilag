@@ -19,15 +19,20 @@ if (!role) Astro.response.status = 404
             </h1>
             <RoleTeamTypes role={role} />
           </header>
-          {ramo(role).map((field) => (
-            <section>
-              <h2 class="ds-heading" data-size="xs">
-                {field.label}
-              </h2>
-              <p class="ds-paragraph">{field.value}</p>
-            </section>
-          ))}
-          {!ramo(role).length && <p class="ds-paragraph">Rollen er ikke beskrevet ennå.</p>}
+          {ramo(role).length ? (
+            <div class="sections">
+              {ramo(role).map((field) => (
+                <section class="ds-card" data-color="neutral">
+                  <h2 class="ds-label" data-size="xs">
+                    {field.label}
+                  </h2>
+                  <p class="ds-paragraph">{field.value}</p>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <p class="ds-paragraph">Rollen er ikke beskrevet ennå.</p>
+          )}
         </>
       ) : (
         <>
@@ -40,21 +45,49 @@ if (!role) Astro.response.status = 404
 </Layout>
 
 <style>
+  /* As on the team type and tool pages: the header on the page, each part of
+     RAMO below in a card, two side by side where there is room. */
   .page {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-size-7);
-    max-width: 52rem;
+    gap: var(--ds-size-8);
   }
 
-  header,
-  section {
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-3);
+    max-width: 48rem;
+  }
+
+  .sections {
+    display: grid;
+    /* At least 40% wide, so never more than two in a row (2×2 for all four),
+       and one under the other where two don't fit. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(22rem, 40%)), 1fr));
+    gap: var(--ds-size-6);
+  }
+
+  /* Designsystemet's card isn't a flex container, so it is made one here for
+     even space between the heading and the text. */
+  .ds-card {
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-2);
   }
 
-  section .ds-paragraph {
+  /* The same blue capitals as the RAMO labels in the role list, a little
+     larger here, where each part has a card of its own. */
+  h2 {
+    margin: 0;
+    color: var(--ds-color-accent-text-subtle);
+    font-size: var(--ds-font-size-3);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .ds-card .ds-paragraph {
     white-space: pre-line;
     text-wrap: pretty;
   }

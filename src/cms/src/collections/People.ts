@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { importEndpoints } from '../imports/endpoints'
+import { collectionGroups } from './groups'
 
 // Employees and contractors, imported from Digdir's authoritative source
 // (NF-07). The import writes through the Local API, which bypasses access
@@ -27,6 +28,7 @@ export const People: CollectionConfig = {
     interface: 'Person',
   },
   admin: {
+    group: collectionGroups.organisation,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'fullName',

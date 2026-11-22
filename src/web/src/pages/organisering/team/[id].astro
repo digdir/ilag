@@ -2,9 +2,11 @@
 import Tag from '../../../components/Tag.astro'
 import MemberList from '../../../components/team/MemberList.astro'
 import TeamOwner from '../../../components/team/TeamOwner.astro'
+import ToolList from '../../../components/verktoy/ToolList.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { ROLE_CODES } from '../../../lib/cms/roles'
 import { getTeam } from '../../../lib/cms/teams'
+import { teamTypeHref } from '../../../lib/teamTypes'
 
 const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
 if (!team) Astro.response.status = 404
@@ -19,7 +21,7 @@ const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.
       team ? (
         <>
           <header>
-            {team.teamType && <Tag>{team.teamType.name}</Tag>}
+            {team.teamType && <Tag href={teamTypeHref(team.teamType.id)}>{team.teamType.name}</Tag>}
             <h1 class="ds-heading" data-size="lg">{team.name}</h1>
             {team.description && <p class="ds-paragraph">{team.description}</p>}
           </header>
@@ -31,6 +33,10 @@ const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.
             <section class="ds-card" data-color="neutral">
               <h2 class="ds-heading" data-size="sm">Hvem er vi?</h2>
               <MemberList members={team.members.filter((m) => !isOwner(m))} />
+            </section>
+            <section class="ds-card" data-color="neutral">
+              <h2 class="ds-heading" data-size="sm">Verktøy teamet bruker</h2>
+              <ToolList tools={team.tools} />
             </section>
           </div>
         </>

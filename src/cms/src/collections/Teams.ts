@@ -3,6 +3,7 @@ import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { ownTeams } from '../access/teamEditor'
+import { collectionGroups } from './groups'
 
 // A team's memberships and mandate mean nothing without the team, and point
 // at it, so they go first. Deleting the mandate deletes its history too;
@@ -34,6 +35,7 @@ export const Teams: CollectionConfig = {
     interface: 'Team',
   },
   admin: {
+    group: collectionGroups.team,
     useAsTitle: 'name',
     defaultColumns: ['name', 'teamType', 'active'],
     // Only the list in the admin panel. Not access control: read is open to
@@ -78,6 +80,15 @@ export const Teams: CollectionConfig = {
       type: 'checkbox',
       required: true,
       defaultValue: true,
+    },
+    {
+      // VK-06, shown on the team's page (TO-07). The teameier and teamleder
+      // may change it, like the rest of the team.
+      name: 'tools',
+      label: 'Verktøy teamet bruker',
+      type: 'relationship',
+      relationTo: 'verktoy',
+      hasMany: true,
     },
     {
       // The members and their roles (TO-03).

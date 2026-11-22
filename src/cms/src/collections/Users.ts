@@ -6,6 +6,7 @@ import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
 import { providers } from '../auth/providers'
+import { collectionGroups } from './groups'
 
 // The first user, created on /admin of an empty database, has to be able to
 // use the admin panel and make others administrators. Not someone who just
@@ -40,6 +41,7 @@ export const Users: CollectionConfig = {
     interface: 'User',
   },
   admin: {
+    group: collectionGroups.system,
     // Team editors only see their teams in the admin panel.
     hidden: hiddenFromEditors,
     useAsTitle: 'email',

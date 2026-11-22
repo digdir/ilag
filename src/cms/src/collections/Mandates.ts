@@ -15,6 +15,7 @@ import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { mandateOwners, mayApprove, mayEdit, ownedBy } from '../access/mandateOwners'
 import type { Mandate } from '../payload-types'
+import { collectionGroups } from './groups'
 
 // A team's or a unit's mandate: the four core fields of Digdir's mandate
 // template (TO-09, Vedlegg 3), approved by the teameier (TO-16), with every
@@ -205,6 +206,7 @@ export const Mandates: CollectionConfig = {
     interface: 'Mandate',
   },
   admin: {
+    group: collectionGroups.team,
     // The first column links to the mandate, so it names the owner.
     defaultColumns: ['title', '_status', 'approvedAt', 'updatedAt'],
     // Team editors see the mandates of their own teams, as they do with teams

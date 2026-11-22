@@ -1,0 +1,45 @@
+---
+import { toolHref } from '../../lib/tools'
+import type { ToolSummary } from '../../types/tool'
+
+interface Props {
+  tools: ToolSummary[]
+}
+
+// The tools a team uses (TO-07), each linking to its page in the toolbox.
+const { tools } = Astro.props
+---
+
+{
+  tools.length ? (
+    <ul>
+      {tools.map((tool) => (
+        <li>
+          <a class="ds-link" href={toolHref(tool.id)}>
+            {tool.name}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="ds-paragraph" data-size="sm">
+      Ingen verktøy registrert ennå.
+    </p>
+  )
+}
+
+<style>
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2) var(--ds-size-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ds-paragraph {
+    margin: 0;
+    color: var(--ds-color-text-subtle);
+  }
+</style>

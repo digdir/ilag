@@ -35,21 +35,38 @@ describe('list filter', () => {
   it('adds the chips after «Alle», which is chosen', async () => {
     const html = await render({
       count: 2,
-      chips: { legend: 'Type', options: [{ value: '7', label: 'Sju' }] },
+      chips: [{ key: 'type', legend: 'Type', options: [{ value: '7', label: 'Sju' }] }],
     })
 
     expect(html).toContain('<legend')
-    expect(html).toMatch(/name="ting-chip" value checked[^>]*>\s*Alle/)
-    expect(html).toMatch(/name="ting-chip" value="7"[^>]*>\s*Sju/)
+    expect(html).toContain('data-chip-row="type"')
+    expect(html).toMatch(/name="ting-type" value checked[^>]*>\s*Alle/)
+    expect(html).toMatch(/name="ting-type" value="7"[^>]*>\s*Sju/)
     expect(html).not.toContain('data-count-suffix')
   })
 
   it('passes the words to name a chosen chip in the count by, if any', async () => {
     const html = await render({
       count: 2,
-      chips: { legend: 'Type', options: [{ value: '7', label: 'Sju' }], countSuffix: 'av typen' },
+      chips: [{ key: 'type', legend: 'Type', options: [{ value: '7', label: 'Sju' }], countSuffix: 'av typen' }],
     })
 
     expect(html).toContain('data-count-suffix="av typen"')
+  })
+
+  it('gives each row of chips its own key and radio group, so a chip can be chosen in each', async () => {
+    const html = await render({
+      count: 2,
+      chips: [
+        { key: 'kind', legend: 'Verktøytype', options: [{ value: 'mal', label: 'Mal' }] },
+        { key: 'type', legend: 'Teamtype', options: [{ value: '7', label: 'Sju' }] },
+      ],
+    })
+
+    expect(html.match(/<fieldset/g)).toHaveLength(2)
+    expect(html).toContain('data-chip-row="kind"')
+    expect(html).toContain('data-chip-row="type"')
+    expect(html).toMatch(/name="ting-kind" value="mal"[^>]*>\s*Mal/)
+    expect(html).toMatch(/name="ting-type" value="7"[^>]*>\s*Sju/)
   })
 })

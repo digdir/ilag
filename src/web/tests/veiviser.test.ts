@@ -97,6 +97,14 @@ describe('team type wizard', () => {
     expect(html).toMatch(/href="\?svar=1"[^>]*>[\s\S]{0,80}Forrige spørsmål/)
   })
 
+  it('TK-01: links from the team type to its page', async () => {
+    vi.stubGlobal('fetch', cms())
+
+    const html = await render('?svar=1.1')
+
+    expect(html).toMatch(/href="\/organisering\/team\/typer\/1"[^>]*>\s*Les mer om prosjektteam/)
+  })
+
   it('TK-03: an answer that leads nowhere ends with the answer as advice', async () => {
     vi.stubGlobal('fetch', cms())
 
@@ -106,6 +114,7 @@ describe('team type wizard', () => {
     expect(html).toContain('Hovedsakelig nei')
     expect(html).toContain('Vurder individuelt ansvar.')
     expect(html).toContain('Start på nytt')
+    expect(html).not.toContain('Les mer om')
   })
 
   it('starts over when the answers in the URL no longer fit', async () => {
