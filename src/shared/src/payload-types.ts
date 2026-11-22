@@ -77,6 +77,7 @@ export interface Config {
     lokasjoner: Location;
     roller: Role;
     brukere: User;
+    tilbakemeldinger: Feedback;
     importkjoringer: ImportRun;
     medier: Media;
     'payload-kv': PayloadKv;
@@ -117,6 +118,7 @@ export interface Config {
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
     brukere: BrukereSelect<false> | BrukereSelect<true>;
+    tilbakemeldinger: TilbakemeldingerSelect<false> | TilbakemeldingerSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     medier: MedierSelect<false> | MedierSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -243,7 +245,7 @@ export interface Tool {
    */
   description: string;
   /**
-   * Teamtypene verktøyet passer for. La feltet stå tomt hvis det passer for alle.
+   * Teamtypene verktøyet passer for. Velg alle hvis det passer for alle team.
    */
   teamTypes?: (number | TeamType)[] | null;
   /**
@@ -463,6 +465,23 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tilbakemeldinger".
+ */
+export interface Feedback {
+  id: number;
+  category: 'faktafeil' | 'utdatert' | 'uklart' | 'mangler' | 'annet';
+  text: string;
+  status: 'ny' | 'under-arbeid' | 'rettet' | 'avvist';
+  page: string;
+  team?: (number | null) | Team;
+  unit?: (number | null) | Unit;
+  contactMe?: boolean | null;
+  reporter?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "importkjoringer".
  */
 export interface ImportRun {
@@ -659,6 +678,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'brukere';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'tilbakemeldinger';
+        value: number | Feedback;
       } | null)
     | ({
         relationTo: 'importkjoringer';
@@ -897,6 +920,22 @@ export interface BrukereSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tilbakemeldinger_select".
+ */
+export interface TilbakemeldingerSelect<T extends boolean = true> {
+  category?: T;
+  text?: T;
+  status?: T;
+  page?: T;
+  team?: T;
+  unit?: T;
+  contactMe?: T;
+  reporter?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

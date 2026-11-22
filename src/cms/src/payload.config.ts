@@ -19,6 +19,7 @@ import { TeamTypeWizard } from './collections/TeamTypeWizard'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { Tools } from './collections/Tools'
 import { ImportRuns } from './collections/ImportRuns'
+import { Feedback } from './collections/Feedback'
 import { isAdmin } from './access/isAdmin'
 import { importTasks } from './imports/tasks'
 import { health } from './endpoints/health'
@@ -78,6 +79,7 @@ export default buildConfig({
     Locations,
     Roles,
     Users,
+    Feedback,
     ImportRuns,
     Media,
   ],

@@ -1,0 +1,43 @@
+---
+interface Props {
+  /** Without a logged-in user (the login page) there is nothing to report from. */
+  signedIn: boolean
+  pathname: string
+  /** The page's title, so the report says what it is about. */
+  title: string
+}
+
+const { signedIn, pathname, title } = Astro.props
+const report = `/meld-fra?${new URLSearchParams({ side: pathname, tittel: title })}`
+---
+
+<footer>
+  <div class="inner">
+    <span class="ds-paragraph" data-size="sm">Forvaltes av Virksomhetsstyring og utvikling (VSU)</span>
+    {
+      signedIn && pathname !== '/meld-fra' && (
+        <a class="ds-link" data-size="sm" href={report}>
+          Meld fra om feil
+        </a>
+      )
+    }
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-block-start: var(--ds-size-12);
+    border-block-start: 1px solid var(--ds-color-neutral-border-subtle);
+    background: var(--ds-color-neutral-background-tinted);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-4) var(--ds-size-8);
+    align-items: baseline;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: var(--ds-size-6) var(--ds-size-4);
+  }
+</style>
