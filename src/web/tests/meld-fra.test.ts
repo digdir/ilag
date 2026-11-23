@@ -36,7 +36,16 @@ describe('report an error page', () => {
     expect(html).toMatch(/<dialog[^>]*id="meld-fra"/)
     expect(html).toContain('action="/meld-fra?side=%2Forganisering%2Fteam%2F7&amp;tittel=Team+Skjemabygger"')
     expect(html).toContain('teameier og teamleder for teamet')
-    expect(html).not.toContain('Takk!')
+    // The footer's own thanks is for coming back after a post without JavaScript.
+    expect(html.slice(0, html.indexOf('<dialog'))).not.toContain('Takk!')
+  })
+
+  it('TB-01: has the thanks ready in the dialog, hidden until the form is sent, with a close button', async () => {
+    const html = await footer('/organisering/team/7')
+    const thanks = html.slice(html.indexOf('data-step="thanks"'), html.indexOf('</dialog>'))
+    expect(html).toMatch(/data-step="thanks"[^>]*hidden/)
+    expect(thanks).toContain('Takk! Tilbakemeldingen er sendt til teameier og teamleder for teamet.')
+    expect(thanks).toMatch(/<button[^>]*command="close"[^>]*commandfor="meld-fra"[^>]*>\s*Lukk/)
   })
 
   it('TB-01: thanks the visitor when they come back, and offers nothing before login', async () => {

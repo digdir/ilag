@@ -53,11 +53,55 @@ const sent = url.search.slice(1) === FEEDBACK_SENT
         <h2 class="ds-heading" data-size="md">
           Meld fra om feil
         </h2>
-        <FeedbackForm page={page} pageTitle={pageTitle} dialogId="meld-fra" />
+        <div data-step="form">
+          <FeedbackForm page={page} pageTitle={pageTitle} dialogId="meld-fra" />
+        </div>
+        {/* Shown by the script below once the form is sent, until the visitor closes it. */}
+        <div class="thanks" data-step="thanks" hidden>
+          <div class="ds-alert" data-color="success" role="status">
+            <p class="ds-paragraph">Takk! Tilbakemeldingen er sendt til {feedbackOwner(page).label}.</p>
+          </div>
+          <button class="ds-button" type="button" command="close" commandfor="meld-fra">
+            Lukk
+          </button>
+        </div>
       </dialog>
     )
   }
 </footer>
+
+<script>
+  // Sends the form without leaving the page, so the thanks shows in the dialog.
+  // On any failure the form is posted as usual: /meld-fra then shows the error
+  // with what was typed. Without this script, the post reloads the page and the
+  // footer thanks the visitor instead.
+  const dialog = document.querySelector<HTMLDialogElement>('dialog#meld-fra')
+  const form = dialog?.querySelector('form')
+  const step = (name: string) => dialog!.querySelector<HTMLElement>(`[data-step="${name}"]`)!
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    let sent = false
+    try {
+      // /meld-fra redirects only when the feedback was saved.
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), redirect: 'manual' })
+      sent = res.type === 'opaqueredirect'
+    } catch {
+      // Sent as usual below.
+    }
+    if (!sent) return form.submit()
+    form.reset()
+    step('form').hidden = true
+    step('thanks').hidden = false
+    step('thanks').querySelector('button')!.focus()
+  })
+
+  // Ready for another report the next time it opens.
+  dialog?.addEventListener('close', () => {
+    step('form').hidden = false
+    step('thanks').hidden = true
+  })
+</script>
 
 <style>
   footer {
@@ -83,6 +127,17 @@ const sent = url.search.slice(1) === FEEDBACK_SENT
   /* Room for the whole form on a laptop screen; Designsystemet's default is 80vh. */
   dialog {
     --dsc-dialog-max-height: 90dvh;
+  }
+
+  .thanks {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--ds-size-6);
+  }
+
+  .thanks[hidden] {
+    display: none;
   }
 
   dialog h2 {
