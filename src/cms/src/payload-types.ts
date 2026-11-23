@@ -399,28 +399,15 @@ export interface Mandate {
    * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
    */
   problem: string;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
   outcomes: string;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
   expectations: string;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
   collaboration: string;
   /**
-   * Dagens dato hvis tomt når mandatet godkjennes.
+   * Dagens dato hvis tomt når mandatet godkjennes. Kan ikke være frem i tid.
    */
   approvedAt?: string | null;
   approvedBy?: (number | null) | Person;
-  /**
-   * Når mandatet ikke lenger gjelder: sett datoen og publiser. Mandatet vises fortsatt, merket som utgått.
-   */
-  expiredAt?: string | null;
-  status?: ('draft' | 'current' | 'expired') | null;
+  status?: ('draft' | 'current') | null;
   complete?: boolean | null;
   missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
   updatedAt: string;
@@ -846,7 +833,6 @@ export interface MandaterSelect<T extends boolean = true> {
   collaboration?: T;
   approvedAt?: T;
   approvedBy?: T;
-  expiredAt?: T;
   status?: T;
   complete?: T;
   missingFields?: T;

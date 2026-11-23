@@ -7,7 +7,6 @@ export const approvedMandate = (overrides: Record<string, unknown> = {}) => ({
   expectations: 'Teamet eier skjemaverktøyet.',
   collaboration: 'Samarbeider med Team Innlogging.',
   approvedAt: '2026-09-15T00:00:00.000Z',
-  expiredAt: null,
   _status: 'published',
   status: 'current',
   complete: true,

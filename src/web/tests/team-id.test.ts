@@ -183,16 +183,6 @@ describe('team page', () => {
     expect(mandate).toContain('Ikke godkjent ennå')
   })
 
-  it('TO-16: marks an expired mandate, with when it stopped applying', async () => {
-    const expired = approvedMandate({ status: 'expired', expiredAt: '2026-11-16T00:00:00.000Z' })
-    vi.stubGlobal('fetch', vi.fn(async () => json({ ...skjemabygger, mandate: joined(expired) })))
-
-    const mandate = mandateSection(await (await render('7')).text())
-
-    expect(mandate).toMatch(/data-color="neutral"[^>]*>\s*Utgått/)
-    expect(mandate).toContain('Gjaldt til 16. november 2026 · Godkjent 15. september 2026')
-  })
-
   it('says so when the team has no mandate the visitor may see', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json({ ...skjemabygger, mandate: joined() })))
     expect(mandateSection(await (await render('7')).text())).toContain('Mandat ikke registrert.')

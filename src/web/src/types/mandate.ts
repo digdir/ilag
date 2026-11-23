@@ -13,12 +13,10 @@ export type MandateField = {
 
 /** A team's or a unit's mandate, as the visitor may see it. */
 export type MandateView = {
-  /** Utkast, gjeldende or utgått (TO-16, LO-04). Readers only ever get an approved one. */
+  /** Utkast or gjeldende (TO-16, LO-04). Readers only ever get an approved one. */
   status: NonNullable<Mandate['status']>
   /** The date of the approval, as an ISO date at midnight UTC; null for a draft. */
   approvedAt: string | null
-  /** When the mandate stopped applying; null unless it has expired. */
-  expiredAt: string | null
   /** The four fields, in the template's order. */
   fields: MandateField[]
   /** The labels of the fields that are empty (TO-10). */

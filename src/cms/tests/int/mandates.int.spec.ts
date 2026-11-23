@@ -5,6 +5,7 @@ import {
   restoreVersionOperation,
   type RequiredDataFromCollectionSlug,
 } from 'payload'
+import { isAfterToday } from '@/collections/Mandates'
 import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -309,36 +310,17 @@ describe('Mandates', () => {
       expect(seen.approvedAt).toBe('2026-11-02T00:00:00.000Z')
     })
 
-    it('TO-16: lets the teameier mark the mandate expired, keeping its approval date', async () => {
-      // The form is opened on the restored draft, which has no date.
-      const expired = await approve(mandate.id, teamOwner, { expiredAt: '2026-11-16T00:00:00.000Z' })
-      expect(expired.status).toBe('expired')
-      expect(expired.expiredAt).toBe('2026-11-16T00:00:00.000Z')
-      expect(expired.approvedAt).toBe('2026-11-02T00:00:00.000Z')
-      expect(idOf(expired.approvedBy)).toBe(ownerPerson.id)
-      const seen = await read(mandate.id, reader)
-      expect(seen.status).toBe('expired')
-      expect(seen.expiredAt).toBe('2026-11-16T00:00:00.000Z')
+    it('TO-16: refuses an approval dated in the future', async () => {
+      const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) + 'T12:00:00.000Z'
+      await expect(approve(mandate.id, teamOwner, { approvedAt: tomorrow })).rejects.toThrow(/approvedAt/)
+      expect((await read(mandate.id, reader)).approvedAt).toBe('2026-11-02T00:00:00.000Z')
     })
 
-    it('TO-16: keeps an expired mandate expired while a draft is worked on, and a new approval makes it current', async () => {
-      const draft = await saveDraft(mandate.id, teamLead, { problem: 'Et tredje problem.' })
-      expect(draft.status).toBe('draft')
-      expect(draft.expiredAt).toBeFalsy()
-      expect((await read(mandate.id, reader)).status).toBe('expired')
-
+    it('TO-16: approving the restored draft makes it the current mandate', async () => {
       const approved = await approve(mandate.id, teamOwner)
       expect(approved.status).toBe('current')
-      expect(approved.expiredAt).toBeFalsy()
+      expect(approved.problem).toBe(content.problem)
       expect(approved.approvedAt).toBe(today())
-    })
-
-    it('TO-16: lets nobody but approvers expire a mandate', async () => {
-      await expect(saveDraft(mandate.id, teamLead, { expiredAt: '2026-11-16T00:00:00.000Z' })).resolves.toMatchObject({
-        expiredAt: null,
-      })
-      expect((await read(mandate.id, reader)).status).toBe('current')
-      await expect(approve(mandate.id, teamLead, { expiredAt: '2026-11-16T00:00:00.000Z' })).rejects.toThrow()
     })
 
     it('never moves a mandate to another team', async () => {
@@ -480,5 +462,16 @@ describe('Mandates', () => {
         expect(totalDocs).toBeGreaterThan(0)
       }
     })
+  })
+})
+
+describe('isAfterToday', () => {
+  // The admin panel stores a picked day at noon UTC.
+  it('compares the picked day with today in Norway', () => {
+    // 00:30 on 24 November in Oslo, still the 23rd in UTC.
+    const now = new Date('2026-11-23T23:30:00.000Z')
+    expect(isAfterToday('2026-11-24T12:00:00.000Z', now)).toBe(false)
+    expect(isAfterToday('2026-11-23T00:00:00.000Z', now)).toBe(false)
+    expect(isAfterToday('2026-11-25T12:00:00.000Z', now)).toBe(true)
   })
 })

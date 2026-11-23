@@ -29,7 +29,6 @@ export function toMandate(mandate: Mandate): MandateView {
   return {
     status: mandate.status ?? (mandate._status === 'published' ? 'current' : 'draft'),
     approvedAt: mandate.approvedAt ?? null,
-    expiredAt: mandate.expiredAt ?? null,
     fields,
     missing: fields.filter((f) => !f.html).map((f) => f.label),
   }
