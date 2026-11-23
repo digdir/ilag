@@ -73,6 +73,7 @@ export interface Config {
     teamtyper: TeamType;
     'teamtype-veiviser': TeamTypeWizardQuestion;
     verktoy: Tool;
+    begreper: Concept;
     personer: Person;
     enheter: Unit;
     lokasjoner: Location;
@@ -116,6 +117,7 @@ export interface Config {
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     verktoy: VerktoySelect<false> | VerktoySelect<true>;
+    begreper: BegreperSelect<false> | BegreperSelect<true>;
     personer: PersonerSelect<false> | PersonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
@@ -482,6 +484,28 @@ export interface TeamTypeWizardQuestion {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "begreper".
+ */
+export interface Concept {
+  id: number;
+  name: string;
+  /**
+   * Kort og tydelig, i noen få setninger. Vises også når begrepet forklares i teksten.
+   */
+  definition: string;
+  /**
+   * Bøyningsformer og andre skrivemåter som skal forklares som dette begrepet, som «teamet» og «teamene». Navnet er alltid med.
+   */
+  variants?: string[] | null;
+  /**
+   * Slå av for vanlige ord, som «team», som ellers blir markert i nesten hver tekst.
+   */
+  autoLink: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "brukere".
  */
 export interface User {
@@ -708,6 +732,10 @@ export interface PayloadLockedDocument {
         value: number | Tool;
       } | null)
     | ({
+        relationTo: 'begreper';
+        value: number | Concept;
+      } | null)
+    | ({
         relationTo: 'personer';
         value: number | Person;
       } | null)
@@ -876,6 +904,18 @@ export interface VerktoySelect<T extends boolean = true> {
         id?: T;
       };
   teams?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "begreper_select".
+ */
+export interface BegreperSelect<T extends boolean = true> {
+  name?: T;
+  definition?: T;
+  variants?: T;
+  autoLink?: T;
   updatedAt?: T;
   createdAt?: T;
 }

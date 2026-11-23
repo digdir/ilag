@@ -223,11 +223,7 @@ export function toDetail(
     name: unit.name,
     code: unit.code || null,
     level: unit.level,
-    // A blank line in the admin panel's text field starts a new paragraph.
-    description: (unit.description ?? '')
-      .split(/\n\s*\n/)
-      .map((p) => p.trim())
-      .filter(Boolean),
+    description: unit.description ?? null,
     ancestors,
     advisesAllOfDigdir: unit.advisesAllOfDigdir,
     mandate: mandateFrom(unit.mandate),

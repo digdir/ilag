@@ -1,6 +1,8 @@
 import { defineMiddleware } from 'astro:middleware'
 import { currentUser } from '@ilag/shared'
 
+import { conceptsFor } from './lib/cms/concepts'
+
 // Every page needs a logged-in user (NF-11), except the login page itself.
 // Payload owns the session: this only asks it who the cookie belongs to.
 // Content is still protected in Payload, whose access control decides what
@@ -27,5 +29,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   context.locals.user = user
+  // Start reading the concepts Prose explains (BG-06) now, alongside the
+  // page's own reads, instead of after them. The read never fails.
+  void conceptsFor(context.locals, context.request.headers.get('cookie'))
   return next()
 })

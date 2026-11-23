@@ -35,8 +35,8 @@ export type UnitDetail = {
   name: string
   code: string | null
   level: Unit['level']
-  /** What the unit does, in paragraphs; empty until an administrator writes one. */
-  description: string[]
+  /** What the unit does, with a blank line between paragraphs; null until an administrator writes one. */
+  description: string | null
   /** The units above it, from the directorate down, for the breadcrumbs; empty for the directorate. */
   ancestors: { id: number; name: string }[]
   advisesAllOfDigdir: boolean

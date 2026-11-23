@@ -34,7 +34,9 @@ the front page then verifies that the frontend can reach the CMS.
 | --- | --- |
 | `pnpm dev` | Run CMS and frontend together |
 | `pnpm dev:cms` / `pnpm dev:web` | Run one of them |
-| `pnpm dev:stop` | Stop both dev servers (Astro runs as a detached daemon, so Ctrl+C alone leaves it running) |
+| `pnpm dev:wt [worktree]` | Move both dev servers to the worktree you are in, or to `[worktree]`, in the background; see [Switching worktrees](#switching-worktrees) |
+| `pnpm dev:status` / `pnpm dev:logs` | Which checkout serves :3000 and :4321 / follow their output |
+| `pnpm dev:stop` | Stop both dev servers, in whichever checkout they run (Astro can run as a detached daemon, so Ctrl+C alone may leave it running) |
 | `pnpm build` | Production build of both |
 | `pnpm setup` | Create missing `.env` files from the examples (safe to re-run) |
 | `pnpm db:up` / `pnpm db:down` | Start/stop PostgreSQL |
@@ -50,6 +52,18 @@ the front page then verifies that the frontend can reach the CMS.
 | `pnpm test:int` | CMS integration tests (vitest, Payload Local API) |
 | `pnpm test:web` | Frontend render tests (vitest, Astro container API) |
 | `pnpm test:e2e` | End-to-end tests (Playwright, needs browsers installed) |
+
+## Switching worktrees
+
+`pnpm dev:wt` moves the dev servers to the
+[Git worktree](https://git-scm.com/docs/git-worktree) you run it in (or the one
+you name, as in `pnpm dev:wt begreper`): it stops them wherever they run and
+starts them there in the background, still on :3000 and :4321. The first time, a
+worktree still on `ilag_dev` gets a database of its own, `ilag_<worktree>`, so
+branches don't drop each other's tables. It starts empty, not as a copy of
+`ilag_dev`, which may hold another branch's tables. A worktree database with no
+users gets the test data from `pnpm db:seed` once the CMS has loaded, so you can
+log in as `admin@example.com`.
 
 ## Ports
 

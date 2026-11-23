@@ -42,7 +42,7 @@ RUN if [ -r /run/agent/tls/ca-bundle.pem ]; then \
        npx --yes "playwright@${PLAYWRIGHT_VERSION}" install-deps chromium \
     && rm -rf "${scratch}" /tmp/node-compile-cache /var/lib/apt/lists/*
 
-# `pnpm dev:stop` (scripts/dev-stop.sh) finds the CMS by its port with lsof. Without it, the CMS keeps running.
+# Handy for seeing what holds a port. scripts/dev-switch.mjs uses ss instead, since lsof skips Next's server process on Linux.
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends lsof \
     && rm -rf /var/lib/apt/lists/*

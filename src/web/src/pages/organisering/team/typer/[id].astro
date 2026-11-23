@@ -1,4 +1,5 @@
 ---
+import Prose from '../../../../components/Prose.astro'
 import TeamCard from '../../../../components/team/TeamCard.astro'
 import ToolList from '../../../../components/verktoy/ToolList.astro'
 import Layout from '../../../../layouts/Layout.astro'
@@ -38,7 +39,7 @@ const requirements = lines(teamType?.requirements)
             <h1 class="ds-heading" data-size="lg">
               {teamType.name}
             </h1>
-            {teamType.description && <p class="ds-paragraph description">{teamType.description}</p>}
+            <Prose text={teamType.description} />
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">
@@ -135,11 +136,6 @@ const requirements = lines(teamType?.requirements)
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ds-color-text-subtle);
-  }
-
-  .description {
-    white-space: pre-line;
-    text-wrap: pretty;
   }
 
   .sections {

@@ -1,0 +1,65 @@
+---
+import { conceptsFor } from '../lib/cms/concepts'
+import { markConcepts } from '../lib/concepts'
+import ConceptPopover from './begreper/ConceptPopover.astro'
+
+// Text from the CMS, in paragraphs, with the first use of each concept
+// explained in a popover (BG-06, ADR-0009). Detail pages render their text
+// through this; lists don't. The concepts are read once per request, however
+// many Prose the page has.
+
+interface Props {
+  /** Paragraphs separated by blank lines. */
+  text: string | null | undefined
+}
+
+const { text } = Astro.props
+const paragraphs = markConcepts(text, await conceptsFor(Astro.locals, Astro.request.headers.get('cookie')))
+
+// One popover per marked word, after the paragraphs: a popover can't sit
+// inside a <p>. A concept is marked once per text, so a word's popover is the
+// only one for its concepts. Ids must be unique on the page, which may have
+// many Prose.
+const popovers = paragraphs.flat().flatMap(({ concepts }) => {
+  if (!concepts) return []
+  Astro.locals.conceptPopovers = (Astro.locals.conceptPopovers ?? 0) + 1
+  return [{ concepts, id: `begrep-${concepts.map((c) => c.id).join('-')}-${Astro.locals.conceptPopovers}` }]
+})
+const popoverFor = new Map(popovers.map((popover) => [popover.concepts, popover.id]))
+---
+
+{
+  paragraphs.length > 0 && (
+    <div class="prose">
+      {paragraphs.map((segments) => (
+        <p class="ds-paragraph">
+          {segments.map((segment) =>
+            segment.concepts ? (
+              <button type="button" data-popover="inline" popovertarget={popoverFor.get(segment.concepts)}>{segment.text}</button>
+            ) : (
+              segment.text
+            ),
+          )}
+        </p>
+      ))}
+      {popovers.map(({ concepts, id }) => (
+        <ConceptPopover concepts={concepts} id={id} />
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  /* A single line break in the admin panel's text field is kept. */
+  .prose > p {
+    margin: 0;
+    white-space: pre-line;
+    text-wrap: pretty;
+  }
+</style>

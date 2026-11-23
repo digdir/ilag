@@ -286,7 +286,7 @@ Begreper skal gi et samlet og søkbart begrepsapparat for team- og leveransearbe
 | BG-03 | Systemet skal la brukeren søke i begrepslisten.                                                                                      | Bør       |
 | BG-04 | Systemet skal vise kobling til begrepet i en ekstern begrepskatalog (f.eks. data.norge.no), der dette finnes.                        | Bør       |
 | BG-05 | Systemet skal vise ytterligere metadata for begrepet utover beskrivelsen, der dette er registrert.                                   | Kan       |
-| BG-06 | Systemet skal, der alle begreper brukes, gi brukeren en «inline» forklaring uten at brukeren må forlate siden/konteksten man står i. | Må        |
+| BG-06 | Systemet skal, der begreper brukes i tekst, gi brukeren en «inline» forklaring uten at brukeren må forlate siden/konteksten man står i. Begrepene finnes automatisk ut fra navnet og registrerte bøyningsformer. Administrator bestemmer hvilke begreper som forklares slik. Forklaringen gis første gang begrepet brukes i hver tekst, på sider for ett team, én enhet, én rolle, én teamtype eller ett verktøy, ikke i lister. | Må        |
 
 ### 3.6 Prinsipper
 Prinsipper beskriver de grunnleggende føringene for hvordan vi organiserer team, følger dem opp og hvilke rammer teamet skal forholde seg til. De gir teamene et felles utgangspunkt for prioriteringer, beslutninger og samarbeid.
@@ -490,7 +490,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Prinsipp** – kan knyttes til et område (generell kategori, f.eks. arkitektur eller ledelse) og/eller til en spesifikk enhet, et prosjekt eller et team
 
-- **Begrep** – definert begrep fra begrepsapparatet, med mulig kobling mot ekstern begrepskatalog (data.norge.no) og egne metadata utover beskrivelsen
+- **Begrep** – definert begrep fra begrepsapparatet, med navn, definisjon, andre former (som bøyningsformer) og om begrepet skal forklares automatisk der det brukes (BG-06), med mulig kobling mot ekstern begrepskatalog (data.norge.no) og egne metadata utover beskrivelsen
 
 - **Mandat** – hvorfor et team eller en enhet finnes, hva det skal oppnå og hva som forventes, i de fire faste feltene fra mandatmalen (jf. Vedlegg 3), skrevet i markdown. Et mandat hører til ett team eller én enhet, og et team eller en enhet har høyst ett mandat. Enheter deler ikke mandat; enheter som har et felles mandat, får hvert sitt. Mandatet har status utkast, gjeldende eller utgått, datoen det ble godkjent, og datoen det gikk ut for et mandat som er utgått. Alle versjoner tas vare på, også utkast (jf. TO-16, TO-17).
 
