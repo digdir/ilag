@@ -24,4 +24,6 @@ against `main`.
   start. If Firefox fails to start after `pnpm test:e2e`, run `find ~/.cache/fontconfig -type l -delete`.
 - A desktop runs on display `:1`, which the developer can watch over VNC. The `desktop` command takes screenshots,
   sends input and records it, as the `recording` skill describes.
-- The developer reaches the dev servers on ports 3000 and 4321 with `agentctl port-forward` from the host.
+- The developer reaches the dev servers on ports 3000 and 4321 with `agentctl port-forward` from the host. Only one
+  checkout can serve them at a time: run `pnpm dev:wt` in the worktree to serve from, which stops them elsewhere,
+  installs, sets up and starts them there in the background. `pnpm dev:status` shows where they run.
