@@ -76,8 +76,18 @@ describe('site header', () => {
     expect(menuLink(html, 'Linjeorganisasjon')).toContain('href="/organisering/linjeorganisasjon"')
   })
 
+  it('FS-01: has the search across ilag', async () => {
+    const html = await render({ user: kari, pathname: '/' })
+
+    expect(html).toMatch(/<label [^>]*for="site-search"[^>]*>Søk i ilag<\/label>/)
+    expect(html).toMatch(/<ds-suggestion [^>]*data-site-search/)
+    expect(html).toMatch(/<u-datalist [^>]*data-nofilter/)
+  })
+
   it('shows only the logo when nobody is logged in', async () => {
     const html = await render({ pathname: '/logg-inn' })
+
+    expect(html).not.toContain('data-site-search')
 
     expect(html).toContain('alt="Digdir"')
     expect(html).not.toContain('Hovedmeny')
