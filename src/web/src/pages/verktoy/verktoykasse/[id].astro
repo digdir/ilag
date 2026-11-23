@@ -2,14 +2,12 @@
 import Prose from '../../../components/Prose.astro'
 import Tag from '../../../components/Tag.astro'
 import Layout from '../../../layouts/Layout.astro'
-import { getConceptMatcher } from '../../../lib/cms/concepts'
 import { getTool } from '../../../lib/cms/tools'
 import { teamTypeHref } from '../../../lib/teamTypes'
 import { toolTypeLabel } from '../../../lib/tools'
 
 const cookie = Astro.request.headers.get('cookie')
 const tool = await getTool(Astro.params.id!, cookie)
-const concepts = tool && (await getConceptMatcher(cookie))
 if (!tool) Astro.response.status = 404
 const resources = tool?.resources ?? []
 ---
@@ -24,7 +22,7 @@ const resources = tool?.resources ?? []
             <h1 class="ds-heading" data-size="lg">
               {tool.name}
             </h1>
-            <Prose text={tool.description} concepts={concepts} />
+            <Prose text={tool.description} />
           </header>
           <div class="sections">
             {/* The team types the tool suits (VK-05). A tool linked to none
