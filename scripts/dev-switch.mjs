@@ -273,8 +273,10 @@ async function loadCms() {
 // Payload pushes each branch's schema to its database on start and drops what
 // the branch lacks, so worktrees sharing a database would undo each other's
 // tables. A worktree still on the shared default gets a database of its own,
-// ilag_<worktree>, which starts as a copy of the shared one so its data comes
-// along. The main checkout keeps the shared one, and other names are left alone.
+// ilag_<worktree>. It starts empty rather than as a copy of the shared one,
+// which may hold another branch's tables, and seedIfEmpty fills it once the CMS
+// has pushed this branch's schema. The main checkout keeps the shared one, and
+// other names are left alone.
 function ensureOwnDatabase(checkout) {
   if (checkout.path === worktrees()[0]?.path) return
   const envFile = path.join(checkout.path, 'src/cms/.env')
@@ -297,14 +299,9 @@ function ensureOwnDatabase(checkout) {
   if (exists.ok && exists.out === '1') {
     console.log(`${name} exists already; using it.`)
   } else {
-    // Needs nobody connected to the shared database; the servers are stopped.
-    const copy = psql(checkout.path, user, `CREATE DATABASE "${name}" TEMPLATE "${SHARED_DATABASE}"`)
-    if (copy.ok) console.log(`Copied ${SHARED_DATABASE} into ${name}.`)
-    else
-      console.warn(
-        `Could not copy ${SHARED_DATABASE} (${copy.out || 'no output'}).\n` +
-          `Payload creates ${name} empty instead, and it is seeded once the CMS has loaded.`,
-      )
+    const create = psql(checkout.path, user, `CREATE DATABASE "${name}"`)
+    if (create.ok) console.log(`Created ${name}, empty; it is seeded once the CMS has loaded.`)
+    else fail(`Could not create ${name}: ${create.out || 'no output'}`)
   }
 
   url.pathname = `/${name}`
@@ -312,7 +309,7 @@ function ensureOwnDatabase(checkout) {
   console.log(`Set DATABASE_URL in ${path.relative(checkout.path, envFile)} to ${name}.`)
 }
 
-// A database with no users, such as one Payload has just created, gets the test
+// A database with no users, such as one ensureOwnDatabase has just created, gets the test
 // data, so you can log in as admin@example.com. Runs once the CMS has loaded,
 // when Payload has pushed the schema. The main checkout's database is left alone.
 function seedIfEmpty(checkout) {
