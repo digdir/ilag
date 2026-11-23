@@ -45,7 +45,7 @@ const crumbs = breadcrumbs(Astro.url.pathname, { trail, current })
       {crumbs && <Breadcrumbs items={crumbs} />}
       <slot />
     </main>
-    <SiteFooter signedIn={Boolean(Astro.locals.user)} pathname={Astro.url.pathname} title={title} />
+    <SiteFooter signedIn={Boolean(Astro.locals.user)} url={Astro.url} title={title} />
     <script>
       // Behaviour for Designsystemet's components, such as ds-field.
       import '@digdir/designsystemet-web'

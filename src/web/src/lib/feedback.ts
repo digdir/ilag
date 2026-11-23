@@ -21,3 +21,6 @@ export function feedbackOwner(path: string): { team?: number; unit?: number; lab
   if (unit) return { unit: Number(unit[1]), label: 'lederen for enheten' }
   return { label: 'administratorene i ilag' }
 }
+
+/** The query /meld-fra adds to the page it sends the visitor back to, so the footer can thank them. */
+export const FEEDBACK_SENT = 'tilbakemelding=sendt'

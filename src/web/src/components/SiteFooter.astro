@@ -1,27 +1,62 @@
 ---
+import FeedbackForm from './feedback/FeedbackForm.astro'
+import { FEEDBACK_SENT, feedbackOwner } from '../lib/feedback'
+
 interface Props {
   /** Without a logged-in user (the login page) there is nothing to report from. */
   signedIn: boolean
-  pathname: string
+  url: URL
   /** The page's title, so the report says what it is about. */
   title: string
 }
 
-const { signedIn, pathname, title } = Astro.props
-const report = `/meld-fra?${new URLSearchParams({ side: pathname, tittel: title })}`
+const { signedIn, url, title } = Astro.props
+const page = url.pathname
+const pageTitle = title.replace(/ — ilag$/, '')
+const canReport = signedIn && page !== '/meld-fra'
+const sent = url.search.slice(1) === FEEDBACK_SENT
 ---
 
 <footer>
-  <div class="inner">
+  {
+    sent && (
+      <div class="inner">
+        <div class="ds-alert" data-color="success" role="status">
+          <p class="ds-paragraph">Takk! Tilbakemeldingen er sendt til {feedbackOwner(page).label}.</p>
+        </div>
+      </div>
+    )
+  }
+  <div class="inner links">
     <span class="ds-paragraph" data-size="sm">Forvaltes av Virksomhetsstyring og utvikling (VSU)</span>
     {
-      signedIn && pathname !== '/meld-fra' && (
-        <a class="ds-link" data-size="sm" href={report}>
+      canReport && (
+        <button class="ds-button" data-variant="tertiary" data-size="sm" type="button" command="show-modal" commandfor="meld-fra">
           Meld fra om feil
-        </a>
+        </button>
       )
     }
   </div>
+  {
+    canReport && (
+      <dialog class="ds-dialog" id="meld-fra" data-modal="true" closedby="any">
+        <button
+          class="ds-button"
+          data-icon="true"
+          data-variant="tertiary"
+          data-color="neutral"
+          type="button"
+          aria-label="Lukk dialogvindu"
+          command="close"
+          commandfor="meld-fra"
+        />
+        <h2 class="ds-heading" data-size="md">
+          Meld fra om feil
+        </h2>
+        <FeedbackForm page={page} pageTitle={pageTitle} dialogId="meld-fra" />
+      </dialog>
+    )
+  }
 </footer>
 
 <style>
@@ -32,12 +67,20 @@ const report = `/meld-fra?${new URLSearchParams({ side: pathname, tittel: title 
   }
 
   .inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: var(--ds-size-6) var(--ds-size-4) 0;
+  }
+
+  .links {
     display: flex;
     flex-wrap: wrap;
     gap: var(--ds-size-4) var(--ds-size-8);
     align-items: baseline;
-    max-width: 72rem;
-    margin-inline: auto;
-    padding: var(--ds-size-6) var(--ds-size-4);
+    padding-block-end: var(--ds-size-6);
+  }
+
+  dialog h2 {
+    margin-block-end: var(--ds-size-4);
   }
 </style>

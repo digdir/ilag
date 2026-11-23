@@ -23,12 +23,27 @@ describe('report an error page', () => {
     vi.unstubAllGlobals()
   })
 
-  it('TB-01: links to the page from the footer, with where the visitor is', async () => {
+  const footer = async (url: string, signedIn = true) => {
     const container = await AstroContainer.create()
-    const html = await container.renderToString(SiteFooter, {
-      props: { signedIn: true, pathname: '/organisering/team/7', title: 'Team Skjemabygger — ilag' },
+    return container.renderToString(SiteFooter, {
+      props: { signedIn, url: new URL(url, 'http://localhost:4321'), title: 'Team Skjemabygger — ilag' },
     })
-    expect(html).toContain('href="/meld-fra?side=%2Forganisering%2Fteam%2F7&amp;tittel=Team+Skjemabygger+%E2%80%94+ilag"')
+  }
+
+  it('TB-01: opens the form in a dialog from the footer, about the page the visitor is on', async () => {
+    const html = await footer('/organisering/team/7')
+    expect(html).toMatch(/<button[^>]*command="show-modal"[^>]*commandfor="meld-fra"/)
+    expect(html).toMatch(/<dialog[^>]*id="meld-fra"/)
+    expect(html).toContain('action="/meld-fra?side=%2Forganisering%2Fteam%2F7&amp;tittel=Team+Skjemabygger"')
+    expect(html).toContain('teameier og teamleder for teamet')
+    expect(html).not.toContain('Takk!')
+  })
+
+  it('TB-01: thanks the visitor when they come back, and offers nothing before login', async () => {
+    expect(await footer('/organisering/team/7?tilbakemelding=sendt')).toContain(
+      'Takk! Tilbakemeldingen er sendt til teameier og teamleder for teamet.',
+    )
+    expect(await footer('/logg-inn', false)).not.toContain('meld-fra')
   })
 
   it('TB-02: says who gets feedback on a team, and offers the categories', async () => {
@@ -45,7 +60,7 @@ describe('report an error page', () => {
     const res = await post('/organisering/team/7', { category: 'uklart', text: ' Feil leder ', contactMe: 'on' })
 
     expect(res.status).toBe(303)
-    expect(res.headers.get('location')).toContain('sendt=')
+    expect(res.headers.get('location')).toBe('/organisering/team/7?tilbakemelding=sendt')
     const [url, init] = fetchMock.mock.calls[0]!
     expect(String(url)).toBe('http://localhost:3000/api/tilbakemeldinger')
     expect(new Headers(init?.headers).get('authorization')).toBe('JWT visitor-token')
