@@ -126,6 +126,7 @@ async function switchTo(target) {
     process.exit(1)
   }
   if (loaded === 'timeout') console.warn(`The CMS has not answered yet; see \`pnpm dev:logs\`.`)
+  else seedIfEmpty(checkout)
 
   console.log(`\nThe dev servers run from ${describe(checkout)}`)
   for (const s of SERVERS) console.log(`  ${s.name.padEnd(9)} ${s.url}`)
@@ -302,7 +303,7 @@ function ensureOwnDatabase(checkout) {
     else
       console.warn(
         `Could not copy ${SHARED_DATABASE} (${copy.out || 'no output'}).\n` +
-          `Payload creates ${name} empty instead; fill it with \`pnpm db:seed\`.`,
+          `Payload creates ${name} empty instead, and it is seeded once the CMS has loaded.`,
       )
   }
 
@@ -311,13 +312,39 @@ function ensureOwnDatabase(checkout) {
   console.log(`Set DATABASE_URL in ${path.relative(checkout.path, envFile)} to ${name}.`)
 }
 
+// A database with no users, such as one Payload has just created, gets the test
+// data, so you can log in as admin@example.com. Runs once the CMS has loaded,
+// when Payload has pushed the schema. The main checkout's database is left alone.
+function seedIfEmpty(checkout) {
+  if (checkout.path === worktrees()[0]?.path) return
+  const db = databaseName(checkout.path)
+  if (!db || db === SHARED_DATABASE) return
+  const users = psql(checkout.path, databaseUser(checkout.path), 'SELECT count(*) FROM users', db)
+  if (!users.ok || users.out !== '0') return
+  console.log(`\n${db} has no users; filling it with test data.`)
+  console.log('\n$ pnpm db:seed')
+  const seed = spawnSync('pnpm', ['db:seed'], { cwd: checkout.path, stdio: 'inherit' })
+  // The servers run either way, so a failed seed is not fatal.
+  if (seed.status !== 0) console.warn(`\nCould not seed ${db}; the servers still run. Try \`pnpm db:seed\` in ${checkout.path}.`)
+}
+
 // psql inside the database container, so it works without psql on the machine.
-function psql(cwd, user, sql) {
-  const r = spawnSync('docker', ['compose', 'exec', '-T', 'postgres', 'psql', '-U', user, '-d', 'postgres', '-Atc', sql], {
+function psql(cwd, user, sql, db = 'postgres') {
+  const r = spawnSync('docker', ['compose', 'exec', '-T', 'postgres', 'psql', '-U', user, '-d', db, '-Atc', sql], {
     cwd,
     encoding: 'utf8',
   })
   return { ok: r.status === 0, out: `${r.stdout ?? ''}${r.stderr ?? ''}`.trim() }
+}
+
+function databaseUser(checkoutPath) {
+  try {
+    const env = fs.readFileSync(path.join(checkoutPath, 'src/cms/.env'), 'utf8')
+    const url = env.match(/^DATABASE_URL=(.*)$/m)?.[1]?.trim().replace(/^["']|["']$/g, '')
+    return (url && decodeURIComponent(new URL(url).username)) || 'ilag'
+  } catch {
+    return 'ilag'
+  }
 }
 
 function databaseName(checkoutPath) {
