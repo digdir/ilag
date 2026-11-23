@@ -43,7 +43,7 @@ digits, `-` or `_` — no `/`, so name it after the task, not the branch
 | `agentctl port-forward 3001:3000` | Forward to a different local port when :3000 is taken |
 
 After a `start`, the database and dev servers are not running: start them again in the
-Sandbox with `pnpm db:up` and `pnpm dev`.
+Sandbox with `pnpm dev:wt` in the worktree to serve, which also starts the database.
 
 ## Everything at once
 
