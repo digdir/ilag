@@ -3,7 +3,6 @@ import Prose from '../../../../components/Prose.astro'
 import TeamCard from '../../../../components/team/TeamCard.astro'
 import ToolList from '../../../../components/verktoy/ToolList.astro'
 import Layout from '../../../../layouts/Layout.astro'
-import { getConceptMatcher } from '../../../../lib/cms/concepts'
 import { getTeamType } from '../../../../lib/cms/teamTypes'
 import { lines } from '../../../../lib/cms/teamTypeWizard'
 import { getTeamsOfType } from '../../../../lib/cms/teams'
@@ -18,13 +17,9 @@ const id = Astro.params.id!
 const teamType = await getTeamType(id, cookie)
 if (!teamType) Astro.response.status = 404
 
-const [teams, tools, concepts] = teamType
-  ? await Promise.all([
-      getTeamsOfType(teamType.id, cookie),
-      getToolsForTeamType(teamType.id, cookie),
-      getConceptMatcher(cookie),
-    ])
-  : [[], [], null]
+const [teams, tools] = teamType
+  ? await Promise.all([getTeamsOfType(teamType.id, cookie), getToolsForTeamType(teamType.id, cookie)])
+  : [[], []]
 const requirements = lines(teamType?.requirements)
 ---
 
@@ -44,7 +39,7 @@ const requirements = lines(teamType?.requirements)
             <h1 class="ds-heading" data-size="lg">
               {teamType.name}
             </h1>
-            <Prose text={teamType.description} concepts={concepts} />
+            <Prose text={teamType.description} />
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">

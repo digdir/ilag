@@ -18,12 +18,18 @@ export async function getConcepts(cookie: string | null): Promise<ConceptSummary
 }
 
 /**
- * The matcher for the concepts explained where they are used (BG-06), for the
- * page to pass to every Prose it renders. Explaining concepts is extra: if
- * the concepts can't be read, the page shows its text unmarked rather than
- * failing.
+ * The matcher for the concepts explained where they are used (BG-06), read
+ * once per request and shared by every Prose on the page.
  */
-export async function getConceptMatcher(cookie: string | null): Promise<ConceptMatcher> {
+export function conceptsFor(locals: App.Locals, cookie: string | null): Promise<ConceptMatcher> {
+  return (locals.concepts ??= getConceptMatcher(cookie))
+}
+
+/**
+ * Explaining concepts is extra: if the concepts can't be read, the page shows
+ * its text unmarked rather than failing.
+ */
+async function getConceptMatcher(cookie: string | null): Promise<ConceptMatcher> {
   try {
     return conceptMatcher(await getConcepts(cookie))
   } catch (err) {

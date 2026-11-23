@@ -5,14 +5,12 @@ import MemberList from '../../../components/team/MemberList.astro'
 import TeamOwner from '../../../components/team/TeamOwner.astro'
 import ToolList from '../../../components/verktoy/ToolList.astro'
 import Layout from '../../../layouts/Layout.astro'
-import { getConceptMatcher } from '../../../lib/cms/concepts'
 import { ROLE_CODES } from '../../../lib/cms/roles'
 import { getTeam } from '../../../lib/cms/teams'
 import { teamTypeHref } from '../../../lib/teamTypes'
 
 const cookie = Astro.request.headers.get('cookie')
 const team = await getTeam(Astro.params.id!, cookie)
-const concepts = team && (await getConceptMatcher(cookie))
 if (!team) Astro.response.status = 404
 
 // The owner has a box of their own; everyone else is in «Hvem er vi?».
@@ -27,7 +25,7 @@ const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.
           <header>
             {team.teamType && <Tag href={teamTypeHref(team.teamType.id)}>{team.teamType.name}</Tag>}
             <h1 class="ds-heading" data-size="lg">{team.name}</h1>
-            <Prose text={team.description} concepts={concepts} />
+            <Prose text={team.description} />
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">

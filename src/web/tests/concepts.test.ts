@@ -79,12 +79,11 @@ describe('finding concepts in text', () => {
     expect(marked(markConcepts('Skrevet i C++ (språk) og C.', matcher))).toEqual(['C++ (språk)→C++ (språk)'])
   })
 
-  it('splits text into paragraphs at blank lines, and takes paragraphs as a list', () => {
+  it('splits text into paragraphs at blank lines', () => {
     expect(plain(markConcepts('Første.\n  \nAndre.\nSamme avsnitt.\n\n', matcher))).toEqual([
       'Første.',
       'Andre.\nSamme avsnitt.',
     ])
-    expect(plain(markConcepts(['Én.', ' ', 'To.'], matcher))).toEqual(['Én.', 'To.'])
     expect(markConcepts(null, matcher)).toEqual([])
   })
 

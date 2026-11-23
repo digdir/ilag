@@ -1,22 +1,20 @@
 ---
-import { conceptMatcher, markConcepts, type ConceptMatcher } from '../lib/concepts'
+import { conceptsFor } from '../lib/cms/concepts'
+import { markConcepts } from '../lib/concepts'
 import ConceptPopover from './begreper/ConceptPopover.astro'
 
 // Text from the CMS, in paragraphs, with the first use of each concept
 // explained in a popover (BG-06, ADR-0009). Detail pages render their text
-// through this; lists don't. The page reads `concepts` with
-// getConceptMatcher in src/lib/cms/concepts.ts and passes it to every Prose.
+// through this; lists don't. The concepts are read once per request, however
+// many Prose the page has.
 
 interface Props {
-  /** Paragraphs separated by blank lines, or a list of paragraphs. */
-  text: string | string[] | null | undefined
-  /** Null or left out shows the text without explaining concepts. */
-  concepts?: ConceptMatcher | null
+  /** Paragraphs separated by blank lines. */
+  text: string | null | undefined
 }
 
-const { text, concepts } = Astro.props
-const noConcepts = conceptMatcher([])
-const paragraphs = markConcepts(text, concepts ?? noConcepts)
+const { text } = Astro.props
+const paragraphs = markConcepts(text, await conceptsFor(Astro.locals, Astro.request.headers.get('cookie')))
 
 // One popover per marked word, after the paragraphs: a popover can't sit
 // inside a <p>. A concept is marked once per text, so a word's popover is the

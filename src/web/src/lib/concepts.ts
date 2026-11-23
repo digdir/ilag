@@ -53,14 +53,14 @@ const patternFor = (forms: string[]) => {
  * Splits text into paragraphs at blank lines, as the admin panel's text
  * fields are written, and marks the first use of each concept in the whole
  * text. A word naming several concepts is marked while one of them is still
- * unexplained, and explains them all. Text that is already in paragraphs can
- * be given as a list.
+ * unexplained, and explains them all.
  */
 export function markConcepts(
-  text: string | string[] | null | undefined,
+  text: string | null | undefined,
   { pattern, byForm }: ConceptMatcher,
 ): Segment[][] {
-  const paragraphs = (Array.isArray(text) ? text : (text ?? '').split(/\n\s*\n/))
+  const paragraphs = (text ?? '')
+    .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean)
   const used = new Set<number>()
