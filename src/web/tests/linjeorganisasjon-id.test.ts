@@ -130,7 +130,7 @@ describe('unit page', () => {
     const [url] = fetchMock.mock.calls.find(([url]) => url.includes('/api/enheter/2'))!
     expect(new URL(url).searchParams.get('select[description]')).toBe('true')
     expect(html).toMatch(
-      /Fellesløsninger\s*<\/h1>\s*<p[^>]*>Utvikler og forvalter fellesløsningene.<\/p>\s*<p[^>]*>Samarbeider med hele offentlig sektor.<\/p>/,
+      /Fellesløsninger\s*<\/h1>\s*<div class="prose"[^>]*>\s*<p[^>]*>Utvikler og forvalter fellesløsningene.<\/p>\s*<p[^>]*>Samarbeider med hele offentlig sektor.<\/p>/,
     )
   })
 

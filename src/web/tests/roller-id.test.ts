@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Role from '../src/pages/organisering/roller/[id].astro'
+import { concepts } from './concepts'
 import { linjeleder, teameier } from './roles'
 import { cookie, json } from './teams'
 import { backLink, trail } from './breadcrumbs'
@@ -67,6 +68,25 @@ describe('role page', () => {
     expect(html).toContain('Samspiller med team')
     expect(html).toMatch(/<h2[^>]*>\s*Rolle\s*<\/h2>/)
     expect(html).not.toMatch(/<h2[^>]*>\s*Ansvar\s*<\/h2>/)
+  })
+
+  it('BG-06: explains concepts in each part of RAMO, with one read and ids unique on the page', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      new URL(url).pathname === '/api/begreper'
+        ? json({ docs: concepts })
+        : json({ ...teameier, responsibility: 'Godkjenne teammandatet og OKR.', authority: 'Fastsette OKR.' }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const html = await (await render('1')).text()
+
+    expect(fetchMock.mock.calls.filter(([url]) => new URL(url).pathname === '/api/begreper')).toHaveLength(1)
+    const targets = [...html.matchAll(/popovertarget="([^"]+)"/g)].map((m) => m[1]!)
+    const ids = [...html.matchAll(/class="ds-popover[^"]*" id="([^"]+)"/g)].map((m) => m[1]!)
+    // OKR is explained in both parts, each with its own popover.
+    expect(targets).toHaveLength(3)
+    expect(ids).toEqual(targets)
+    expect(new Set(ids).size).toBe(ids.length)
   })
 
   it('answers 404 when the CMS has no such role', async () => {

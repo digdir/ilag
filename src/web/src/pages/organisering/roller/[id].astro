@@ -1,10 +1,14 @@
 ---
+import Prose from '../../../components/Prose.astro'
 import RoleTeamTypes from '../../../components/roller/RoleTeamTypes.astro'
 import Layout from '../../../layouts/Layout.astro'
+import { getConceptMatcher } from '../../../lib/cms/concepts'
 import { getRole } from '../../../lib/cms/roles'
 import { ramo } from '../../../lib/roles'
 
-const role = await getRole(Astro.params.id!, Astro.request.headers.get('cookie'))
+const cookie = Astro.request.headers.get('cookie')
+const role = await getRole(Astro.params.id!, cookie)
+const concepts = role && (await getConceptMatcher(cookie))
 if (!role) Astro.response.status = 404
 ---
 
@@ -26,7 +30,7 @@ if (!role) Astro.response.status = 404
                   <h2 class="ds-label" data-size="xs">
                     {field.label}
                   </h2>
-                  <p class="ds-paragraph">{field.value}</p>
+                  <Prose text={field.value} concepts={concepts} />
                 </section>
               ))}
             </div>
@@ -85,10 +89,5 @@ if (!role) Astro.response.status = 404
     font-size: var(--ds-font-size-3);
     letter-spacing: 0.04em;
     text-transform: uppercase;
-  }
-
-  .ds-card .ds-paragraph {
-    white-space: pre-line;
-    text-wrap: pretty;
   }
 </style>

@@ -1,0 +1,87 @@
+---
+import ListFilter from '../../../components/ListFilter.astro'
+import ConceptRow from '../../../components/begreper/ConceptRow.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getConcepts } from '../../../lib/cms/concepts'
+
+// The concept list (BG-01): each concept's name and definition (BG-02),
+// searchable by name, other forms and definition (BG-03).
+const concepts = await getConcepts(Astro.request.headers.get('cookie'))
+---
+
+<Layout title="Begreper — ilag">
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Begreper</h1>
+      <p class="ds-paragraph">
+        Målet er ikke at alle skal bruke identisk språk, men at vi har et felles referansepunkt for hva vi
+        legger i de viktigste begrepene.
+      </p>
+    </header>
+    {
+      concepts.length ? (
+        <>
+          <ListFilter
+            list="begreper"
+            empty="begreper-tom"
+            label="Søk i begrepene"
+            placeholder="Søk etter begrep eller forklaring"
+            count={concepts.length}
+            noun={{ one: 'begrep', other: 'begreper' }}
+          />
+          <ul class="concepts" id="begreper">
+            {concepts.map((concept) => (
+              <li data-search={[concept.name, ...concept.variants, concept.definition].join(' ').toLowerCase()}>
+                <ConceptRow concept={concept} />
+              </li>
+            ))}
+          </ul>
+          <p class="ds-paragraph empty" id="begreper-tom" hidden>
+            Ingen begreper passer søket. Prøv et annet ord.
+          </p>
+        </>
+      ) : (
+        <p class="ds-paragraph">Ingen begreper er registrert ennå.</p>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  header > * {
+    margin: 0;
+  }
+
+  .concepts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .concepts > li[hidden] {
+    display: none;
+  }
+
+  .empty {
+    padding: var(--ds-size-8);
+    border: var(--ds-border-width-default) dashed var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+    text-align: center;
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+</style>
