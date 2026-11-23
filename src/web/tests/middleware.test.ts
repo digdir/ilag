@@ -53,6 +53,18 @@ describe('middleware', () => {
     expect(locals.user).toEqual(user)
   })
 
+  it('BG-06: starts reading the concepts before the page runs', async () => {
+    const fetchMock = vi.fn(async (url: string) =>
+      Response.json(new URL(url).pathname === '/api/begreper' ? { docs: [] } : { user }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { locals } = await run('/', 'payload-token=abc.def.ghi')
+
+    expect(fetchMock.mock.calls.map(([url]) => new URL(url).pathname)).toContain('/api/begreper')
+    expect(await locals.concepts).toMatchObject({ pattern: null })
+  })
+
   it('turns away a session the CMS no longer accepts', async () => {
     vi.stubGlobal('fetch', me({ user: null }))
 
