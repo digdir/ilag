@@ -80,6 +80,7 @@ export interface Config {
     brukere: User;
     importkjoringer: ImportRun;
     medier: Media;
+    sok: SearchResult;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -121,6 +122,7 @@ export interface Config {
     brukere: BrukereSelect<false> | BrukereSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     medier: MedierSelect<false> | MedierSelect<true>;
+    sok: SokSelect<false> | SokSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -516,6 +518,42 @@ export interface ImportRun {
   createdAt: string;
 }
 /**
+ * Lages og oppdateres automatisk fra team, enheter, personer, roller og verktøy. Brukes av søket i ilag.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sok".
+ */
+export interface SearchResult {
+  id: number;
+  title?: string | null;
+  priority?: number | null;
+  doc:
+    | {
+        relationTo: 'team';
+        value: number | Team;
+      }
+    | {
+        relationTo: 'enheter';
+        value: number | Unit;
+      }
+    | {
+        relationTo: 'personer';
+        value: number | Person;
+      }
+    | {
+        relationTo: 'roller';
+        value: number | Role;
+      }
+    | {
+        relationTo: 'verktoy';
+        value: number | Tool;
+      };
+  subtitle?: string | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -695,6 +733,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'medier';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'sok';
+        value: number | SearchResult;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -976,6 +1018,19 @@ export interface MedierSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sok_select".
+ */
+export interface SokSelect<T extends boolean = true> {
+  title?: T;
+  priority?: T;
+  doc?: T;
+  subtitle?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
