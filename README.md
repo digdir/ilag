@@ -59,8 +59,11 @@ the front page then verifies that the frontend can reach the CMS.
 [Git worktree](https://git-scm.com/docs/git-worktree) you run it in (or the one
 you name, as in `pnpm dev:wt begreper`): it stops them wherever they run and
 starts them there in the background, still on :3000 and :4321. The first time, a
-worktree still on `ilag_dev` gets a database of its own, `ilag_<worktree>`, copied
-from `ilag_dev`, so branches don't drop each other's tables.
+worktree still on `ilag_dev` gets a database of its own, `ilag_<worktree>`, so
+branches don't drop each other's tables. It starts empty, not as a copy of
+`ilag_dev`, which may hold another branch's tables. A worktree database with no
+users gets the test data from `pnpm db:seed` once the CMS has loaded, so you can
+log in as `admin@example.com`.
 
 ## Ports
 
