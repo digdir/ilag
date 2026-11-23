@@ -80,6 +80,11 @@ const sent = url.search.slice(1) === FEEDBACK_SENT
     padding-block-end: var(--ds-size-6);
   }
 
+  /* Room for the whole form on a laptop screen; Designsystemet's default is 80vh. */
+  dialog {
+    --dsc-dialog-max-height: 90dvh;
+  }
+
   dialog h2 {
     margin-block-end: var(--ds-size-4);
   }
