@@ -1,5 +1,7 @@
 import type { PayloadRequest } from 'payload'
 
+import { idOf } from '../utils/ids'
+
 type ID = number
 
 // The units the request's user leads (`leader` on Enheter, LO-02), looked up
@@ -8,7 +10,7 @@ export const unitIdsLedBy = (req: PayloadRequest): Promise<ID[]> => {
   const cached = req.context.unitIdsLedBy as Promise<ID[]> | undefined
   if (cached) return cached
   const person = req.user?.person
-  const personId = typeof person === 'object' && person ? person.id : person
+  const personId = idOf(person)
   const ids = personId
     ? req.payload
         .find({

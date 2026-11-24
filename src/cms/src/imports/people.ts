@@ -2,6 +2,7 @@ import type { PayloadRequest } from 'payload'
 
 import { columns, parseCsv, type ImportError } from './csv'
 import { SKIPPED_UNIT_IDS } from './settings'
+import { idOf } from '../utils/ids'
 
 // The people file from SAP (docs/integrations/people-import.md). A person
 // has one line per unit; the other values come from their first line.
@@ -167,7 +168,7 @@ export const applyPeople = async (file: PeopleFile, req: PayloadRequest): Promis
   const unitIdOf = new Map(units.docs.map((u) => [u.externalUnitId, u.id]))
   const locationIdOf = new Map(locations.docs.map((l) => [l.code, l.id]))
   const unknown = { units: new Set<string>(), locations: new Set<string>(), managers: new Set<string>() }
-  const idOf = new Map<string, number>()
+  const idByEmployeeNumber = new Map<string, number>()
   let created = 0
   let updated = 0
 
@@ -185,21 +186,21 @@ export const applyPeople = async (file: PeopleFile, req: PayloadRequest): Promis
     const saved = found
       ? await payload.update({ collection: 'personer', id: found.id, data, depth: 0, req })
       : await payload.create({ collection: 'personer', data, depth: 0, req })
-    idOf.set(person.employeeNumber, saved.id)
+    idByEmployeeNumber.set(person.employeeNumber, saved.id)
     if (found) updated++
     else created++
   }
 
   // Managers once everyone in the file exists.
   for (const person of file.people) {
-    const manager = person.managerEmployeeNumber ? idOf.get(person.managerEmployeeNumber) : undefined
+    const manager = person.managerEmployeeNumber ? idByEmployeeNumber.get(person.managerEmployeeNumber) : undefined
     if (person.managerEmployeeNumber && manager === undefined) unknown.managers.add(person.managerEmployeeNumber)
     const found = byEmployeeNumber.get(person.employeeNumber)
-    const current = typeof found?.manager === 'object' ? found.manager?.id : found?.manager
+    const current = idOf(found?.manager)
     if ((current ?? null) !== (manager ?? null)) {
       await payload.update({
         collection: 'personer',
-        id: idOf.get(person.employeeNumber)!,
+        id: idByEmployeeNumber.get(person.employeeNumber)!,
         data: { manager: manager ?? null },
         depth: 0,
         req,
@@ -209,7 +210,7 @@ export const applyPeople = async (file: PeopleFile, req: PayloadRequest): Promis
 
   let deactivated = 0
   for (const person of existing.docs) {
-    if (person.active && !idOf.has(person.employeeNumber)) {
+    if (person.active && !idByEmployeeNumber.has(person.employeeNumber)) {
       await payload.update({ collection: 'personer', id: person.id, data: { active: false }, depth: 0, req })
       deactivated++
     }

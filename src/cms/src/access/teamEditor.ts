@@ -1,6 +1,7 @@
 import type { Payload, PayloadRequest, Where } from 'payload'
 
 import { isAdmin } from './isAdmin'
+import { idOf } from '../utils/ids'
 
 // Roles that access depends on, by their fixed code (`code` on Roller). The
 // names are for people and can be changed or translated without changing
@@ -25,7 +26,7 @@ export const teamsWithRoles = async (
   req?: PayloadRequest,
 ): Promise<ID[]> => {
   const person = user?.person
-  const personId = typeof person === 'object' && person ? person.id : person
+  const personId = idOf(person)
   if (!personId || !codes.length) return []
 
   const { docs: roles } = await payload.find({
@@ -44,7 +45,7 @@ export const teamsWithRoles = async (
     depth: 0,
     req,
   })
-  return [...new Set(memberships.map((m) => (typeof m.team === 'object' ? m.team.id : m.team)))]
+  return [...new Set(memberships.map((m) => idOf(m.team)!))]
 }
 
 // The teams the user is teameier or teamleder of.

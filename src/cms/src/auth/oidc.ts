@@ -5,6 +5,7 @@ import { addSessionToUser, generatePayloadCookie, parseCookies } from 'payload/s
 
 import type { User } from '@/payload-types'
 import { webURL } from '@/urls'
+import { idOf } from '@/utils/ids'
 import type { Identity, OidcProvider, OidcSettings } from './providers'
 
 // Login with an OpenID Connect provider (authorization code flow with PKCE).
@@ -111,8 +112,6 @@ async function personWithEmail(req: PayloadRequest, email: string): Promise<numb
   })
   return docs.length === 1 ? docs[0]!.id : undefined
 }
-
-const idOf = (value: User['person']) => (typeof value === 'object' && value ? value.id : value)
 
 // Finds the user the provider identified, by the provider's ID for them.
 // Someone logging in for the first time is matched on email, so an existing
