@@ -93,6 +93,16 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
   }
 
   /*
+   * A quieter focus than Designsystemet's ring around the field: its border
+   * in the accent colour, a little thicker. Still clearly visible (WCAG 2.4.7).
+   */
+  .site-search :global(.ds-input:focus-visible) {
+    box-shadow: none;
+    outline: 2px solid var(--ds-color-accent-border-strong);
+    outline-offset: -1px;
+  }
+
+  /*
    * Designsystemet makes the list as wide as the field and as tall as the room
    * below it, the height set on the element itself. Long enough for about six
    * hits here; the rest scroll.
