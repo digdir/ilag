@@ -29,7 +29,9 @@ const { concept } = Astro.props
     margin: 0;
   }
 
+  /* On the wide page, short enough lines to read. */
   .ds-paragraph {
+    max-width: 45rem;
     text-wrap: pretty;
   }
 
