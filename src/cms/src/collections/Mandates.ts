@@ -15,6 +15,7 @@ import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { mandateOwners, mayApprove, mayEdit, ownedBy } from '../access/mandateOwners'
 import type { Mandate } from '../payload-types'
+import { idOf } from '../utils/ids'
 import { collectionGroups } from './groups'
 
 // A team's or a unit's mandate: the four core fields of Digdir's mandate
@@ -27,7 +28,6 @@ import { collectionGroups } from './groups'
 // publishes it. Payload stores the published version in the collection's
 // table and every save, drafts included, in the versions table.
 
-type ID = number
 
 // The template's fields, in its order. Plain text in markdown; the frontend
 // renders it without raw HTML (ADR-0007).
@@ -41,12 +41,6 @@ export const MANDATE_FIELDS = [
 type MandateField = (typeof MANDATE_FIELDS)[number]['name']
 
 const MARKDOWN_HELP = 'Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.'
-
-const idOf = (value: unknown): ID | null => {
-  if (value == null) return null
-  if (typeof value === 'object' && 'id' in value) return (value as { id: ID }).id
-  return value as ID
-}
 
 const ownerOf = (doc: Partial<Mandate> | undefined) => ({ team: idOf(doc?.team), unit: idOf(doc?.unit) })
 

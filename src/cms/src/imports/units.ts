@@ -3,6 +3,7 @@ import type { PayloadRequest } from 'payload'
 import type { Unit } from '../payload-types'
 import { columns, parseCsv, type ImportError } from './csv'
 import { DIRECTORATE_UNIT_ID, SKIPPED_UNIT_IDS, UNIT_LEVELS } from './settings'
+import { idOf } from '../utils/ids'
 
 // The unit file from SAP (docs/integrations/unit-import.md). Its Avdeling,
 // Seksjon and gruppe are what ilag calls divisjon, avdeling and seksjon.
@@ -149,9 +150,6 @@ export const readUnitFile = (text: string): { errors: ImportError[] } | UnitFile
   }
 }
 
-const idOrNull = (value: number | { id: number } | null | undefined) =>
-  (typeof value === 'object' ? value?.id : value) ?? null
-
 // Links every person's `units` and `location` from the IDs and code they came
 // with, against the units and locations in ilag now, so a unit or location
 // that arrives later is linked by the next import of either kind (ADR-0003,
@@ -168,9 +166,9 @@ export const linkPeople = async (req: PayloadRequest): Promise<void> => {
 
   for (const person of people.docs) {
     const wanted = (person.externalUnitIds ?? []).flatMap((id) => unitIdOf.get(id) ?? [])
-    const current = (person.units ?? []).map(idOrNull)
+    const current = (person.units ?? []).map(idOf)
     const location = locationIdOf.get(person.locationCode) ?? null
-    if (wanted.join() !== current.join() || location !== idOrNull(person.location)) {
+    if (wanted.join() !== current.join() || location !== idOf(person.location)) {
       await payload.update({ collection: 'personer', id: person.id, data: { units: wanted, location }, depth: 0, req })
     }
   }
@@ -181,7 +179,7 @@ export const applyUnits = async (file: UnitFile, req: PayloadRequest): Promise<U
   const { payload } = req
   const existing = await payload.find({ collection: 'enheter', pagination: false, depth: 0, req })
   const byExternalId = new Map(existing.docs.map((u) => [u.externalUnitId, u]))
-  const idOf = new Map<string, number>()
+  const idByUnitId = new Map<string, number>()
   const result: UnitsResult = { created: 0, updated: 0, deactivated: 0, skipped: file.skipped }
 
   const ordered = [...file.units].sort((a, b) => LEVELS.indexOf(a.level) - LEVELS.indexOf(b.level))
@@ -191,19 +189,19 @@ export const applyUnits = async (file: UnitFile, req: PayloadRequest): Promise<U
       name: unit.name,
       code: unit.code,
       level: unit.level,
-      parent: unit.parentId ? (idOf.get(unit.parentId) ?? null) : null,
+      parent: unit.parentId ? (idByUnitId.get(unit.parentId) ?? null) : null,
       active: true,
     }
     const found = byExternalId.get(unit.externalUnitId)
     const saved = found
       ? await payload.update({ collection: 'enheter', id: found.id, data, depth: 0, req })
       : await payload.create({ collection: 'enheter', data, depth: 0, req })
-    idOf.set(unit.externalUnitId, saved.id)
+    idByUnitId.set(unit.externalUnitId, saved.id)
     result[found ? 'updated' : 'created']++
   }
 
   for (const unit of existing.docs) {
-    if (unit.active && !idOf.has(unit.externalUnitId)) {
+    if (unit.active && !idByUnitId.has(unit.externalUnitId)) {
       await payload.update({ collection: 'enheter', id: unit.id, data: { active: false }, depth: 0, req })
       result.deactivated++
     }
