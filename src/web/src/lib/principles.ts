@@ -1,6 +1,6 @@
 import type { PrincipleArea } from '../types/principle'
 
-// The principle areas (PR-02, PR-06) by their stored value, in the order the
+// The principle areas (PR-02) by their stored value, in the order the
 // chips show them. The same values as PRINCIPLE_AREAS in the CMS
 // (collections/Principles.ts).
 export const PRINCIPLE_AREA_LABELS: Record<PrincipleArea, string> = {

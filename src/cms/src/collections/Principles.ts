@@ -5,8 +5,9 @@ import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { collectionGroups } from './groups'
 
-// The areas a principle belongs to (PR-02, PR-06): a fixed list, like the
-// tool types, which developers add to. The value is stored and stays the same
+// The areas a principle belongs to (PR-02). For now a fixed list, like the
+// tool types, which developers add to. PR-06, letting users define the areas,
+// isn't built yet. The value is stored and stays the same
 // if the label changes.
 export const PRINCIPLE_AREAS = [
   { value: 'felles', label: 'Alle i Digdir' },

@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { Principle, User } from '@/payload-types'
 
-// The principles (PR-01, PR-02, PR-06): everyone signed in reads them,
+// The principles (PR-01, PR-02): everyone signed in reads them,
 // administrators maintain them, and the areas are a fixed list.
 
 let payload: Payload
@@ -99,7 +99,7 @@ describe('Principles', () => {
     await expect(payload.delete({ collection: 'prinsipper', id: principle.id, ...as(user) })).rejects.toThrow()
   })
 
-  it('PR-06: only takes the areas in the list', async () => {
+  it('PR-02: only takes the areas in the list', async () => {
     await expect(
       payload.create({
         collection: 'prinsipper',
