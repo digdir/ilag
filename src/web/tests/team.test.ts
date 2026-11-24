@@ -32,6 +32,8 @@ describe('team overview', () => {
     const { pathname, searchParams } = new URL(url)
     expect(pathname).toBe('/api/team')
     expect(searchParams.get('where[active][equals]')).toBe('true')
+    // The overview shows no mandates, so it doesn't fetch them.
+    expect(searchParams.get('joins[mandate]')).toBe('false')
     expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
   })
 

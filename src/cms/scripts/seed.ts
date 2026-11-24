@@ -31,6 +31,7 @@ type Slug =
   | 'teamtype-veiviser'
   | 'team'
   | 'teammedlemskap'
+  | 'mandater'
 
 // An administrator to log in to the admin panel with.
 const ADMIN = { email: 'admin@example.com', password: 'ilag' }
@@ -248,6 +249,33 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Mandates, made through drafts and approval like in the admin panel. A
+  // team or unit that already has a mandate keeps it.
+  for (const { team, unit, approvedAt, draft, ...fields } of data.mandates) {
+    const ownerId = team
+      ? await findId(payload, 'team', { name: { equals: team } })
+      : await findId(payload, 'enheter', { externalUnitId: { equals: unit } })
+    if (!ownerId) continue
+    const owner = team ? { team: ownerId } : { unit: ownerId }
+    if (await findId(payload, 'mandater', team ? { team: { equals: ownerId } } : { unit: { equals: ownerId } })) continue
+    const mandate = await payload.create({
+      collection: 'mandater',
+      data: { ...owner, ...fields } as RequiredDataFromCollectionSlug<'mandater'>,
+      draft: true,
+    })
+    if (approvedAt) {
+      await payload.update({
+        collection: 'mandater',
+        id: mandate.id,
+        data: { _status: 'published', approvedAt: new Date(approvedAt).toISOString() },
+      })
+    }
+    if (draft) {
+      await payload.update({ collection: 'mandater', id: mandate.id, data: draft, draft: true })
+    }
+    count('mandater')
+  }
+
   // Users for some of the people, to try the admin panel as a team editor or
   // as someone who may not edit, linked the way an Entra ID login links them.
   for (const { person, email } of data.users) {
@@ -258,6 +286,27 @@ const seed = async (payload: Payload) => {
       })
       count('brukere')
     }
+  }
+
+  // Sent as the reporter, so the collection's hook stores them as it does for
+  // anyone who may be contacted.
+  for (const item of data.feedback) {
+    if (await findId(payload, 'tilbakemeldinger', { text: { equals: item.text } })) continue
+    const team = 'team' in item ? await findId(payload, 'team', { name: { equals: item.team } }) : undefined
+    const unit =
+      'unit' in item ? await findId(payload, 'enheter', { externalUnitId: { equals: item.unit } }) : undefined
+    const page = team ? `/organisering/team/${team}` : unit ? `/organisering/linjeorganisasjon/${unit}` : item.page
+    const reporter =
+      'reporter' in item
+        ? (await payload.find({ collection: 'brukere', where: { email: { equals: item.reporter } } })).docs[0]
+        : undefined
+    const { id } = await payload.create({
+      collection: 'tilbakemeldinger',
+      data: { category: item.category, text: item.text, status: 'ny', page: page!, team, unit, contactMe: Boolean(reporter) },
+      user: reporter ? { ...reporter, collection: 'brukere' } : undefined,
+    })
+    if (item.status !== 'ny') await payload.update({ collection: 'tilbakemeldinger', id, data: { status: item.status } })
+    count('tilbakemeldinger')
   }
 
   return created
@@ -271,8 +320,10 @@ const removeSeed = async (payload: Payload) => {
   const employeeNumbers = files.people.people.map((p) => p.employeeNumber)
   const unitIds = files.units.units.map((u) => u.externalUnitId)
   const deletes: [Slug | 'importkjoringer', Where][] = [
-    // Deleting a team deletes its memberships.
+    ['tilbakemeldinger', { text: { in: data.feedback.map((f) => f.text) } }],
+    // Deleting a team deletes its memberships and its mandate.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
+    ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['verktoy', { name: { in: data.tools.map((t) => t.name) } }],
     ['begreper', { name: { in: data.concepts.map((c) => c.name) } }],

@@ -4,12 +4,13 @@ import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { editableTeamIds, isTeamEditor, ownTeams } from '../access/teamEditor'
 import { collectionGroups } from './groups'
+import { idOf } from '../utils/ids'
 
 // Create access can't be limited with a query, so a team editor's new
 // membership is checked here: it has to be in one of their teams.
 const onlyOwnTeams: CollectionBeforeChangeHook = async ({ data, operation, req }) => {
   if (operation !== 'create' || !req.user || isAdmin(req.user)) return data
-  const team = typeof data.team === 'object' && data.team ? data.team.id : data.team
+  const team = idOf(data.team)
   if (!(await editableTeamIds(req)).includes(team)) throw new Forbidden(req.t)
   return data
 }

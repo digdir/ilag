@@ -576,6 +576,55 @@ export const teams = [
   },
 ] as const
 
+// Mandates (TO-09, LO-02), made up. Each in a different state: approved,
+// approved with a new draft on top, never approved and incomplete, and a
+// unit's. `approvedAt` publishes the mandate; `draft` is saved after it.
+type MandateText = Partial<Record<'problem' | 'outcomes' | 'expectations' | 'collaboration', string>>
+
+export const mandates: (MandateText & {
+  team?: string
+  unit?: string
+  approvedAt?: string
+  draft?: MandateText
+})[] = [
+  {
+    team: 'Team Skjemabygger',
+    approvedAt: '2026-09-15',
+    problem:
+      'Offentlige virksomheter bruker mye tid på å lage og vedlikeholde skjema, og mange skjema er vanskelige å fylle ut. Se [innsikten fra brukerintervjuene](https://example.com/innsikt).',
+    outcomes:
+      '- Virksomhetene lager et nytt skjema på under en dag.\n- Flere enn 90 % av skjemaene består testene for universell utforming.',
+    expectations:
+      'Teamet eier skjemaverktøyet og svarer for drift og videreutvikling. Teamet rapporterer til teameier, og prioriterer innenfor rammene i porteføljeforum.',
+    collaboration:
+      'Samarbeider tett med **Team Innlogging** om innlogging i skjema, og med Brukeropplevelse og design om komponentene.',
+  },
+  {
+    team: 'Team Innlogging',
+    approvedAt: '2026-10-01',
+    problem: 'Innbyggere og virksomheter trenger en sikker og enkel innlogging til offentlige tjenester.',
+    outcomes: 'Innloggingen er tilgjengelig 99,9 % av tiden, og færre brukere trenger hjelp til å logge inn.',
+    expectations: 'Teamet eier innloggingsløsningen og svarer for drift, sikkerhet og videreutvikling.',
+    collaboration: 'Samarbeider med tjenesteeierne som bruker løsningen, og med Team Skjemabygger.',
+    draft: {
+      outcomes:
+        'Innloggingen er tilgjengelig 99,95 % av tiden, færre brukere trenger hjelp, og alle tjenester har tatt i bruk den nye påloggingsflyten.',
+    },
+  },
+  {
+    team: 'Støtteteam Arbeidsflate',
+    problem: 'Teamene i Digdir bruker ulike verktøy for det samme, og bruker tid på å sette dem opp.',
+  },
+  {
+    unit: '10003276', // FEL - Utvikling
+    approvedAt: '2026-08-20',
+    problem: 'Fellesløsningene må utvikles i takt med behovene til virksomhetene som bruker dem.',
+    outcomes: 'Fellesløsningene leveres med jevn kvalitet, og nye behov kommer raskere i produksjon.',
+    expectations: 'Avdelingen svarer for utvikling og drift av fellesløsningene, og for kompetansen som trengs.',
+    collaboration: 'Samarbeider med Strategi og forretningsutvikling om prioriteringer, og med teamene om leveransene.',
+  },
+]
+
 // Concepts from the prototype (TERMS), with the inflected forms to match
 // (BG-06). Explained automatically where the prototype did (TERM_TIPS); common
 // words like «team» are not.
@@ -734,4 +783,31 @@ export const users = [
   { person: '1008', email: 'teamleder@example.com', description: 'teamleder for Team Skjemabygger' },
   { person: '1004', email: 'teameier@example.com', description: 'teameier for Team Innlogging' },
   { person: '1012', email: 'ihaugen@example.com', description: 'teammedlem and fagkoordinator, edits no team' },
+  { person: '1003', email: 'enhetsleder@example.com', description: 'enhetsleder for Digital strategi og samordning, edits no team' },
+] as const
+
+// Reported errors (TB-01) on a team, a unit and a page for all of Digdir, so
+// each owner has something to read (TB-02). `reporter` is a user above, or
+// none for anonymous feedback (TB-05).
+export const feedback = [
+  {
+    team: 'Team Skjemabygger',
+    reporter: 'ihaugen@example.com',
+    category: 'faktafeil',
+    status: 'ny',
+    text: 'Teamet bruker ikke lenger Figma, men Penpot.',
+  },
+  {
+    unit: '10008675', // Digital strategi og samordning
+    category: 'utdatert',
+    status: 'under-arbeid',
+    text: 'Beskrivelsen nevner en seksjon som ble lagt ned i fjor.',
+  },
+  {
+    page: '/verktoy/verktoykasse',
+    reporter: 'teamleder@example.com',
+    category: 'mangler',
+    status: 'ny',
+    text: 'Verktøykassen mangler en mal for retrospektiv.',
+  },
 ] as const

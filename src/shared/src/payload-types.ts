@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     team: Team;
     teammedlemskap: TeamMembership;
+    mandater: Mandate;
     teamtyper: TeamType;
     'teamtype-veiviser': TeamTypeWizardQuestion;
     verktoy: Tool;
@@ -78,6 +79,7 @@ export interface Config {
     lokasjoner: Location;
     roller: Role;
     brukere: User;
+    tilbakemeldinger: Feedback;
     importkjoringer: ImportRun;
     medier: Media;
     sok: SearchResult;
@@ -90,6 +92,7 @@ export interface Config {
   collectionsJoins: {
     team: {
       members: 'teammedlemskap';
+      mandate: 'mandater';
     };
     teamtyper: {
       roles: 'roller';
@@ -103,6 +106,7 @@ export interface Config {
     enheter: {
       children: 'enheter';
       people: 'personer';
+      mandate: 'mandater';
     };
     lokasjoner: {
       people: 'personer';
@@ -111,6 +115,7 @@ export interface Config {
   collectionsSelect: {
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    mandater: MandaterSelect<false> | MandaterSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     verktoy: VerktoySelect<false> | VerktoySelect<true>;
@@ -120,6 +125,7 @@ export interface Config {
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
     roller: RollerSelect<false> | RollerSelect<true>;
     brukere: BrukereSelect<false> | BrukereSelect<true>;
+    tilbakemeldinger: TilbakemeldingerSelect<false> | TilbakemeldingerSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     medier: MedierSelect<false> | MedierSelect<true>;
     sok: SokSelect<false> | SokSelect<true>;
@@ -189,6 +195,11 @@ export interface Team {
   tools?: (number | Tool)[] | null;
   members?: {
     docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  mandate?: {
+    docs?: (number | Mandate)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -363,8 +374,49 @@ export interface Unit {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  mandate?: {
+    docs?: (number | Mandate)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater".
+ */
+export interface Mandate {
+  id: number;
+  title?: string | null;
+  /**
+   * Teamet mandatet hører til. Kan ikke endres etterpå.
+   */
+  team?: (number | null) | Team;
+  /**
+   * Enheten mandatet hører til. Kan ikke endres etterpå.
+   */
+  unit?: (number | null) | Unit;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  problem: string;
+  outcomes: string;
+  expectations: string;
+  collaboration: string;
+  /**
+   * Dagens dato hvis tomt når mandatet godkjennes. Kan ikke være frem i tid.
+   */
+  approvedAt?: string | null;
+  approvedBy?: (number | null) | Person;
+  status?: ('draft' | 'current') | null;
+  complete?: boolean | null;
+  missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -486,6 +538,23 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'brukere';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tilbakemeldinger".
+ */
+export interface Feedback {
+  id: number;
+  category: 'faktafeil' | 'utdatert' | 'uklart' | 'mangler' | 'annet';
+  text: string;
+  status: 'ny' | 'under-arbeid' | 'rettet' | 'avvist';
+  page: string;
+  team?: (number | null) | Team;
+  unit?: (number | null) | Unit;
+  contactMe?: boolean | null;
+  reporter?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -691,6 +760,10 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
+        relationTo: 'mandater';
+        value: number | Mandate;
+      } | null)
+    | ({
         relationTo: 'teamtyper';
         value: number | TeamType;
       } | null)
@@ -725,6 +798,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'brukere';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'tilbakemeldinger';
+        value: number | Feedback;
       } | null)
     | ({
         relationTo: 'importkjoringer';
@@ -791,6 +868,7 @@ export interface TeamSelect<T extends boolean = true> {
   active?: T;
   tools?: T;
   members?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -805,6 +883,27 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater_select".
+ */
+export interface MandaterSelect<T extends boolean = true> {
+  title?: T;
+  team?: T;
+  unit?: T;
+  problem?: T;
+  outcomes?: T;
+  expectations?: T;
+  collaboration?: T;
+  approvedAt?: T;
+  approvedBy?: T;
+  status?: T;
+  complete?: T;
+  missingFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -913,6 +1012,7 @@ export interface EnheterSelect<T extends boolean = true> {
   active?: T;
   children?: T;
   people?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -979,6 +1079,22 @@ export interface BrukereSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tilbakemeldinger_select".
+ */
+export interface TilbakemeldingerSelect<T extends boolean = true> {
+  category?: T;
+  text?: T;
+  status?: T;
+  page?: T;
+  team?: T;
+  unit?: T;
+  contactMe?: T;
+  reporter?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

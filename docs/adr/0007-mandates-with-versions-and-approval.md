@@ -1,4 +1,4 @@
-# ADR-0006: Mandates as a versioned collection with approval
+# ADR-0007: Mandates as a versioned collection with approval
 
 - **Status:** Proposed
 - **Requirements:** TO-04, TO-09, TO-10, TO-16, TO-17, LO-02, LO-03, LO-04
@@ -95,11 +95,14 @@ For the status (draft, current or expired):
   two in step on every save, publish and restore, and a path it misses leaves
   them disagreeing. The select also gets the same enum name in Postgres as
   `_status` unless renamed.
-- **Payload's `_status`, and a date for expiry (chosen).** `_status` already
-  says whether a version is a draft or approved. Only expiry is ours: an
-  `expiredAt` date, which also says when. The status is calculated from the
-  two for display. It can't be filtered on as one field; queries use
-  `_status` and `expiredAt`.
+- **Payload's `_status` and the version history (chosen).** `_status` already
+  says whether a version is a draft or approved. An approved version that a
+  later approval replaced is expired, from the date the next approved version
+  was saved. The status is calculated for display. An earlier draft of this
+  ADR also had an `expiredAt` date, for marking a mandate that no longer
+  applies; it was dropped in the review of #60, since a closed team or unit is
+  already marked inactive, and a date set in the future made the mandate
+  expired at once.
 
 ## Decision
 
@@ -116,9 +119,8 @@ For the status (draft, current or expired):
 | `expectations` | textarea, markdown | Hva forventes av oss? |
 | `collaboration` | textarea, markdown | Hvordan samarbeider vi med andre? |
 | `approvedAt` | date | Godkjent |
-| `expiredAt` | date | Utgått |
 | `approvedBy` | relationship to `personer`, set by the CMS | Godkjent av |
-| `status` | virtual: `draft`, `current`, `expired` | Status |
+| `status` | virtual: `draft`, `current` | Status |
 | `complete`, `missingFields` | virtual | |
 
 Payload adds `_status` (`draft` or `published`) for the drafts.
@@ -152,30 +154,29 @@ Payload adds `_status` (`draft` or `published`) for the drafts.
 ### Status and approval
 
 Payload's `_status` says whether a version is a draft or approved
-(published), and `expiredAt` whether an approved mandate has expired. The
-calculated `status` is `draft` for a draft, `expired` for a published mandate
-with `expiredAt`, and `current` otherwise.
+(published). The calculated `status` is `draft` for a draft and `current` for
+an approved mandate.
 
 - **Draft.** Saving with Payload's «Save draft». Readers keep seeing the
   published version, if there is one. A mandate that has never been approved
-  is a draft and isn't shown to readers. A draft has no `approvedAt` or
-  `expiredAt`: approving it is a new approval.
+  is a draft and isn't shown to readers. A draft has no `approvedAt`:
+  approving it is a new approval.
 - **Current.** Approving publishes the draft. The approver gives
   `approvedAt`, which defaults to today but can be earlier, for a mandate
-  approved in a meeting before it was registered. A new approval clears
-  `expiredAt`. The CMS sets `approvedBy` to the approver's person, since
+  approved in a meeting before it was registered, never later. The CMS sets `approvedBy` to the approver's person, since
   Payload's versions don't record who saved them; this needs users linked to
   people, so it comes with ADR-0005's implementation (#58).
-- **Expired.** The team owner publishes the mandate with `expiredAt` when it
-  no longer applies, for example when a team is closed. It keeps the date of
-  the approval that ends, stays readable, and is marked as expired.
+- **Expired.** An approved version that a later approval replaced. It stays
+  in the version history, and expired from the date the next approved version
+  was saved. Payload records no such date itself; it is the `createdAt` of the
+  next published version. When a team or unit is closed, it is marked
+  inactive; its mandate is not marked separately.
 
-A hook sets the dates; only approvers publish, so only they set them.
+A hook sets the date and the approver; only approvers publish, so only they
+set them.
 
 When a new version is approved, the previous one is not changed: it is in the
-version history with its own approval date. The history shows earlier approved
-versions as replaced; «expired» is only for a mandate that no longer applies at
-all.
+version history with its own approval date, and is expired from then.
 
 ### Guarding the drafts
 
@@ -192,7 +193,7 @@ without approval.
   the API be either a draft save or a publish, and every restore only a
   draft. Restored text is approved again like any other draft.
 - Unpublishing is refused for everyone, administrators included. A mandate
-  that no longer applies is expired, not hidden.
+  is replaced by a new approval, not hidden.
 
 ### Access
 
@@ -217,8 +218,8 @@ Access lives in the collection's access functions, as everywhere else:
 - `update` lets editors in, and refuses `_status: 'published'` unless the user
   may approve. The admin panel asks the same access function with
   `_status: 'published'` and only shows «Publish» when it is allowed, so a
-  teamleder sees «Save draft» only. A draft never carries `approvedAt` or
-  `expiredAt`, so a teamleder can't set them either.
+  teamleder sees «Save draft» only. A draft never carries `approvedAt`, so a
+  teamleder can't set it either.
 - `readVersions` returns a query: published versions to everyone signed in,
   drafts only to editors.
 - In the admin panel the collection is shown to team editors, with the list

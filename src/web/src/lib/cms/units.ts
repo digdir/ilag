@@ -1,6 +1,7 @@
 import { authHeaders, PayloadSDKError, sdk, type Person, type Unit } from '@ilag/shared'
 
 import type { OrgUnit, SubUnit, UnitDetail, UnitPerson } from '../../types/unit'
+import { mandateFrom } from './mandates'
 
 // The queries the line organisation pages use. Reads as the visitor, so
 // Payload's access control decides what comes back.
@@ -134,6 +135,8 @@ export async function getUnit(id: string, cookie: string | null): Promise<UnitDe
             leader: true,
             advisesAllOfDigdir: true,
             active: true,
+            // The join to the unit's mandate (LO-02), with its read access.
+            mandate: true,
           },
           // The parent's own parent, and so on up to the directorate, for the
           // breadcrumbs.
@@ -186,7 +189,8 @@ type SelectedDetail = Pick<
   | 'leader'
   | 'advisesAllOfDigdir'
   | 'active'
->
+> &
+  Partial<Pick<Unit, 'mandate'>>
 
 const toPerson = ({ id, fullName, title, email, mobile }: SelectedContact): UnitPerson => ({
   id,
@@ -222,6 +226,7 @@ export function toDetail(
     description: unit.description ?? null,
     ancestors,
     advisesAllOfDigdir: unit.advisesAllOfDigdir,
+    mandate: mandateFrom(unit.mandate),
     leader,
     employees: people
       .filter((p) => p.id !== leader?.id)

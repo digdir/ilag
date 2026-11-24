@@ -13,7 +13,8 @@ import { collectionGroups } from './groups'
 // delete units through the admin panel or the REST/GraphQL API, or change what
 // the import sets. Administrators set the leader and the description, which
 // the file doesn't have.
-// What a unit leader maintains in ilag (LO-03) will live elsewhere.
+// What a unit leader maintains in ilag (LO-03) lives elsewhere, such as the
+// unit's mandate in Mandates.
 //
 // The import matches units on externalUnitId, and sets `parent` from the
 // codes in the file. The field mapping is in docs/integrations/unit-import.md.
@@ -95,7 +96,7 @@ export const Units: CollectionConfig = {
     {
       // What the unit does, in a few sentences, shown under the unit's name on
       // its page (LO-02). Set by an administrator; the import never changes
-      // it. The mandate (LO-02, LO-03) is separate and comes later.
+      // it. The mandate (LO-02, LO-03) is in Mandates.
       name: 'description',
       type: 'textarea',
       label: 'Beskrivelse',
@@ -152,6 +153,15 @@ export const Units: CollectionConfig = {
       type: 'join',
       collection: 'personer',
       on: 'units',
+    },
+    {
+      // The unit's mandate (LO-02), at most one. Read access on mandates
+      // applies: drafts only reach those who may edit them (ADR-0007).
+      name: 'mandate',
+      type: 'join',
+      collection: 'mandater',
+      on: 'unit',
+      defaultLimit: 1,
     },
   ],
 }

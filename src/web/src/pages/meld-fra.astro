@@ -1,0 +1,55 @@
+---
+import { PayloadSDKError } from '@ilag/shared'
+
+import FeedbackForm from '../components/feedback/FeedbackForm.astro'
+import Layout from '../layouts/Layout.astro'
+import { sendFeedback } from '../lib/cms/feedback'
+import { FEEDBACK_CATEGORIES, FEEDBACK_SENT, feedbackOwner } from '../lib/feedback'
+import { sameSiteURL } from '../lib/paths'
+
+// Receives the form in the footer's dialog (TB-01). The CMS decides who may
+// read it (TB-02) and whether the reporter is stored (TB-05). Shown as a page
+// of its own when sending fails, with what was typed, or when opened directly.
+const params = Astro.url.searchParams
+const page = sameSiteURL(params.get('side'), Astro.url)?.pathname ?? '/'
+const pageTitle = params.get('tittel')?.replace(/ — ilag$/, '') || page
+
+let error: string | null = null
+let category = FEEDBACK_CATEGORIES[0]!.value
+let text = ''
+let contactMe = false
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData()
+  const chosen = FEEDBACK_CATEGORIES.find((c) => c.value === form.get('category'))?.value
+  text = String(form.get('text') ?? '').trim()
+  contactMe = form.get('contactMe') === 'on'
+  if (chosen) category = chosen
+  if (!chosen || !text) {
+    Astro.response.status = 400
+    error = 'Velg hva det gjelder, og beskriv hva som er feil.'
+  } else {
+    try {
+      const { team, unit } = feedbackOwner(page)
+      await sendFeedback({ category, text, page, contactMe, team, unit }, Astro.request.headers.get('cookie'))
+      // Back to the page, where the footer thanks for it.
+      return Astro.redirect(`${page}?${FEEDBACK_SENT}`, 303)
+    } catch (e) {
+      if (!(e instanceof PayloadSDKError)) throw e
+      Astro.response.status = e.status >= 500 ? 502 : 400
+      error = 'Tilbakemeldingen ble ikke sendt. Prøv igjen om litt.'
+    }
+  }
+}
+---
+
+<Layout title="Meld fra om feil — ilag">
+  <h1 class="ds-heading" data-size="xl">Meld fra om feil</h1>
+  {
+    error && (
+      <div class="ds-alert" data-color="danger" role="alert">
+        <p class="ds-paragraph">{error}</p>
+      </div>
+    )
+  }
+  <FeedbackForm page={page} pageTitle={pageTitle} category={category} text={text} contactMe={contactMe} />
+</Layout>

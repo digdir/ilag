@@ -1,3 +1,4 @@
+import { MandateTitle as MandateTitle_0c248988e8a4816201f9a8d2d6c787fa } from '../../../components/MandateTitle'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { GoToWebsite as GoToWebsite_a704a2038d0b74d32ae18fd94eef9aaf } from '../../../components/GoToWebsite'
@@ -7,6 +8,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/MandateTitle#MandateTitle": MandateTitle_0c248988e8a4816201f9a8d2d6c787fa,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "/components/GoToWebsite#GoToWebsite": GoToWebsite_a704a2038d0b74d32ae18fd94eef9aaf,
