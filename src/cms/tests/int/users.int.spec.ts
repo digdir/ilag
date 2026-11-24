@@ -43,6 +43,28 @@ describe('Users', () => {
     expect(await access(await req(employee))).toBe(false)
   })
 
+  it('tells users on their own user whether they may use the admin panel', async () => {
+    const self = (user: User) => payload.findByID({ collection: 'brukere', id: user.id, ...asUser(user) })
+
+    expect((await self(admin)).canAccessAdmin).toBe(true)
+    expect((await self(employee)).canAccessAdmin).toBe(false)
+  })
+
+  it('says nothing about the admin panel on other users', async () => {
+    const other = await payload.findByID({ collection: 'brukere', id: employee.id, ...asUser(admin) })
+
+    expect(other.canAccessAdmin ?? null).toBeNull()
+  })
+
+  it('never stores whether a user may use the admin panel', async () => {
+    await expect(
+      payload.update({ collection: 'brukere', id: employee.id, data: { canAccessAdmin: true }, ...asUser(admin) }),
+    ).resolves.toBeTruthy()
+    const after = await payload.findByID({ collection: 'brukere', id: employee.id, ...asUser(employee) })
+
+    expect(after.canAccessAdmin).toBe(false)
+  })
+
   it('lets an employee read only their own user', async () => {
     const { docs } = await payload.find({
       collection: 'brukere',

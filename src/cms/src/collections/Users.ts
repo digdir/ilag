@@ -1,10 +1,16 @@
-import { APIError, type CollectionBeforeChangeHook, type CollectionBeforeLoginHook, type CollectionConfig } from 'payload'
+import {
+  APIError,
+  type CollectionBeforeChangeHook,
+  type CollectionBeforeLoginHook,
+  type CollectionConfig,
+  type FieldHook,
+} from 'payload'
 
+import { mayUseAdminPanel } from '../access/adminPanel'
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors, isTeamEditor } from '../access/teamEditor'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
-import { isUnitLeader } from '../access/unitLeader'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
 import { providers } from '../auth/providers'
 import { collectionGroups } from './groups'
@@ -26,6 +32,16 @@ const makeFirstUserAdmin: CollectionBeforeChangeHook = async ({ context, data, o
 const refuseIntegrationLogin: CollectionBeforeLoginHook = ({ user }) => {
   if (isIntegration(user)) throw new APIError('Integrasjonsbrukeren kan ikke logge inn.', 403)
   return user
+}
+
+// Whether the user may use the admin panel, on their own user only, so the
+// frontend can show the way there with the user it already reads on every
+// page (/brukere/me). Worked out on every read, never stored, so it follows
+// when someone becomes or stops being teamleder. Not access control: the
+// admin panel still asks mayUseAdminPanel.
+const canAccessAdminOfSelf: FieldHook = async ({ data, req }) => {
+  if (!req.user || req.user.collection !== 'brukere' || data?.id !== req.user.id) return undefined
+  return mayUseAdminPanel({ req })
 }
 
 // Everyone who can log in. People log in with Entra ID (NF-02), which creates
@@ -57,9 +73,7 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
   },
   access: {
-    // Administrators, the teameiere and teamledere who edit their teams
-    // (TO-08, RO-06), and enhetsledere, who read feedback on their units (TB-02).
-    admin: async ({ req }) => isAdmin(req.user) || (await isTeamEditor(req)) || (await isUnitLeader(req)),
+    admin: mayUseAdminPanel,
     read: ({ req }) => isAdmin(req.user) || (isSignedIn(req.user) ? { id: { equals: req.user!.id } } : false),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
@@ -110,6 +124,22 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Settes ved innlogging fra personen med samme e-post.',
+      },
+    },
+    {
+      // Set by canAccessAdminOfSelf; see there.
+      name: 'canAccessAdmin',
+      type: 'checkbox',
+      virtual: true,
+      access: {
+        create: () => false,
+        update: () => false,
+      },
+      admin: {
+        hidden: true,
+      },
+      hooks: {
+        afterRead: [canAccessAdminOfSelf],
       },
     },
     {

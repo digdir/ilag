@@ -29,9 +29,13 @@ const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
               <Avatar name={userName} />
               <span>{userName}</span>
             </span>
-            <a class="ds-button" data-variant="tertiary" data-size="sm" href={cmsAdminURL}>
-              CMS
-            </a>
+            {/* Only for those the CMS lets into the admin panel (`canAccessAdmin`
+                on their user); the CMS still decides who gets in. */}
+            {user.canAccessAdmin && (
+              <a class="ds-button" data-variant="tertiary" data-size="sm" href={cmsAdminURL}>
+                CMS
+              </a>
+            )}
             <form method="post" action="/logg-ut">
               <button class="ds-button" data-variant="secondary" data-size="sm" type="submit">
                 Logg ut

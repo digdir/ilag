@@ -261,6 +261,13 @@ describe('Team editors', () => {
     expect(await mayUseAdminPanel(unlinkedUser)).toBe(false)
   })
 
+  it('TO-08: tells team editors on their own user that they may use the admin panel', async () => {
+    const self = (u: User) => payload.findByID({ collection: 'brukere', id: u.id, depth: 0, ...as(u) })
+
+    expect((await self(leadUser)).canAccessAdmin).toBe(true)
+    expect((await self(memberUser)).canAccessAdmin).toBe(false)
+  })
+
   it('TO-08: checks roles by their code, so renaming a role changes no rights', async () => {
     await payload.update({ collection: 'roller', id: lead.id, data: { name: `${prefix} Leder` } })
     try {
