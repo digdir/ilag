@@ -1,7 +1,9 @@
 import { APIError, type CollectionBeforeChangeHook, type CollectionBeforeLoginHook, type CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors, isTeamEditor } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
+import { isTeamEditor } from '../access/teamEditor'
+import { isEditor } from '../access/isEditor'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
 import { isUnitLeader } from '../access/unitLeader'
@@ -43,8 +45,8 @@ export const Users: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.system,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // Only administrators see it in the admin panel's menu.
+    hidden: hiddenUnlessAdmin,
     useAsTitle: 'email',
     defaultColumns: ['email', 'firstName', 'lastName', 'roles'],
   },
@@ -57,9 +59,11 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
   },
   access: {
-    // Administrators, the teameiere and teamledere who edit their teams
-    // (TO-08, RO-06), and enhetsledere, who read feedback on their units (TB-02).
-    admin: async ({ req }) => isAdmin(req.user) || (await isTeamEditor(req)) || (await isUnitLeader(req)),
+    // Administrators, redaktører, who maintain shared content, the teameiere
+    // and teamledere who edit their teams (TO-08, RO-06), and enhetsledere, who
+    // read feedback on their units (TB-02).
+    admin: async ({ req }) =>
+      isAdmin(req.user) || isEditor(req.user) || (await isTeamEditor(req)) || (await isUnitLeader(req)),
     read: ({ req }) => isAdmin(req.user) || (isSignedIn(req.user) ? { id: { equals: req.user!.id } } : false),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),
@@ -87,6 +91,8 @@ export const Users: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Administrator', value: 'admin' },
+        // Maintains shared content, such as tools, principles and concepts.
+        { label: 'Redaktør', value: 'editor' },
         // May call the import endpoints and nothing else (ADR-0003).
         { label: 'Integrasjon', value: 'integration' },
       ],

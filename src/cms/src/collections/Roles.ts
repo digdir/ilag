@@ -1,8 +1,15 @@
-import type { CollectionConfig, FieldHook, Validate } from 'payload'
+import {
+  APIError,
+  type CollectionBeforeDeleteHook,
+  type CollectionConfig,
+  type FieldHook,
+  type Validate,
+} from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { canEditSharedContent } from '../access/isEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { isSignedIn } from '../access/isSignedIn'
+import { TEAM_EDITOR_ROLES } from '../access/teamEditor'
 import { codeFromName, isCode } from '../utils/codes'
 import { collectionGroups } from './groups'
 
@@ -17,9 +24,25 @@ const validCode: Validate = (value) =>
     ? true
     : 'Koden kan bare ha små bokstaver a–z, tall og bindestrek, som «teamleder».'
 
+// Who may edit a team follows the roles with these codes (TEAM_EDITOR_ROLES),
+// so deleting one would leave every team without editors. No user may delete
+// them, administrators included; their name and description can still change,
+// and the code never does. Scripts on the server, which run without a user
+// (the seed's clear, the tests' clean-up), still can.
+const keepTeamEditorRoles: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  if (!req.user) return
+  const role = await req.payload.findByID({ collection: 'roller', id, depth: 0, req })
+  if (role.code && TEAM_EDITOR_ROLES.includes(role.code)) {
+    throw new APIError(
+      `Rollen «${role.name}» styrer hvem som kan redigere team, og kan ikke slettes.`,
+      403,
+    )
+  }
+}
+
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier,
 // described after RAMO: rolle, ansvar, myndighet og oppgaver (RO-02).
-// Administrators maintain them (RO-07), and link each role to the team types
+// Administrators and redaktører maintain them (RO-07), and link each role to the team types
 // it is relevant for (RO-03).
 export const Roles: CollectionConfig = {
   slug: 'roller',
@@ -33,16 +56,19 @@ export const Roles: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.organisation,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // In the admin panel's menu for administrators and redaktører.
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'code'],
   },
+  hooks: {
+    beforeDelete: [keepTeamEditorRoles],
+  },
   access: {
     read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
+    create: ({ req }) => canEditSharedContent(req.user),
+    update: ({ req }) => canEditSharedContent(req.user),
+    delete: ({ req }) => canEditSharedContent(req.user),
   },
   defaultSort: 'name',
   fields: [

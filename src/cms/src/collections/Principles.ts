@@ -1,8 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
+import { canEditSharedContent } from '../access/isEditor'
 import { isSignedIn } from '../access/isSignedIn'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
 // The areas a principle belongs to (PR-02). For now a fixed list, like the
@@ -16,7 +16,7 @@ export const PRINCIPLE_AREAS = [
 ] as const
 
 // Digdir's principles (PR-01, Vedlegg 6): the basic rules for how we organise
-// and follow up teams. Administrators maintain them; everyone signed in reads
+// and follow up teams. Administrators and redaktører maintain them; everyone signed in reads
 // them. A team's, unit's or project's own principles (PR-04, PR-05) come later.
 export const Principles: CollectionConfig = {
   slug: 'prinsipper',
@@ -30,15 +30,15 @@ export const Principles: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.governance,
-    hidden: hiddenFromEditors,
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'title',
     defaultColumns: ['number', 'title', 'area'],
   },
   access: {
     read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
+    create: ({ req }) => canEditSharedContent(req.user),
+    update: ({ req }) => canEditSharedContent(req.user),
+    delete: ({ req }) => canEditSharedContent(req.user),
   },
   defaultSort: 'number',
   fields: [

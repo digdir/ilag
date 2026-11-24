@@ -7,6 +7,7 @@ import type {
 } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
+import { isEditor } from '../access/isEditor'
 import { isSignedIn } from '../access/isSignedIn'
 import { editableTeamIds } from '../access/teamEditor'
 import { unitIdsLedBy } from '../access/unitLeader'
@@ -21,7 +22,8 @@ export const FEEDBACK_CATEGORIES = [
 ] as const
 
 // The owner of the content (TB-02): teameier and teamleder for a team,
-// enhetsleder for a unit, administrators for everything else.
+// enhetsleder for a unit, administrators and redaktører for everything else.
+// Administrators also see everything, the team's and unit's too.
 const ownedByUser: Access = async ({ req }) => {
   if (isAdmin(req.user)) return true
   if (!isSignedIn(req.user)) return false
@@ -29,6 +31,8 @@ const ownedByUser: Access = async ({ req }) => {
   const or: Where[] = []
   if (teams.length) or.push({ team: { in: teams } })
   if (units.length) or.push({ unit: { in: units } })
+  if (isEditor(req.user))
+    or.push({ and: [{ team: { exists: false } }, { unit: { exists: false } }] })
   return or.length ? { or } : false
 }
 
@@ -51,7 +55,8 @@ const setReporterAndStatus: CollectionBeforeChangeHook = ({ data, operation, req
 
 // Errors and gaps reported from a page in the frontend (TB-01). Read by the
 // owner of the content, administrators and a reporter who left their name
-// (TB-02), never in an overview for everyone (TB-04 is removed).
+// (TB-02), never in an overview for everyone (TB-04 is removed). Redaktører
+// own the shared content, alongside the administrators.
 export const Feedback: CollectionConfig = {
   slug: 'tilbakemeldinger',
   dbName: 'feedback',

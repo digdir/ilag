@@ -859,6 +859,7 @@ export const users = [
   { person: '1004', email: 'teameier@example.com', description: 'teameier for Team Innlogging' },
   { person: '1012', email: 'ihaugen@example.com', description: 'teammedlem and fagkoordinator, edits no team' },
   { person: '1003', email: 'enhetsleder@example.com', description: 'enhetsleder for Digital strategi og samordning, edits no team' },
+  { person: '1015', email: 'redaktor@example.com', description: 'redaktør for shared content, edits no team', roles: ['editor'] },
 ] as const
 
 // Reported errors (TB-01) on a team, a unit and a page for all of Digdir, so
