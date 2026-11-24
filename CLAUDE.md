@@ -122,6 +122,7 @@ CMS `:3000`, frontend `:4321`, PostgreSQL `:5432` (Docker).
 | `pnpm dev:wt [worktree]` | Moves both dev servers to the worktree you are in (or `[worktree]`) in the background, on :3000 and :4321. A worktree on `ilag_dev` first gets its own empty database, `ilag_<worktree>`, and a worktree database with no users is seeded. `pnpm dev:status`, `pnpm dev:logs`, `pnpm dev:stop`. |
 | `pnpm lint` | ESLint for the CMS. |
 | `pnpm check:web` | Type-checks the frontend (`astro check`). Dev and build don't. |
+| `pnpm check:cms` | Type-checks the CMS, its scripts and tests (`tsc`). Dev and the tests don't. |
 | `pnpm test` | CMS integration + frontend tests. Needs the database up. |
 | `pnpm test:e2e` | Playwright. Needs `pnpm --filter cms exec playwright install chromium` once. |
 | `pnpm generate:types` | Run after every change to a collection — regenerates types and copies them into `src/shared`. Then update the seed data. |

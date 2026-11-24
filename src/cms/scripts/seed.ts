@@ -2,7 +2,13 @@ import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { getPayload, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
+import {
+  getPayload,
+  type CollectionSlug as Slug,
+  type Payload,
+  type RequiredDataFromCollectionSlug,
+  type Where,
+} from 'payload'
 import config from '@payload-config'
 
 import type { ImportError } from '../src/imports/csv'
@@ -20,18 +26,6 @@ import * as data from './seed-data'
 // again, and `pnpm db:seed:clear` only deletes it. They pass `reset` and
 // `clear` without dashes, since `payload run` only hands the script arguments
 // that aren't flags.
-
-type Slug =
-  | 'brukere'
-  | 'lokasjoner'
-  | 'enheter'
-  | 'personer'
-  | 'roller'
-  | 'teamtyper'
-  | 'teamtype-veiviser'
-  | 'team'
-  | 'teammedlemskap'
-  | 'mandater'
 
 // An administrator to log in to the admin panel with.
 const ADMIN = { email: 'admin@example.com', password: 'ilag' }
@@ -295,7 +289,13 @@ const seed = async (payload: Payload) => {
     const team = 'team' in item ? await findId(payload, 'team', { name: { equals: item.team } }) : undefined
     const unit =
       'unit' in item ? await findId(payload, 'enheter', { externalUnitId: { equals: item.unit } }) : undefined
-    const page = team ? `/organisering/team/${team}` : unit ? `/organisering/linjeorganisasjon/${unit}` : item.page
+    const page = team
+      ? `/organisering/team/${team}`
+      : unit
+        ? `/organisering/linjeorganisasjon/${unit}`
+        : 'page' in item
+          ? item.page
+          : undefined
     const reporter =
       'reporter' in item
         ? (await payload.find({ collection: 'brukere', where: { email: { equals: item.reporter } } })).docs[0]
@@ -319,7 +319,7 @@ const removeSeed = async (payload: Payload) => {
   const files = readFiles()
   const employeeNumbers = files.people.people.map((p) => p.employeeNumber)
   const unitIds = files.units.units.map((u) => u.externalUnitId)
-  const deletes: [Slug | 'importkjoringer', Where][] = [
+  const deletes: [Slug, Where][] = [
     ['tilbakemeldinger', { text: { in: data.feedback.map((f) => f.text) } }],
     // Deleting a team deletes its memberships and its mandate.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],

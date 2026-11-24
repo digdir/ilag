@@ -11,6 +11,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types && cp src/payload-types.ts ../shared/src/payload-types.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "check": "tsc --noEmit",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start -p 3000",
     "test": "pnpm run test:int && pnpm run test:e2e",

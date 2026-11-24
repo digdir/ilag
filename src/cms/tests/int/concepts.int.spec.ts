@@ -39,6 +39,7 @@ describe('Concepts', () => {
         name: `${prefix} Teammandat`,
         definition: 'Beskriver hvorfor teamet finnes.',
         variants: [`${prefix} teammandatet`],
+        autoLink: true,
       },
       ...as(admin),
     })
@@ -64,7 +65,7 @@ describe('Concepts', () => {
   })
 
   it('BG-01: lets only administrators create, change and delete concepts', async () => {
-    const data = { name: `${prefix} OKR`, definition: 'Objectives and key results.' }
+    const data = { name: `${prefix} OKR`, definition: 'Objectives and key results.', autoLink: true }
     await expect(payload.create({ collection: 'begreper', data, ...as(user) })).rejects.toThrow()
     await expect(
       payload.update({ collection: 'begreper', id: concept.id, data: { definition: 'Endret.' }, ...as(user) }),
@@ -78,7 +79,12 @@ describe('Concepts', () => {
   it('BG-06: lets two concepts share a form, which the popover then explains both', async () => {
     const other = await payload.create({
       collection: 'begreper',
-      data: { name: `${prefix} Enhetsmandat`, definition: 'Beskriver hvorfor enheten finnes.', variants: [`${prefix} teammandatet`] },
+      data: {
+        name: `${prefix} Enhetsmandat`,
+        definition: 'Beskriver hvorfor enheten finnes.',
+        variants: [`${prefix} teammandatet`],
+        autoLink: true,
+      },
       ...as(admin),
     })
 

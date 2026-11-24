@@ -1,4 +1,4 @@
-import type { Payload, PayloadRequest, Where } from 'payload'
+import type { ClientUser, Payload, PayloadRequest, Where } from 'payload'
 
 import { isAdmin } from './isAdmin'
 
@@ -78,4 +78,6 @@ export const ownTeams = async (req: PayloadRequest, field: string): Promise<bool
 
 // For `admin.hidden`: collections team editors can't change aren't shown to
 // them in the admin panel. Not access control; read access is unchanged.
-export const hiddenFromEditors = ({ user }: { user: PayloadRequest['user'] }): boolean => !isAdmin(user)
+// The admin panel passes the user without `collection`, which isAdmin doesn't read.
+export const hiddenFromEditors = ({ user }: { user: ClientUser }): boolean =>
+  !isAdmin(user as PayloadRequest['user'])

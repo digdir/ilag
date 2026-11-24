@@ -28,6 +28,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm check:web
+      - run: pnpm check:cms
 
   test:
     runs-on: ubuntu-latest
