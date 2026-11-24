@@ -67,6 +67,7 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    prinsipper: Principle;
     team: Team;
     teammedlemskap: TeamMembership;
     mandater: Mandate;
@@ -112,6 +113,7 @@ export interface Config {
     };
   };
   collectionsSelect: {
+    prinsipper: PrinsipperSelect<false> | PrinsipperSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     mandater: MandaterSelect<false> | MandaterSelect<true>;
@@ -179,6 +181,25 @@ export interface BrukereAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "prinsipper".
+ */
+export interface Principle {
+  id: number;
+  /**
+   * Prinsippene vises i rekkefølge etter nummeret.
+   */
+  number: number;
+  title: string;
+  area: 'felles' | 'ledelse' | 'arkitektur';
+  /**
+   * Hva prinsippet innebærer. Avsnitt skilles med en tom linje.
+   */
+  description: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -714,6 +735,10 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'prinsipper';
+        value: number | Principle;
+      } | null)
+    | ({
         relationTo: 'team';
         value: number | Team;
       } | null)
@@ -814,6 +839,18 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "prinsipper_select".
+ */
+export interface PrinsipperSelect<T extends boolean = true> {
+  number?: T;
+  title?: T;
+  area?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

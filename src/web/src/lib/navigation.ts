@@ -22,7 +22,7 @@ export const NAV: NavGroup[] = [
     path: '/styring',
     pages: [
       { label: 'Styringsfundament', href: '/styring/styringsfundament', built: false },
-      { label: 'Prinsipper', href: '/styring/prinsipper', built: false },
+      { label: 'Prinsipper', href: '/styring/prinsipper', built: true },
       { label: 'Porteføljestyring', href: '/styring/portefolje', built: false },
     ],
   },

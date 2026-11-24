@@ -1,0 +1,40 @@
+---
+import { principleAreaLabel } from '../../lib/principles'
+import type { PrincipleView } from '../../types/principle'
+import Tag from '../Tag.astro'
+
+interface Props {
+  principle: PrincipleView
+}
+
+// A principle (PR-01): its number, area (PR-02), title and what it means.
+// Not a link: the whole text is here, as in the prototype. In a list, so
+// concepts aren't marked (BG-06).
+const { principle } = Astro.props
+const paragraphs = principle.description
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean)
+---
+
+<article class="ds-card" data-color="neutral" aria-labelledby={`prinsipp-${principle.id}`}>
+  <div class="meta">
+    <span class="number">{principle.number}</span>
+    <Tag>{principleAreaLabel(principle.area)}</Tag>
+  </div>
+  <h2 class="ds-heading" data-size="xs" id={`prinsipp-${principle.id}`}>{principle.title}</h2>
+  {paragraphs.map((p) => <p class="ds-paragraph" data-size="sm">{p}</p>)}
+</article>
+
+<style>
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-3);
+  }
+
+  .number {
+    font-weight: var(--ds-font-weight-semibold);
+    color: var(--ds-color-accent-text-subtle);
+  }
+</style>
