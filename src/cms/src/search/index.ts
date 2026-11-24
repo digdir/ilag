@@ -8,8 +8,8 @@ import { hiddenFromEditors } from '../access/teamEditor'
 import { collectionGroups } from '../collections/groups'
 import type { SearchSubtitle } from './subtitle'
 
-// One search across ilag (FS-01): teams, units, people (FO-03), roles and
-// tools. Payload's search plugin keeps a document in `sok` for each of them,
+// One search across ilag (FS-01): teams, team types, units, people (FO-03),
+// roles and tools. Payload's search plugin keeps a document in `sok` for each of them,
 // with the hooks it adds to these collections, and the web frontend searches
 // that collection as the visitor.
 //
@@ -20,8 +20,10 @@ import type { SearchSubtitle } from './subtitle'
 
 export const SEARCH_SLUG = 'sok'
 
-// The collections, in the order their results are listed. The priority keeps
-// each type's results together when sorted by it.
+// The collections and their priorities, in the order their results are
+// listed: sorted by priority, each type's results stay together. The plugin
+// keeps a document's priority when it updates it, so give a new collection a
+// number between the others rather than renumbering them.
 //
 // Whoever may read a document must find it, and nobody else:
 // tests/int/searchAccess.int.spec.ts checks every collection here against the
@@ -29,9 +31,18 @@ export const SEARCH_SLUG = 'sok'
 // to `read` below if the collection's own read access differs. Its hits are
 // titled by its `admin.useAsTitle`; for a line of context under the title,
 // give it a `custom.searchSubtitle`.
-export const SEARCHED_COLLECTIONS = ['team', 'enheter', 'personer', 'roller', 'verktoy'] as const satisfies CollectionSlug[]
+const PRIORITIES = {
+  team: 10,
+  teamtyper: 15,
+  enheter: 20,
+  personer: 30,
+  roller: 40,
+  verktoy: 50,
+} as const satisfies Partial<Record<CollectionSlug, number>>
 
-export type SearchedCollection = (typeof SEARCHED_COLLECTIONS)[number]
+export type SearchedCollection = keyof typeof PRIORITIES
+
+export const SEARCHED_COLLECTIONS = Object.keys(PRIORITIES) as SearchedCollection[]
 
 // The name and the line of context the searched collection gives its
 // documents (search/subtitle.ts), and whether the source is active. Teams,
@@ -52,8 +63,8 @@ const beforeSync: BeforeSync = async ({ collectionSlug, originalDoc: doc, payloa
 const FIELD_LABELS: Record<string, string> = { title: 'Tittel', priority: 'Prioritet', doc: 'Kilde' }
 
 export const search = searchPlugin({
-  collections: [...SEARCHED_COLLECTIONS],
-  defaultPriorities: Object.fromEntries(SEARCHED_COLLECTIONS.map((slug, i) => [slug, (i + 1) * 10])),
+  collections: SEARCHED_COLLECTIONS,
+  defaultPriorities: PRIORITIES,
   beforeSync,
   searchOverrides: {
     slug: SEARCH_SLUG,
@@ -67,13 +78,14 @@ export const search = searchPlugin({
       // would only say «<Ingen Doc>», as the plugin keeps it unpopulated.
       defaultColumns: ['title', 'subtitle', 'active'],
       description:
-        'Lages og oppdateres automatisk fra team, enheter, personer, roller og verktøy. Brukes av søket i ilag.',
+        'Lages og oppdateres automatisk fra team, teamtyper, enheter, personer, roller og verktøy. Brukes av søket i ilag.',
     },
     access: {
       read: ({ req }) => isSignedIn(req.user),
-      create: () => false,
-      // The plugin writes past access control. Reindexing needs update and
-      // delete, which keeps it to administrators.
+      // Nobody creates search documents: the plugin writes past access
+      // control. `create` is left to the plugin, which denies it; set here, the
+      // reindex endpoint would ask for it too and refuse everyone.
+      // Reindexing needs update and delete, which keeps it to administrators.
       update: ({ req }) => isAdmin(req.user),
       delete: ({ req }) => isAdmin(req.user),
     },

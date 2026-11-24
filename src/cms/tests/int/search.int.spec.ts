@@ -1,4 +1,4 @@
-import { getPayload, Payload, type RequiredDataFromCollectionSlug } from 'payload'
+import { createLocalReq, getPayload, Payload, type RequiredDataFromCollectionSlug } from 'payload'
 import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -138,6 +138,12 @@ describe('Search (FS-01)', () => {
     )
   })
 
+  it('indexes team types by name', async () => {
+    expect(await indexOf('teamtyper', productTeam.id)).toMatchObject([
+      { title: `${prefix} Produktteam`, subtitle: null, active: true },
+    ])
+  })
+
   it('indexes roles and tools, tools with their type', async () => {
     const role = await payload.create({ collection: 'roller', data: { name: `${prefix} Teamleder` } })
     const tool = await payload.create({
@@ -152,7 +158,7 @@ describe('Search (FS-01)', () => {
     expect((await indexOf('verktoy', tool.id))[0]).toMatchObject({ title: `${prefix} Prosjektmandat`, subtitle: 'Mal' })
   })
 
-  it('orders the types by priority: teams, units, people, roles, tools', async () => {
+  it('orders the types by priority: teams, team types, units, people, roles, tools', async () => {
     const { docs } = await payload.find({
       collection: SEARCH_SLUG,
       where: { title: { like: prefix } },
@@ -187,5 +193,28 @@ describe('Search (FS-01)', () => {
         ...as(admin),
       }),
     ).rejects.toThrow()
+  })
+
+  // What the admin panel's «Reindekser» button calls.
+  const reindex = async (u: User, collections: string[]) => {
+    const endpoint = payload.collections[SEARCH_SLUG].config.endpoints || []
+    const { handler } = endpoint.find((e) => e.path === '/reindex')!
+    const req = await createLocalReq({ user: { ...u, collection: 'brukere' } }, payload)
+    req.json = async () => ({ collections })
+    return handler(req)
+  }
+
+  it('lets administrators reindex a collection, and nobody else', async () => {
+    const type = await payload.create({ collection: 'teamtyper', data: { name: `${prefix} Uindeksert` } })
+    await payload.delete({
+      collection: SEARCH_SLUG,
+      where: { 'doc.relationTo': { equals: 'teamtyper' }, 'doc.value': { equals: type.id } },
+    })
+
+    expect((await reindex(user, ['teamtyper'])).status).toBe(401)
+    expect(await indexOf('teamtyper', type.id)).toHaveLength(0)
+
+    expect((await reindex(admin, ['teamtyper'])).status).toBe(200)
+    expect(await indexOf('teamtyper', type.id)).toMatchObject([{ title: `${prefix} Uindeksert`, priority: 15 }])
   })
 })
