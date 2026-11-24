@@ -156,7 +156,7 @@ ilag inngår i og må sees i sammenheng med følgende:
 
 Teamets mandat er et unntak: det kan bare redigeres av teameier og teamleder, og bare godkjennes av teameier (jf. TO-09, TO-16).
 
-- **Administrator** — kan opprette og vedlikeholde felles innhold som gjelder på tvers av Digdir (f.eks. teamtyper, verktøytyper, roller, begreper og prinsippområder). Rollen innehas av Organisasjonslæring (VSU).
+- **Administrator** — kan opprette og vedlikeholde felles innhold som gjelder på tvers av Digdir (f.eks. teamtyper, verktøytyper, roller, begreper og prinsipper). Rollen innehas av Organisasjonslæring (VSU).
 
 - **Ekstern bruker** — har lesetilgang til innhold som er gjort tilgjengelig eksternt, uten redigeringsrettigheter. Rollen er ikke med i første versjon (jf. NF-03 og NF-11).
 
@@ -309,7 +309,7 @@ Prinsipper skal gi et samlet sted for prinsipper som skal bidra til å forme kul
 | PR-03 | Systemet skal la brukeren søke og filtrere prinsipper etter område.                                                                        | Bør       |
 | PR-04 | Systemet skal la et team, en enhet eller et prosjekt knytte egne prinsipper til seg selv.                                                  | Kan       |
 | PR-05 | Systemet skal vise prinsipper knyttet til et gitt team, enhet eller prosjekt sammen med dets øvrige informasjon (f.eks. i Teamoversikten). | Bør       |
-| PR-06 | Systemet skal la brukeren definere hvilke områder prinsipper skal kunne knyttes til (eks. lederprinsipper, arkitekturprinsipper)           | Må        |
+| PR-06 | Systemet skal knytte hvert prinsipp til ett av de faste områdene Alle i Digdir, Ledelse og Arkitektur. Nye områder legges til av utviklerne. | Må        |
 
 ### 3.7 Styringsfundament
 Digdirs styringsfundament er en samlet fremstilling av virksomhetens visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller. Det er én av tre MVP-er fra arbeidspakken "Digdirs styringsfundament" i OU-prosessen — de to andre (styringsstruktur og styringsprinsipper) er hovedsakelig til bruk for andre OU-kjerneteam, og planlegges tatt inn i ilag på et senere tidspunkt.
@@ -489,7 +489,7 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Verktøy** – metode, mal eller verktøy fra verktøykassen
 
-- **Prinsipp** – kan knyttes til et område (generell kategori, f.eks. arkitektur eller ledelse) og/eller til en spesifikk enhet, et prosjekt eller et team
+- **Prinsipp** – hører til ett område fra en fast liste (Alle i Digdir, Ledelse eller Arkitektur), og kan knyttes til en spesifikk enhet, et prosjekt eller et team
 
 - **Begrep** – definert begrep fra begrepsapparatet, med navn, definisjon, andre former (som bøyningsformer) og om begrepet skal forklares automatisk der det brukes (BG-06), med mulig kobling mot ekstern begrepskatalog (data.norge.no) og egne metadata utover beskrivelsen
 
