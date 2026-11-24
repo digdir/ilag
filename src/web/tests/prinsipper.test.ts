@@ -48,7 +48,7 @@ describe('principles page', () => {
     expect(html).not.toContain('href="/styring/prinsipper/')
   })
 
-  it('PR-03: filters by area, in one row of chips, and searches the title and the text', async () => {
+  it('PR-03: filters by area, in one row of chips, without a search field', async () => {
     vi.stubGlobal('fetch', cms([brukerbehov, retning]))
 
     const html = await render()
@@ -58,7 +58,7 @@ describe('principles page', () => {
       expect(html).toMatch(new RegExp(`name="prinsipper-area" value="[a-z]+"[^>]*>\\s*${label}`))
     }
     expect(html).toContain('data-filter-area="ledelse"')
-    expect(html).toContain('data-search="vi løser reelle brukerbehov vi starter med')
+    expect(html).not.toContain('type="search"')
     expect(html).toContain('Ingen prinsipper passer filtrene. Prøv en annen kombinasjon.')
   })
 

@@ -7,7 +7,7 @@ import { PRINCIPLE_AREA_LABELS } from '../../../lib/principles'
 
 const principles = await getPrinciples(Astro.request.headers.get('cookie'))
 
-// Search by title and description, and filter by area (PR-03).
+// Filter by area (PR-03). There are few principles, so no search.
 const chips = [
   {
     key: 'area',
@@ -32,18 +32,13 @@ const chips = [
           <ListFilter
             list="prinsipper"
             empty="prinsipper-tom"
-            label="Søk i prinsippene"
-            placeholder="Søk etter tittel eller beskrivelse"
             count={principles.length}
             noun={{ one: 'prinsipp', other: 'prinsipper' }}
             chips={chips}
           />
           <ul class="principles" id="prinsipper">
             {principles.map((principle) => (
-              <li
-                data-search={`${principle.title} ${principle.description}`.toLowerCase()}
-                data-filter-area={principle.area}
-              >
+              <li data-search data-filter-area={principle.area}>
                 <PrincipleCard principle={principle} />
               </li>
             ))}
