@@ -18,12 +18,16 @@ interface ChipRow {
 }
 
 interface Props {
-  /** The id of the list to filter. Its items to filter carry `data-search`. */
+  /**
+   * The id of the list to filter. Its items to filter carry `data-search`: the text to search,
+   * or nothing when the list has no search field.
+   */
   list: string
   /** The id of the message to show when nothing matches, if there is one. */
   empty?: string
-  label: string
-  placeholder: string
+  /** The search field's label. Without it, the list is only filtered by the chips. */
+  label?: string
+  placeholder?: string
   /** How many items there are before filtering. */
   count: number
   /** The word for what is counted, such as `{ one: 'rolle', other: 'roller' }`. */
@@ -37,7 +41,8 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 ---
 
 <!--
-  Search and filter a list the page has already rendered. The script hides the
+  Search and filter a list the page has already rendered, or only filter it
+  when there is no search field. The script hides the
   items in the list that don't match: an item shows when every word searched
   for is in its data-search and, in each row of chips where a chip is chosen,
   the chip's value is one of the space-separated values in the item's
@@ -51,10 +56,14 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
   data-one={noun.one}
   data-other={noun.other}
 >
-  <ds-field class="ds-field">
-    <label class="ds-label" for={`${list}-search`}>{label}</label>
-    <input class="ds-input" id={`${list}-search`} type="search" placeholder={placeholder} />
-  </ds-field>
+  {
+    label && (
+      <ds-field class="ds-field">
+        <label class="ds-label" for={`${list}-search`}>{label}</label>
+        <input class="ds-input" id={`${list}-search`} type="search" placeholder={placeholder} />
+      </ds-field>
+    )
+  }
   {
     chips.map((row) => (
       <fieldset class="ds-fieldset" data-chip-row={row.key} data-count-suffix={row.countSuffix}>
@@ -95,7 +104,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 <script>
   for (const filter of document.querySelectorAll<HTMLElement>('[data-list-filter]')) {
     const { list, empty, one, other } = filter.dataset
-    const search = filter.querySelector<HTMLInputElement>('input[type=search]')!
+    const search = filter.querySelector<HTMLInputElement>('input[type=search]')
     const count = filter.querySelector<HTMLElement>('[data-filter-count]')!
     const message = empty ? document.getElementById(empty) : null
     const items = [...document.getElementById(list!)!.querySelectorAll<HTMLElement>('[data-search]')]
@@ -103,7 +112,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
     const rows = [...filter.querySelectorAll<HTMLElement>('[data-chip-row]')]
 
     filter.addEventListener('input', () => {
-      const words = search.value.trim().toLowerCase().split(/\s+/)
+      const words = (search?.value ?? '').trim().toLowerCase().split(/\s+/)
       const chosen = rows.flatMap((row) => {
         const input = row.querySelector<HTMLInputElement>('input[type=radio]:checked')
         return input?.value ? [{ row, input }] : []

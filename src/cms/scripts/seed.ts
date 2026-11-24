@@ -199,6 +199,13 @@ const seed = async (payload: Payload) => {
     toolIds.set(tool.name, id)
   }
 
+  for (const principle of data.principles) {
+    if (!(await findId(payload, 'prinsipper', { title: { equals: principle.title } }))) {
+      await payload.create({ collection: 'prinsipper', data: { ...principle } })
+      count('prinsipper')
+    }
+  }
+
   for (const concept of data.concepts) {
     if (!(await findId(payload, 'begreper', { name: { equals: concept.name } }))) {
       await payload.create({ collection: 'begreper', data: { ...concept, variants: [...concept.variants] } })
@@ -314,6 +321,7 @@ const removeSeed = async (payload: Payload) => {
     ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['verktoy', { name: { in: data.tools.map((t) => t.name) } }],
+    ['prinsipper', { title: { in: data.principles.map((p) => p.title) } }],
     ['begreper', { name: { in: data.concepts.map((c) => c.name) } }],
     ['roller', { code: { in: data.roles.map((r) => r.code) } }],
     ['teamtype-veiviser', { title: { in: data.wizardQuestions.map((q) => q.title) } }],

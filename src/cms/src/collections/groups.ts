@@ -2,6 +2,7 @@
 // Payload shows the groups in the order their first collection appears in
 // `collections` in payload.config.ts, so keep that list in this order.
 export const collectionGroups = {
+  governance: 'Styring',
   team: 'Team',
   organisation: 'Organisasjon',
   system: 'System',
