@@ -306,7 +306,7 @@ Prinsipper skal gi et samlet sted for prinsipper som skal bidra til å forme kul
 |-------|--------------------------------------------------------------------------------------------------------------------------------------------|-----------|
 | PR-01 | Systemet skal vise en liste over registrerte prinsipper.                                                                                   | Må        |
 | PR-02 | Systemet skal for hvert prinsipp vise hvilket område prinsippet tilhører.                                                                  | Må        |
-| PR-03 | Systemet skal la brukeren søke og filtrere prinsipper etter område.                                                                        | Bør       |
+| PR-03 | Systemet skal la brukeren filtrere prinsipper etter område.                                                                                | Bør       |
 | PR-04 | Systemet skal la et team, en enhet eller et prosjekt knytte egne prinsipper til seg selv.                                                  | Kan       |
 | PR-05 | Systemet skal vise prinsipper knyttet til et gitt team, enhet eller prosjekt sammen med dets øvrige informasjon (f.eks. i Teamoversikten). | Bør       |
 | PR-06 | Systemet skal knytte hvert prinsipp til ett av de faste områdene Alle i Digdir, Ledelse og Arkitektur. Nye områder legges til av utviklerne. | Må        |
