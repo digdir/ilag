@@ -1,0 +1,103 @@
+---
+import type { Feedback } from '@ilag/shared'
+
+import { FEEDBACK_CATEGORIES, feedbackOwner } from '../../lib/feedback'
+
+interface Props {
+  /** The page the feedback is about, a path on this site. */
+  page: string
+  pageTitle: string
+  /** In a dialog, «Avbryt» closes it; on its own page, it goes back to the page. */
+  dialogId?: string
+  /** What was typed, shown again when sending failed. */
+  category?: Feedback['category']
+  text?: string
+  contactMe?: boolean
+}
+
+const {
+  page,
+  pageTitle,
+  dialogId,
+  category = FEEDBACK_CATEGORIES[0]!.value,
+  text = '',
+  contactMe = false,
+} = Astro.props
+// Posts to /meld-fra from any page, which sends it and comes back here (TB-01).
+const action = `/meld-fra?${new URLSearchParams({ side: page, tittel: pageTitle })}`
+const id = dialogId ?? 'meld-fra'
+---
+
+<p class="ds-paragraph">
+  Gjelder: <strong>{pageTitle}</strong>
+  <br />
+  Går til: {feedbackOwner(page).label}
+</p>
+<form method="post" action={action}>
+  <fieldset class="ds-fieldset">
+    <legend class="ds-label">Hva gjelder det?</legend>
+    <div class="chips">
+      {
+        FEEDBACK_CATEGORIES.map(({ value, label }) => (
+          <label class="ds-chip">
+            <input class="ds-input" type="radio" name="category" value={value} checked={value === category} required />
+            {label}
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <ds-field class="ds-field">
+    <label class="ds-label" for={`${id}-text`}>Beskriv kort hva som er feil</label>
+    <textarea
+      class="ds-input"
+      id={`${id}-text`}
+      name="text"
+      rows="5"
+      maxlength="5000"
+      placeholder="Hva er feil, og hva burde det stå?"
+      required>{text}</textarea>
+  </ds-field>
+  <ds-field class="ds-field">
+    <input class="ds-input" type="checkbox" name="contactMe" checked={contactMe} />
+    <label class="ds-label" data-weight="regular">Jeg kan kontaktes om tilbakemeldingen</label>
+    <div data-field="description">
+      Da lagres navnet ditt sammen med tilbakemeldingen, og du kan se den igjen. Ellers sendes den anonymt.
+    </div>
+  </ds-field>
+  <div class="buttons">
+    <button class="ds-button" type="submit">Send tilbakemelding</button>
+    {
+      dialogId ? (
+        <button class="ds-button" data-variant="secondary" type="button" command="close" commandfor={dialogId}>
+          Avbryt
+        </button>
+      ) : (
+        <a class="ds-button" data-variant="secondary" href={page}>
+          Avbryt
+        </a>
+      )
+    }
+  </div>
+</form>
+
+<style>
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+    margin-block-start: var(--ds-size-6);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-3);
+  }
+</style>

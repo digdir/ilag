@@ -80,6 +80,7 @@ Follow the specification here, not the prototype, unless the specification is ch
 | Innsatsområde | Status page about an ongoing decision | Overview of focus areas, owner and linked teams (`IO-01`–`IO-06`) |
 | Team data | Imported from Baksia | Baksia is not a data source; the data in the prototype is test data |
 | Employees and units | Built from team members; units mostly missing | Fetched automatically from the HR system or Entra ID (`NF-07`, open question 6) |
+| Tilbakemeldinger | Sent to an overview visible to everyone, with the sender's name | Visible only to the content owner, administrators and the reporter (`TB-02`); no overview (`TB-04` removed); anonymous unless the reporter may be contacted (`TB-05`) |
 | Porteføljestyring | Explanatory page | Placeholder without requirements (open question 5); do not build yet |
 | Name | Saman | ilag, always lowercase, also at the start of a sentence |
 

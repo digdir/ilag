@@ -4,6 +4,7 @@ import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors, isTeamEditor } from '../access/teamEditor'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
+import { isUnitLeader } from '../access/unitLeader'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
 import { providers } from '../auth/providers'
 import { collectionGroups } from './groups'
@@ -56,9 +57,9 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
   },
   access: {
-    // Administrators, and the teameiere and teamledere who edit their teams
-    // (TO-08, RO-06).
-    admin: async ({ req }) => isAdmin(req.user) || (await isTeamEditor(req)),
+    // Administrators, the teameiere and teamledere who edit their teams
+    // (TO-08, RO-06), and enhetsledere, who read feedback on their units (TB-02).
+    admin: async ({ req }) => isAdmin(req.user) || (await isTeamEditor(req)) || (await isUnitLeader(req)),
     read: ({ req }) => isAdmin(req.user) || (isSignedIn(req.user) ? { id: { equals: req.user!.id } } : false),
     create: ({ req }) => isAdmin(req.user),
     update: ({ req }) => isAdmin(req.user),

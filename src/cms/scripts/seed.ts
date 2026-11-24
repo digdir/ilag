@@ -260,6 +260,27 @@ const seed = async (payload: Payload) => {
     }
   }
 
+  // Sent as the reporter, so the collection's hook stores them as it does for
+  // anyone who may be contacted.
+  for (const item of data.feedback) {
+    if (await findId(payload, 'tilbakemeldinger', { text: { equals: item.text } })) continue
+    const team = 'team' in item ? await findId(payload, 'team', { name: { equals: item.team } }) : undefined
+    const unit =
+      'unit' in item ? await findId(payload, 'enheter', { externalUnitId: { equals: item.unit } }) : undefined
+    const page = team ? `/organisering/team/${team}` : unit ? `/organisering/linjeorganisasjon/${unit}` : item.page
+    const reporter =
+      'reporter' in item
+        ? (await payload.find({ collection: 'brukere', where: { email: { equals: item.reporter } } })).docs[0]
+        : undefined
+    const { id } = await payload.create({
+      collection: 'tilbakemeldinger',
+      data: { category: item.category, text: item.text, status: 'ny', page: page!, team, unit, contactMe: Boolean(reporter) },
+      user: reporter ? { ...reporter, collection: 'brukere' } : undefined,
+    })
+    if (item.status !== 'ny') await payload.update({ collection: 'tilbakemeldinger', id, data: { status: item.status } })
+    count('tilbakemeldinger')
+  }
+
   return created
 }
 
@@ -271,6 +292,7 @@ const removeSeed = async (payload: Payload) => {
   const employeeNumbers = files.people.people.map((p) => p.employeeNumber)
   const unitIds = files.units.units.map((u) => u.externalUnitId)
   const deletes: [Slug | 'importkjoringer', Where][] = [
+    ['tilbakemeldinger', { text: { in: data.feedback.map((f) => f.text) } }],
     // Deleting a team deletes its memberships.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],

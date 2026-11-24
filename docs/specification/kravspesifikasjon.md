@@ -460,9 +460,10 @@ Tilbakemeldinger skal gjøre det enkelt å melde fra om feil og mangler, og sikr
 | ID    | Beskrivelse                                                                                                                                                                       | Prioritet |
 |-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
 | TB-01 | Systemet skal la brukeren melde inn feil og mangler fra hver side, med kategori (faktafeil, utdatert, uklart, mangler, annet).                                                    | Bør       |
-| TB-02 | Systemet skal sende tilbakemeldingen til den som eier innholdet: teamleder for teamets innhold, enhetsleder for enhetens innhold og Organisasjonslæring (VSU) for felles innhold. | Bør       |
-| TB-03 | Systemet skal la eieren av innholdet sette status på tilbakemeldingen (ny, under arbeid, rettet, avvist).                                                                         | Kan       |
-| TB-04 | Systemet skal vise en oversikt over innmeldte tilbakemeldinger og status, åpen for alle ansatte.                                                                                  | Kan       |
+| TB-02 | Systemet skal gi tilbakemeldingen til den som eier innholdet: teameier og teamleder for teamets innhold, enhetsleder for enhetens innhold og administratorene for felles innhold. Bare eieren, administratorene og innmelderen kan lese tilbakemeldingen. | Bør |
+| TB-03 | Systemet skal la eieren av innholdet og administratorene sette status på tilbakemeldingen (ny, under arbeid, rettet, avvist). | Kan |
+| TB-04 | *Fjernet.* Tilbakemeldingene vises ikke i en oversikt for alle ansatte; se TB-02. | – |
+| TB-05 | Systemet skal lagre hvem som meldte inn tilbakemeldingen bare når innmelderen sier ja til å bli kontaktet. Ellers er tilbakemeldingen anonym. | Bør |
 
 ## 4. Informasjonsmodell
 ### 4.1 Entiteter
@@ -500,6 +501,8 @@ Aktuelle entiteter systemet skal håndtere. Listen er ikke nødvendigvis komplet
 
 - **Innholdstype** – definert type innhold f eks strategi
 
+- **Tilbakemelding** – en feil eller mangel som en bruker har meldt inn fra en side (jf. TB-01), med kategori, beskrivelse og status. Gjelder et team, en enhet eller felles innhold, og det avgjør hvem som får den (jf. TB-02). Innmelderen lagres bare når innmelderen vil bli kontaktet (jf. TB-05).
+
 ### 4.2 Logisk datamodell
 Den logiske datamodell viser entitetene og relasjonene imellom dem, samt hva relasjonen er.
 
@@ -535,6 +538,8 @@ erDiagram
     Enhet }o--o{ Verktoy : "bruker"
     Team }o--o{ Verktoy : "bruker"
     Verktoy }o--o{ Teamtype : "passer for"
+    Team ||--o{ Tilbakemelding : "får"
+    Enhet ||--o{ Tilbakemelding : "får"
 ```
 
 ## 5. Ikke funksjonelle krav

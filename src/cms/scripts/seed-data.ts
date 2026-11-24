@@ -734,4 +734,31 @@ export const users = [
   { person: '1008', email: 'teamleder@example.com', description: 'teamleder for Team Skjemabygger' },
   { person: '1004', email: 'teameier@example.com', description: 'teameier for Team Innlogging' },
   { person: '1012', email: 'ihaugen@example.com', description: 'teammedlem and fagkoordinator, edits no team' },
+  { person: '1003', email: 'enhetsleder@example.com', description: 'enhetsleder for Digital strategi og samordning, edits no team' },
+] as const
+
+// Reported errors (TB-01) on a team, a unit and a page for all of Digdir, so
+// each owner has something to read (TB-02). `reporter` is a user above, or
+// none for anonymous feedback (TB-05).
+export const feedback = [
+  {
+    team: 'Team Skjemabygger',
+    reporter: 'ihaugen@example.com',
+    category: 'faktafeil',
+    status: 'ny',
+    text: 'Teamet bruker ikke lenger Figma, men Penpot.',
+  },
+  {
+    unit: '10008675', // Digital strategi og samordning
+    category: 'utdatert',
+    status: 'under-arbeid',
+    text: 'Beskrivelsen nevner en seksjon som ble lagt ned i fjor.',
+  },
+  {
+    page: '/verktoy/verktoykasse',
+    reporter: 'teamleder@example.com',
+    category: 'mangler',
+    status: 'ny',
+    text: 'Verktøykassen mangler en mal for retrospektiv.',
+  },
 ] as const

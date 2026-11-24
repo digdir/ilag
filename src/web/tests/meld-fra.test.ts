@@ -1,0 +1,117 @@
+import { experimental_AstroContainer as AstroContainer } from 'astro/container'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import MeldFra from '../src/pages/meld-fra.astro'
+import SiteFooter from '../src/components/SiteFooter.astro'
+import { cookie, json } from './teams'
+
+const render = async (path: string, form?: Record<string, string>) => {
+  const container = await AstroContainer.create()
+  return container.renderToResponse(MeldFra, {
+    request: new Request(new URL(path, 'http://localhost:4321'), {
+      headers: { cookie },
+      ...(form && { method: 'POST', body: new URLSearchParams(form) }),
+    }),
+  })
+}
+
+const post = (side: string, form: Record<string, string>) =>
+  render(`/meld-fra?${new URLSearchParams({ side, tittel: 'Team Skjemabygger — ilag' })}`, form)
+
+describe('report an error page', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  const footer = async (url: string, signedIn = true) => {
+    const container = await AstroContainer.create()
+    return container.renderToString(SiteFooter, {
+      props: { signedIn, url: new URL(url, 'http://localhost:4321'), title: 'Team Skjemabygger — ilag' },
+    })
+  }
+
+  it('TB-01: opens the form in a dialog from the footer, about the page the visitor is on', async () => {
+    const html = await footer('/organisering/team/7')
+    expect(html).toMatch(/<button[^>]*command="show-modal"[^>]*commandfor="meld-fra"/)
+    expect(html).toMatch(/<dialog[^>]*id="meld-fra"/)
+    expect(html).toContain('action="/meld-fra?side=%2Forganisering%2Fteam%2F7&amp;tittel=Team+Skjemabygger"')
+    expect(html).toContain('teameier og teamleder for teamet')
+    // The footer's own thanks is for coming back after a post without JavaScript.
+    expect(html.slice(0, html.indexOf('<dialog'))).not.toContain('Takk!')
+  })
+
+  it('TB-01: has the thanks ready in the dialog, hidden until the form is sent, with a close button', async () => {
+    const html = await footer('/organisering/team/7')
+    const thanks = html.slice(html.indexOf('data-step="thanks"'), html.indexOf('</dialog>'))
+    expect(html).toMatch(/data-step="thanks"[^>]*hidden/)
+    expect(thanks).toContain('Takk! Tilbakemeldingen er sendt til teameier og teamleder for teamet.')
+    expect(thanks).toMatch(/<button[^>]*command="close"[^>]*commandfor="meld-fra"[^>]*>\s*Lukk/)
+  })
+
+  it('TB-01: thanks the visitor when they come back, and offers nothing before login', async () => {
+    expect(await footer('/organisering/team/7?tilbakemelding=sendt')).toContain(
+      'Takk! Tilbakemeldingen er sendt til teameier og teamleder for teamet.',
+    )
+    expect(await footer('/logg-inn', false)).not.toContain('meld-fra')
+  })
+
+  it('TB-02: says who gets feedback on a team, and offers the categories', async () => {
+    const html = await (await render(`/meld-fra?${new URLSearchParams({ side: '/organisering/team/7', tittel: 'Team Skjemabygger — ilag' })}`)).text()
+    expect(html).toContain('Team Skjemabygger')
+    expect(html).toContain('teameier og teamleder for teamet')
+    for (const label of ['Faktafeil', 'Utdatert', 'Uklart', 'Mangler', 'Annet']) expect(html).toContain(label)
+  })
+
+  it('TB-01, TB-02: sends the feedback as the visitor, with the team the page is about', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => json({ doc: { id: 1 } }, 201))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const res = await post('/organisering/team/7', { category: 'uklart', text: ' Feil leder ', contactMe: 'on' })
+
+    expect(res.status).toBe(303)
+    expect(res.headers.get('location')).toBe('/organisering/team/7?tilbakemelding=sendt')
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect(String(url)).toBe('http://localhost:3000/api/tilbakemeldinger')
+    expect(new Headers(init?.headers).get('authorization')).toBe('JWT visitor-token')
+    expect(JSON.parse(String(init?.body))).toMatchObject({
+      category: 'uklart',
+      text: 'Feil leder',
+      page: '/organisering/team/7',
+      contactMe: true,
+      team: 7,
+    })
+  })
+
+  it('TB-02: sends feedback on other pages to the administrators, and never to another site', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => json({ doc: { id: 1 } }, 201))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await post('https://evil.example/organisering/team/7', { category: 'annet', text: 'Hei' })
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0]![1]?.body))
+    expect(body).toMatchObject({ page: '/', contactMe: false })
+    expect(body.team).toBeUndefined()
+  })
+
+  it('keeps what was typed when the CMS refuses it', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ errors: [{ message: 'Nei' }] }, 400)))
+
+    const res = await post('/organisering/linjeorganisasjon/3', { category: 'mangler', text: 'Mangler leder' })
+
+    expect(res.status).toBe(400)
+    const html = await res.text()
+    expect(html).toContain('ble ikke sendt')
+    expect(html).toContain('Mangler leder</textarea>')
+    expect(html).toMatch(/value="mangler"[^>]*checked/)
+  })
+
+  it('refuses an empty description without asking the CMS', async () => {
+    const fetchMock = vi.fn<typeof fetch>()
+    vi.stubGlobal('fetch', fetchMock)
+
+    const res = await post('/', { category: 'annet', text: '   ' })
+
+    expect(res.status).toBe(400)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
