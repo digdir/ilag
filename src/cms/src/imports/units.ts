@@ -195,7 +195,8 @@ export const applyUnits = async (file: UnitFile, req: PayloadRequest): Promise<U
     const found = byExternalId.get(unit.externalUnitId)
     const saved = found
       ? await payload.update({ collection: 'enheter', id: found.id, data, depth: 0, req })
-      : await payload.create({ collection: 'enheter', data, depth: 0, req })
+      : // advisesAllOfDigdir is the administrator's to set: a new unit starts without it.
+        await payload.create({ collection: 'enheter', data: { ...data, advisesAllOfDigdir: false }, depth: 0, req })
     idByUnitId.set(unit.externalUnitId, saved.id)
     result[found ? 'updated' : 'created']++
   }
