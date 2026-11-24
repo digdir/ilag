@@ -19,12 +19,24 @@ const menuLink = (html: string, label: string) =>
   html.match(new RegExp(`<a [^>]*>\\s*${label}\\s*</a>`))?.[0]
 
 describe('site header', () => {
-  it('shows the logged-in user, a link to the CMS and a way to log out', async () => {
+  it('shows the logged-in user and a way to log out', async () => {
     const html = await render({ user: kari, pathname: '/' })
 
     expect(html).toContain('Kari Nordmann')
-    expect(html).toContain('href="http://localhost:3000/admin"')
     expect(html).toMatch(/<form[^>]*method="post"[^>]*action="\/logg-ut"/)
+  })
+
+  it('links to the CMS for someone who may use the admin panel', async () => {
+    const html = await render({ user: { ...kari!, canAccessAdmin: true }, pathname: '/' })
+
+    expect(html).toContain('href="http://localhost:3000/admin"')
+  })
+
+  it('leaves the CMS link out for someone who may not use the admin panel', async () => {
+    const html = await render({ user: { ...kari!, canAccessAdmin: false }, pathname: '/' })
+
+    expect(html).not.toContain('/admin')
+    expect(html).not.toMatch(/>\s*CMS\s*</)
   })
 
   it('links the logo to the front page', async () => {

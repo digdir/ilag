@@ -146,6 +146,13 @@ describe('Redaktører', () => {
     expect(await mayUseAdminPanel(user)).toBe(false)
   })
 
+  it('tells a redaktør on their own user that they may use the admin panel, for the CMS button', async () => {
+    const self = (u: User) => payload.findByID({ collection: 'brukere', id: u.id, ...as(u) })
+
+    expect((await self(editor)).canAccessAdmin).toBe(true)
+    expect((await self(user)).canAccessAdmin).toBe(false)
+  })
+
   it('shows a redaktør only the shared content in the menu', () => {
     const args = (u: User) =>
       ({ user: { roles: u.roles } }) as unknown as Parameters<typeof hiddenUnlessAdmin>[0]
