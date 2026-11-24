@@ -4,14 +4,13 @@ import {
   type CollectionBeforeLoginHook,
   type CollectionConfig,
   type FieldHook,
-  type PayloadRequest,
 } from 'payload'
 
+import { mayUseAdminPanel } from '../access/adminPanel'
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors, isTeamEditor } from '../access/teamEditor'
+import { hiddenFromEditors } from '../access/teamEditor'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
-import { isUnitLeader } from '../access/unitLeader'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
 import { providers } from '../auth/providers'
 import { collectionGroups } from './groups'
@@ -34,12 +33,6 @@ const refuseIntegrationLogin: CollectionBeforeLoginHook = ({ user }) => {
   if (isIntegration(user)) throw new APIError('Integrasjonsbrukeren kan ikke logge inn.', 403)
   return user
 }
-
-// Who may use the admin panel: administrators, the teameiere and teamledere
-// who edit their teams (TO-08, RO-06), and enhetsledere, who read feedback on
-// their units (TB-02).
-const mayUseAdminPanel = async ({ req }: { req: PayloadRequest }): Promise<boolean> =>
-  isAdmin(req.user) || (await isTeamEditor(req)) || (await isUnitLeader(req))
 
 // Whether the user may use the admin panel, on their own user only, so the
 // frontend can show the way there with the user it already reads on every
