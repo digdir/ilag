@@ -9,7 +9,7 @@ import { getConcepts } from '../../../lib/cms/concepts'
 const concepts = await getConcepts(Astro.request.headers.get('cookie'))
 ---
 
-<Layout title="Begreper — ilag">
+<Layout title="Begreper — ilag" wide>
   <div class="page">
     <header>
       <h1 class="ds-heading" data-size="lg">Begreper</h1>
@@ -58,6 +58,7 @@ const concepts = await getConcepts(Astro.request.headers.get('cookie'))
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-3);
+    max-width: 45rem;
   }
 
   header > * {
