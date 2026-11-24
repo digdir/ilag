@@ -2,6 +2,7 @@
 import '../styles/global.css'
 
 import Breadcrumbs from '../components/Breadcrumbs.astro'
+import SiteFooter from '../components/SiteFooter.astro'
 import SiteHeader from '../components/SiteHeader.astro'
 import { breadcrumbs, type Crumb } from '../lib/navigation'
 
@@ -44,6 +45,7 @@ const crumbs = breadcrumbs(Astro.url.pathname, { trail, current })
       {crumbs && <Breadcrumbs items={crumbs} />}
       <slot />
     </main>
+    <SiteFooter signedIn={Boolean(Astro.locals.user)} url={Astro.url} title={title} />
     <script>
       // Behaviour for Designsystemet's components, such as ds-field.
       import '@digdir/designsystemet-web'

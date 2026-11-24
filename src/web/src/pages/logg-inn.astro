@@ -2,19 +2,12 @@
 import { login, loginProviders, providerLoginURL, type LoginProvider } from '@ilag/shared'
 
 import Layout from '../layouts/Layout.astro'
+import { sameSiteURL } from '../lib/paths'
 
 // Only pages on this site, so a crafted link can't send people elsewhere.
-// The target is resolved the way a browser resolves a Location header, which
-// drops tabs and newlines and reads backslashes as slashes, so a target like
-// "/<tab>/evil.example" is seen for what it is: //evil.example.
 const safeRedirect = (target: string | null): string => {
-  if (!target) return '/'
-  try {
-    const url = new URL(target, Astro.url)
-    return url.origin === Astro.url.origin ? url.pathname + url.search + url.hash : '/'
-  } catch {
-    return '/'
-  }
+  const url = sameSiteURL(target, Astro.url)
+  return url ? url.pathname + url.search + url.hash : '/'
 }
 const redirect = safeRedirect(Astro.url.searchParams.get('redirect'))
 
