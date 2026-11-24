@@ -1,15 +1,17 @@
 import { authHeaders, sdk } from '@ilag/shared'
 
 import type { SearchHit, SearchKind } from '../../types/search'
+import { teamTypeHref } from '../teamTypes'
 import { toolHref } from '../tools'
 
-// The search across ilag (FS-01): teams, units, people (FO-03), roles and
-// tools, from the index Payload's search plugin keeps in `sok`. Reads as the
-// visitor, so Payload's access control decides what comes back.
+// The search across ilag (FS-01): teams, team types, units, people (FO-03),
+// roles and tools, from the index Payload's search plugin keeps in `sok`.
+// Reads as the visitor, so Payload's access control decides what comes back.
 
 /** What a hit is, in the words of the menu, and the address of its page. */
 const KINDS: Record<SearchKind, { label: string; href: (id: number) => string }> = {
   team: { label: 'Team', href: (id) => `/organisering/team/${id}` },
+  teamtyper: { label: 'Teamtype', href: teamTypeHref },
   enheter: { label: 'Enhet', href: (id) => `/organisering/linjeorganisasjon/${id}` },
   personer: { label: 'Person', href: (id) => `/folk/${id}` },
   roller: { label: 'Rolle', href: (id) => `/organisering/roller/${id}` },
@@ -20,8 +22,9 @@ const KINDS: Record<SearchKind, { label: string; href: (id: number) => string }>
 export const MIN_QUERY_LENGTH = 2
 
 /**
- * The active teams, units, people, roles and tools whose names contain every
- * word in `query`, in that order of types and by name within each.
+ * The active teams, team types, units, people, roles and tools whose names
+ * contain every word in `query`, in that order of types and by name within
+ * each.
  */
 export async function search(query: string, cookie: string | null, limit = 15): Promise<SearchHit[]> {
   const q = query.trim()

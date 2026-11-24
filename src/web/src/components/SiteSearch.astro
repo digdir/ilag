@@ -13,7 +13,7 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
   <label class="ds-label ds-sr-only" for="site-search">Søk i ilag</label>
   <ds-suggestion class="ds-suggestion" data-site-search data-min={MIN_QUERY_LENGTH}>
     <input class="ds-input" id="site-search" type="search" placeholder="Søk etter team, enheter, folk …" autocomplete="off" />
-    <u-datalist data-nofilter data-overscroll="contain">
+    <u-datalist data-nofilter>
       <u-option data-empty>Ingen treff</u-option>
     </u-datalist>
   </ds-suggestion>
@@ -90,6 +90,15 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
   .site-search {
     flex: 1 1 16rem;
     max-width: 28rem;
+  }
+
+  /*
+   * Designsystemet makes the list as wide as the field and as tall as the room
+   * below it, the height set on the element itself. Long enough for about six
+   * hits here; the rest scroll.
+   */
+  .site-search :global(u-datalist) {
+    max-height: min(24rem, 60vh) !important;
   }
 
   .site-search :global(u-option) {

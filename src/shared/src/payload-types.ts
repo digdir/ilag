@@ -587,7 +587,7 @@ export interface ImportRun {
   createdAt: string;
 }
 /**
- * Lages og oppdateres automatisk fra team, enheter, personer, roller og verktøy. Brukes av søket i ilag.
+ * Lages og oppdateres automatisk fra team, teamtyper, enheter, personer, roller og verktøy. Brukes av søket i ilag.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sok".
@@ -600,6 +600,10 @@ export interface SearchResult {
     | {
         relationTo: 'team';
         value: number | Team;
+      }
+    | {
+        relationTo: 'teamtyper';
+        value: number | TeamType;
       }
     | {
         relationTo: 'enheter';

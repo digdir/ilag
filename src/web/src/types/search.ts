@@ -8,7 +8,7 @@ export interface SearchHit {
   title: string
   /** Such as a person's title or a unit's level. */
   subtitle: string | null
-  /** «Team», «Enhet», «Person», «Rolle» or «Verktøy». */
+  /** «Team», «Teamtype», «Enhet», «Person», «Rolle» or «Verktøy». */
   kindLabel: string
   url: string
 }

@@ -48,6 +48,7 @@ describe('search (FS-01)', () => {
         json({
           docs: [
             hit('team', 7, 'Team Skjemabygger', 'Produktteam'),
+            hit('teamtyper', 1, 'Produktteam'),
             hit('enheter', 3, 'Fellesløsninger', 'Divisjon'),
             hit('personer', 12, 'Kari Nordmann', 'Seniorrådgiver'),
             hit('roller', 2, 'Teamleder'),
@@ -64,6 +65,7 @@ describe('search (FS-01)', () => {
     const { hits: found } = await get('te')
     expect(found).toEqual([
       { title: 'Team Skjemabygger', subtitle: 'Produktteam', kindLabel: 'Team', url: '/organisering/team/7' },
+      { title: 'Produktteam', subtitle: null, kindLabel: 'Teamtype', url: '/organisering/team/typer/1' },
       {
         title: 'Fellesløsninger',
         subtitle: 'Divisjon',

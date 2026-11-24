@@ -56,6 +56,7 @@ const fixtures: Record<SearchedCollection, () => Promise<{ id: number }[]>> = {
       data: { name: `${prefix} Nedlagt team`, teamType, active: false } as RequiredDataFromCollectionSlug<'team'>,
     }),
   ],
+  teamtyper: async () => [await payload.create({ collection: 'teamtyper', data: { name: `${prefix} Teamtype` } })],
   enheter: async () =>
     Promise.all(
       [true, false].map((active, i) =>
