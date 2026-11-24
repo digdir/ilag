@@ -21,7 +21,14 @@ export const SEARCH_SLUG = 'sok'
 
 // The collections, in the order their results are listed. The priority keeps
 // each type's results together when sorted by it.
-const SEARCHED = ['team', 'enheter', 'personer', 'roller', 'verktoy'] as const satisfies CollectionSlug[]
+//
+// Whoever may read a document must find it, and nobody else:
+// tests/int/searchAccess.int.spec.ts checks every collection here against the
+// read access of `sok`. Adding one needs test data for it there, and a change
+// to `read` below if the collection's own read access differs.
+export const SEARCHED_COLLECTIONS = ['team', 'enheter', 'personer', 'roller', 'verktoy'] as const satisfies CollectionSlug[]
+
+export type SearchedCollection = (typeof SEARCHED_COLLECTIONS)[number]
 
 /** The label of a select field's value, as the admin panel shows it. */
 const optionLabel = (payload: Payload, collection: CollectionSlug, field: string, value: unknown): string | null => {
@@ -79,8 +86,8 @@ const beforeSync: BeforeSync = async (args) => {
 const FIELD_LABELS: Record<string, string> = { title: 'Tittel', priority: 'Prioritet', doc: 'Kilde' }
 
 export const search = searchPlugin({
-  collections: [...SEARCHED],
-  defaultPriorities: Object.fromEntries(SEARCHED.map((slug, i) => [slug, (i + 1) * 10])),
+  collections: [...SEARCHED_COLLECTIONS],
+  defaultPriorities: Object.fromEntries(SEARCHED_COLLECTIONS.map((slug, i) => [slug, (i + 1) * 10])),
   beforeSync,
   searchOverrides: {
     slug: SEARCH_SLUG,
