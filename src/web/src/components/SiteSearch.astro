@@ -29,7 +29,7 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
     const input = box.querySelector<HTMLInputElement>('input')!
     const list = box.querySelector<HTMLElement>('u-datalist')!
     const empty = list.querySelector<HTMLElement>('[data-empty]')!
-    const min = Number(box.dataset.min) || 2
+    const min = Number(box.dataset.min)
     let timer: ReturnType<typeof setTimeout> | undefined
     let pending: AbortController | undefined
 

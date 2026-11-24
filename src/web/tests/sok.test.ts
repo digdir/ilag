@@ -63,17 +63,16 @@ describe('search (FS-01)', () => {
 
     const { hits: found } = await get('te')
     expect(found).toEqual([
-      { title: 'Team Skjemabygger', subtitle: 'Produktteam', kind: 'team', kindLabel: 'Team', url: '/organisering/team/7' },
+      { title: 'Team Skjemabygger', subtitle: 'Produktteam', kindLabel: 'Team', url: '/organisering/team/7' },
       {
         title: 'Fellesløsninger',
         subtitle: 'Divisjon',
-        kind: 'enheter',
         kindLabel: 'Enhet',
         url: '/organisering/linjeorganisasjon/3',
       },
-      { title: 'Kari Nordmann', subtitle: 'Seniorrådgiver', kind: 'personer', kindLabel: 'Person', url: '/folk/12' },
-      { title: 'Teamleder', subtitle: null, kind: 'roller', kindLabel: 'Rolle', url: '/organisering/roller/2' },
-      { title: 'OKR', subtitle: 'Metode', kind: 'verktoy', kindLabel: 'Verktøy', url: '/verktoy/verktoykasse/4' },
+      { title: 'Kari Nordmann', subtitle: 'Seniorrådgiver', kindLabel: 'Person', url: '/folk/12' },
+      { title: 'Teamleder', subtitle: null, kindLabel: 'Rolle', url: '/organisering/roller/2' },
+      { title: 'OKR', subtitle: 'Metode', kindLabel: 'Verktøy', url: '/verktoy/verktoykasse/4' },
     ])
   })
 
