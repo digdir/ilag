@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
-import { currentUser } from '@ilag/shared'
+import { canAccessAdmin, currentUser } from '@ilag/shared'
 
 import { conceptsFor } from './lib/cms/concepts'
 
@@ -32,5 +32,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Start reading the concepts Prose explains (BG-06) now, alongside the
   // page's own reads, instead of after them. The read never fails.
   void conceptsFor(context.locals, context.request.headers.get('cookie'))
+  // Whether the header links to the admin panel, also read alongside the
+  // page. Never fails: false when the CMS can't tell.
+  context.locals.canAccessAdmin = canAccessAdmin(context.request.headers.get('cookie'))
   return next()
 })

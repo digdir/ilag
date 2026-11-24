@@ -65,6 +65,36 @@ describe('middleware', () => {
     expect(await locals.concepts).toMatchObject({ pattern: null })
   })
 
+  it('asks the CMS whether the user may use the admin panel, for the header', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      Response.json(new URL(url).pathname === '/api/access' ? { canAccessAdmin: true } : { user, docs: [] }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { locals } = await run('/', 'payload-token=abc.def.ghi')
+
+    const access = fetchMock.mock.calls.find(([url]) => new URL(url).pathname === '/api/access')
+    expect(access![1]!.headers).toMatchObject({ Authorization: 'JWT abc.def.ghi' })
+    expect(await locals.canAccessAdmin).toBe(true)
+  })
+
+  it('shows no way to the admin panel when the CMS says no or can\'t tell', async () => {
+    const answers = [{ canAccessAdmin: false }, null]
+    for (const answer of answers) {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (url: string) => {
+          if (new URL(url).pathname !== '/api/access') return Response.json({ user, docs: [] })
+          return answer ? Response.json(answer) : new Response('nope', { status: 500 })
+        }),
+      )
+
+      const { locals } = await run('/', 'payload-token=abc.def.ghi')
+
+      expect(await locals.canAccessAdmin).toBe(false)
+    }
+  })
+
   it('turns away a session the CMS no longer accepts', async () => {
     vi.stubGlobal('fetch', me({ user: null }))
 

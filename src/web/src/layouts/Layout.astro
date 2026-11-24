@@ -40,7 +40,11 @@ const crumbs = breadcrumbs(Astro.url.pathname, { trail, current })
   </head>
   <body data-color-scheme="auto" data-size="md">
     <a class="ds-skip-link" href="#hovedinnhold">Hopp til hovedinnhold</a>
-    <SiteHeader user={Astro.locals.user} pathname={Astro.url.pathname} />
+    <SiteHeader
+      user={Astro.locals.user}
+      canAccessAdmin={await (Astro.locals.canAccessAdmin ?? false)}
+      pathname={Astro.url.pathname}
+    />
     <main id="hovedinnhold" tabindex="-1" class:list={{ wide }}>
       {crumbs && <Breadcrumbs items={crumbs} />}
       <slot />

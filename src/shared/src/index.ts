@@ -75,6 +75,22 @@ export async function currentUser(cookie: string | null): Promise<User | null> {
   return user
 }
 
+/**
+ * Whether the user a request's cookies belong to may use the CMS's admin
+ * panel, by Payload's own rule (`access.admin` on Brukere). Only for showing
+ * the way there: the CMS still decides who gets in. False when it can't tell.
+ */
+export async function canAccessAdmin(cookie: string | null): Promise<boolean> {
+  const headers = authHeaders(cookie)
+  if (!headers.Authorization) return false
+  try {
+    const { canAccessAdmin } = await cmsFetch<{ canAccessAdmin?: boolean }>('/access', { headers })
+    return canAccessAdmin === true
+  } catch {
+    return false
+  }
+}
+
 export type LoginProvider = { id: string; label: string }
 
 /** The login providers configured in the CMS, besides email and password. */
