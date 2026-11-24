@@ -1,0 +1,44 @@
+---
+import { formatDay } from '../lib/dates'
+import type { MandateView } from '../types/mandate'
+import Tag from './Tag.astro'
+
+interface Props {
+  mandate: Pick<MandateView, 'status' | 'approvedAt'>
+}
+
+const { mandate } = Astro.props
+
+const tags = {
+  current: { label: 'Gjeldende', color: 'success' },
+  draft: { label: 'Utkast', color: 'warning' },
+} as const
+const tag = tags[mandate.status]
+
+const details =
+  mandate.status === 'draft'
+    ? 'Ikke godkjent ennå. Bare de som kan redigere mandatet, ser det.'
+    : mandate.approvedAt && `Godkjent ${formatDay(mandate.approvedAt)}`
+---
+
+<!--
+  A mandate's status and the date it was approved (TO-16, LO-04).
+-->
+<p class="status">
+  <Tag color={tag.color}>{tag.label}</Tag>
+  {details && <span class="ds-paragraph" data-size="sm">{details}</span>}
+</p>
+
+<style>
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ds-size-2) var(--ds-size-3);
+    margin: 0;
+  }
+
+  .status span {
+    color: var(--ds-color-text-subtle);
+  }
+</style>

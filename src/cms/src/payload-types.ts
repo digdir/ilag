@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     team: Team;
     teammedlemskap: TeamMembership;
+    mandater: Mandate;
     teamtyper: TeamType;
     'teamtype-veiviser': TeamTypeWizardQuestion;
     verktoy: Tool;
@@ -90,6 +91,7 @@ export interface Config {
   collectionsJoins: {
     team: {
       members: 'teammedlemskap';
+      mandate: 'mandater';
     };
     teamtyper: {
       roles: 'roller';
@@ -103,6 +105,7 @@ export interface Config {
     enheter: {
       children: 'enheter';
       people: 'personer';
+      mandate: 'mandater';
     };
     lokasjoner: {
       people: 'personer';
@@ -111,6 +114,7 @@ export interface Config {
   collectionsSelect: {
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
+    mandater: MandaterSelect<false> | MandaterSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
     'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     verktoy: VerktoySelect<false> | VerktoySelect<true>;
@@ -189,6 +193,11 @@ export interface Team {
   tools?: (number | Tool)[] | null;
   members?: {
     docs?: (number | TeamMembership)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  mandate?: {
+    docs?: (number | Mandate)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -363,8 +372,49 @@ export interface Unit {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  mandate?: {
+    docs?: (number | Mandate)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater".
+ */
+export interface Mandate {
+  id: number;
+  title?: string | null;
+  /**
+   * Teamet mandatet hører til. Kan ikke endres etterpå.
+   */
+  team?: (number | null) | Team;
+  /**
+   * Enheten mandatet hører til. Kan ikke endres etterpå.
+   */
+  unit?: (number | null) | Unit;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  problem: string;
+  outcomes: string;
+  expectations: string;
+  collaboration: string;
+  /**
+   * Dagens dato hvis tomt når mandatet godkjennes. Kan ikke være frem i tid.
+   */
+  approvedAt?: string | null;
+  approvedBy?: (number | null) | Person;
+  status?: ('draft' | 'current') | null;
+  complete?: boolean | null;
+  missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -672,6 +722,10 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
+        relationTo: 'mandater';
+        value: number | Mandate;
+      } | null)
+    | ({
         relationTo: 'teamtyper';
         value: number | TeamType;
       } | null)
@@ -772,6 +826,7 @@ export interface TeamSelect<T extends boolean = true> {
   active?: T;
   tools?: T;
   members?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -786,6 +841,27 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater_select".
+ */
+export interface MandaterSelect<T extends boolean = true> {
+  title?: T;
+  team?: T;
+  unit?: T;
+  problem?: T;
+  outcomes?: T;
+  expectations?: T;
+  collaboration?: T;
+  approvedAt?: T;
+  approvedBy?: T;
+  status?: T;
+  complete?: T;
+  missingFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -894,6 +970,7 @@ export interface EnheterSelect<T extends boolean = true> {
   active?: T;
   children?: T;
   people?: T;
+  mandate?: T;
   updatedAt?: T;
   createdAt?: T;
 }

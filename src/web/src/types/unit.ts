@@ -1,5 +1,7 @@
 import type { Unit } from '@ilag/shared'
 
+import type { MandateView } from './mandate'
+
 // The shape the organisation chart works with. src/lib/cms/units.ts builds it
 // from Payload's generated types.
 
@@ -38,6 +40,8 @@ export type UnitDetail = {
   /** The units above it, from the directorate down, for the breadcrumbs; empty for the directorate. */
   ancestors: { id: number; name: string }[]
   advisesAllOfDigdir: boolean
+  /** The unit's mandate (LO-02), or null if it has none the visitor may see. */
+  mandate: MandateView | null
   /** Null until an administrator has set an active leader. */
   leader: UnitPerson | null
   /** The active people in the unit itself, by name, without the leader. */

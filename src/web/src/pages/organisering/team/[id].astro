@@ -1,4 +1,5 @@
 ---
+import Mandate from '../../../components/Mandate.astro'
 import Prose from '../../../components/Prose.astro'
 import Tag from '../../../components/Tag.astro'
 import MemberList from '../../../components/team/MemberList.astro'
@@ -28,6 +29,10 @@ const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.
             <Prose text={team.description} />
           </header>
           <div class="sections">
+            <section class="ds-card" data-color="neutral" aria-labelledby="mandat">
+              <h2 class="ds-heading" data-size="sm" id="mandat">Mandat</h2>
+              <Mandate mandate={team.mandate} owner="team" />
+            </section>
             <section class="ds-card" data-color="neutral">
               <h2 class="ds-heading" data-size="sm">Teameier</h2>
               <TeamOwner owners={team.members.filter(isOwner)} />

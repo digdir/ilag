@@ -5,6 +5,10 @@ import Team from '../src/pages/organisering/team/[id].astro'
 import { concepts, teammandat } from './concepts'
 import { cookie, json, nettverk, skjemabygger } from './teams'
 import { backLink, trail } from './breadcrumbs'
+import { approvedMandate, joined } from './mandates'
+
+// The mandate section, from its heading to the end of the section.
+const mandateSection = (html: string) => html.match(/id="mandat"[\s\S]*?<\/section>/)?.[0] ?? ''
 
 const render = async (id: string) => {
   const container = await AstroContainer.create()
@@ -144,6 +148,47 @@ describe('team page', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(nettverk)))
 
     expect(await (await render('8')).text()).toContain('Ingen verktøy registrert ennå.')
+  })
+
+  it('TO-04, TO-16: shows the approved mandate first, with its status and approval date', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ ...skjemabygger, mandate: joined(approvedMandate()) })))
+
+    const html = await (await render('7')).text()
+    const mandate = mandateSection(html)
+
+    expect(html.indexOf('id="mandat"')).toBeLessThan(html.indexOf('Teameier</h2>'))
+    expect(mandate).toMatch(/<span class="ds-tag" data-color="success"[^>]*>\s*Gjeldende/)
+    expect(mandate).toContain('Godkjent 15. september 2026')
+    for (const label of ['Hva skal vi løse?', 'Hva skal vi oppnå?', 'Hva forventes av oss?', 'Hvordan samarbeider vi med andre?']) {
+      expect(mandate).toMatch(new RegExp(`<h3[^>]*>\\s*${label.replace('?', '\\?')}`))
+    }
+    // TO-09: the fields are markdown.
+    expect(mandate).toContain('<strong>gode</strong>')
+    expect(mandate).toContain('<a href="https://example.com/innsikt" class="ds-link">innsikten</a>')
+    expect(mandate).toContain('<li>Et nytt skjema på under en dag.</li>')
+    expect(mandate).not.toContain('ikke komplett')
+  })
+
+  it('TO-10: says the mandate is incomplete, and which fields are missing', async () => {
+    const incomplete = approvedMandate({ status: 'draft', _status: 'draft', approvedAt: null, outcomes: null, collaboration: '  ' })
+    vi.stubGlobal('fetch', vi.fn(async () => json({ ...skjemabygger, mandate: joined(incomplete) })))
+
+    const mandate = mandateSection(await (await render('7')).text())
+
+    expect(mandate).toMatch(/<div class="ds-alert" data-color="warning"[^>]*>[\s\S]*Mandatet er ikke komplett\. Teamet fyller ut resten selv/)
+    expect(mandate).toMatch(/<li[^>]*>Hva skal vi oppnå\?<\/li>\s*<li[^>]*>Hvordan samarbeider vi med andre\?<\/li>/)
+    expect(mandate.match(/Ikke registrert ennå/g)).toHaveLength(2)
+    // TO-16: a mandate that has never been approved is a draft, which only its editors get.
+    expect(mandate).toMatch(/data-color="warning"[^>]*>\s*Utkast/)
+    expect(mandate).toContain('Ikke godkjent ennå')
+  })
+
+  it('says so when the team has no mandate the visitor may see', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => json({ ...skjemabygger, mandate: joined() })))
+    expect(mandateSection(await (await render('7')).text())).toContain('Mandat ikke registrert.')
+
+    vi.stubGlobal('fetch', vi.fn(async () => json(nettverk)))
+    expect(mandateSection(await (await render('8')).text())).toContain('Mandat ikke registrert.')
   })
 
   it('BG-06: explains a concept in the description in a popover, read once as the visitor', async () => {

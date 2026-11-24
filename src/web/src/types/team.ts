@@ -1,5 +1,6 @@
 import type { Team, TeamType } from '@ilag/shared'
 
+import type { MandateView } from './mandate'
 import type { ToolSummary } from './tool'
 
 // The shapes the team pages and components work with. src/lib/cms/teams.ts
@@ -21,9 +22,11 @@ export type Member = {
   units: string[]
 }
 
-export type TeamWithMembers = Omit<Team, 'members' | 'teamType' | 'tools'> & {
+export type TeamWithMembers = Omit<Team, 'members' | 'teamType' | 'tools' | 'mandate'> & {
   teamType: TeamType | null
   members: Member[]
+  /** The team's mandate (TO-04), or null if it has none the visitor may see. */
+  mandate: MandateView | null
   /** The tools the team uses (TO-07), by name. */
   tools: ToolSummary[]
 }

@@ -17,6 +17,7 @@ import { Teams } from './collections/Teams'
 import { TeamTypes } from './collections/TeamTypes'
 import { TeamTypeWizard } from './collections/TeamTypeWizard'
 import { TeamMemberships } from './collections/TeamMemberships'
+import { Mandates } from './collections/Mandates'
 import { Tools } from './collections/Tools'
 import { Concepts } from './collections/Concepts'
 import { ImportRuns } from './collections/ImportRuns'
@@ -72,6 +73,7 @@ export default buildConfig({
   collections: [
     Teams,
     TeamMemberships,
+    Mandates,
     TeamTypes,
     TeamTypeWizard,
     Tools,

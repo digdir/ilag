@@ -5,11 +5,17 @@ import { isSignedIn } from '../access/isSignedIn'
 import { ownTeams } from '../access/teamEditor'
 import { collectionGroups } from './groups'
 
-// A team's memberships mean nothing without the team, and point at it with a
-// required relationship, so they go first.
-const deleteMemberships: CollectionBeforeDeleteHook = async ({ id, req }) => {
+// A team's memberships and mandate mean nothing without the team, and point
+// at it, so they go first. Deleting the mandate deletes its history too;
+// teams are normally closed (`active`) rather than deleted.
+const deleteMembershipsAndMandate: CollectionBeforeDeleteHook = async ({ id, req }) => {
   await req.payload.delete({
     collection: 'teammedlemskap',
+    where: { team: { equals: id } },
+    req,
+  })
+  await req.payload.delete({
+    collection: 'mandater',
     where: { team: { equals: id } },
     req,
   })
@@ -46,7 +52,7 @@ export const Teams: CollectionConfig = {
     delete: ({ req }) => isAdmin(req.user),
   },
   hooks: {
-    beforeDelete: [deleteMemberships],
+    beforeDelete: [deleteMembershipsAndMandate],
   },
   defaultSort: 'name',
   fields: [
@@ -99,6 +105,15 @@ export const Teams: CollectionConfig = {
       // person's location and units, when the request's depth asks for it; a
       // join stops at the membership by default.
       maxDepth: 3,
+    },
+    {
+      // The team's mandate (TO-04), at most one. Read access on mandates
+      // applies: drafts only reach those who may edit them (ADR-0007).
+      name: 'mandate',
+      type: 'join',
+      collection: 'mandater',
+      on: 'team',
+      defaultLimit: 1,
     },
   ],
 }
