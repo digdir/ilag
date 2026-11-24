@@ -156,6 +156,7 @@ describe('Login with Entra ID', () => {
           externalId: `${prefix}-person-${n}`,
           employeeNumber: `${prefix}-${n}`,
           locationCode: code,
+          isEmployee: true,
           active,
         },
       })

@@ -131,6 +131,8 @@ describe('Feedback', () => {
         name: `${prefix} Enhet`,
         level: 'division',
         leader: unitLeaderP.id,
+        advisesAllOfDigdir: false,
+        active: true,
       },
     })
 

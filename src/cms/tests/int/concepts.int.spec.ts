@@ -1,4 +1,4 @@
-import { getPayload, Payload } from 'payload'
+import { getPayload, Payload, type RequiredDataFromCollectionSlug } from 'payload'
 import config from '@/payload.config'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -35,11 +35,13 @@ describe('Concepts', () => {
     })
     concept = await payload.create({
       collection: 'begreper',
+      // Without autoLink, to check its default below. Payload's types require
+      // every required field on create, also those with a default value.
       data: {
         name: `${prefix} Teammandat`,
         definition: 'Beskriver hvorfor teamet finnes.',
         variants: [`${prefix} teammandatet`],
-      },
+      } as RequiredDataFromCollectionSlug<'begreper'>,
       ...as(admin),
     })
   })
@@ -64,7 +66,7 @@ describe('Concepts', () => {
   })
 
   it('BG-01: lets only administrators create, change and delete concepts', async () => {
-    const data = { name: `${prefix} OKR`, definition: 'Objectives and key results.' }
+    const data = { name: `${prefix} OKR`, definition: 'Objectives and key results.', autoLink: true }
     await expect(payload.create({ collection: 'begreper', data, ...as(user) })).rejects.toThrow()
     await expect(
       payload.update({ collection: 'begreper', id: concept.id, data: { definition: 'Endret.' }, ...as(user) }),
@@ -78,7 +80,12 @@ describe('Concepts', () => {
   it('BG-06: lets two concepts share a form, which the popover then explains both', async () => {
     const other = await payload.create({
       collection: 'begreper',
-      data: { name: `${prefix} Enhetsmandat`, definition: 'Beskriver hvorfor enheten finnes.', variants: [`${prefix} teammandatet`] },
+      data: {
+        name: `${prefix} Enhetsmandat`,
+        definition: 'Beskriver hvorfor enheten finnes.',
+        variants: [`${prefix} teammandatet`],
+        autoLink: true,
+      },
       ...as(admin),
     })
 
