@@ -1,11 +1,6 @@
-import type {
-  Access,
-  CollectionBeforeChangeHook,
-  CollectionConfig,
-  FieldAccess,
-  Where,
-} from 'payload'
+import type { Access, CollectionBeforeChangeHook, CollectionConfig, Where } from 'payload'
 
+import { adminOnly } from '../access/fields'
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { editableTeamIds } from '../access/teamEditor'
@@ -39,8 +34,6 @@ const ownedOrReported: Access = async (args) => {
   const mine: Where = { reporter: { equals: args.req.user!.id } }
   return owned ? { or: [owned as Where, mine] } : mine
 }
-
-const adminOnly: FieldAccess = ({ req }) => isAdmin(req.user)
 
 // Whoever sends it can't choose the reporter or the status. The reporter is
 // stored only when they may be contacted (TB-05).
