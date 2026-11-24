@@ -9,7 +9,7 @@ const kari = {
   lastName: 'Nordmann',
 } as App.Locals['user']
 
-const render = async (props: { user?: App.Locals['user']; canAccessAdmin?: boolean; pathname: string }) => {
+const render = async (props: { user?: App.Locals['user']; pathname: string }) => {
   const container = await AstroContainer.create()
   return container.renderToString(SiteHeader, { props })
 }
@@ -27,13 +27,13 @@ describe('site header', () => {
   })
 
   it('links to the CMS for someone who may use the admin panel', async () => {
-    const html = await render({ user: kari, canAccessAdmin: true, pathname: '/' })
+    const html = await render({ user: { ...kari!, canAccessAdmin: true }, pathname: '/' })
 
     expect(html).toContain('href="http://localhost:3000/admin"')
   })
 
   it('leaves the CMS link out for someone who may not use the admin panel', async () => {
-    const html = await render({ user: kari, canAccessAdmin: false, pathname: '/' })
+    const html = await render({ user: { ...kari!, canAccessAdmin: false }, pathname: '/' })
 
     expect(html).not.toContain('/admin')
     expect(html).not.toMatch(/>\s*CMS\s*</)

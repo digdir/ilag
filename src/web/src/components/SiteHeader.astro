@@ -7,15 +7,10 @@ import SiteMenu from './SiteMenu.astro'
 interface Props {
   /** Who is logged in. Without one (the login page) only the logo shows. */
   user?: User
-  /**
-   * Whether the user may use the CMS's admin panel. Only they get the link;
-   * the CMS still decides who gets in.
-   */
-  canAccessAdmin?: boolean
   pathname: string
 }
 
-const { user, canAccessAdmin = false, pathname } = Astro.props
+const { user, pathname } = Astro.props
 const userName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || ''
 const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
 ---
@@ -34,7 +29,9 @@ const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
               <Avatar name={userName} />
               <span>{userName}</span>
             </span>
-            {canAccessAdmin && (
+            {/* Only for those the CMS lets into the admin panel (`canAccessAdmin`
+                on their user); the CMS still decides who gets in. */}
+            {user.canAccessAdmin && (
               <a class="ds-button" data-variant="tertiary" data-size="sm" href={cmsAdminURL}>
                 CMS
               </a>
