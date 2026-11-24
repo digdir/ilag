@@ -4,6 +4,7 @@ import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
 import { importEndpoints } from '../imports/endpoints'
+import type { SearchSubtitle } from '../search/subtitle'
 import { collectionGroups } from './groups'
 
 // The directorate, its divisions, departments and sections, imported from
@@ -19,6 +20,16 @@ import { collectionGroups } from './groups'
 
 // For the fields the import sets.
 const importOnly: FieldAccess = () => false
+
+// The levels of the organisation chart (LO-01), from the top.
+const LEVEL_OPTIONS = [
+  { label: 'Direktorat', value: 'directorate' },
+  { label: 'Divisjon', value: 'division' },
+  { label: 'Stab', value: 'support' },
+  { label: 'Tilsyn', value: 'authority' },
+  { label: 'Avdeling', value: 'department' },
+  { label: 'Seksjon', value: 'section' },
+] as const
 
 export const Units: CollectionConfig = {
   slug: 'enheter',
@@ -36,6 +47,9 @@ export const Units: CollectionConfig = {
     hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name', 'level', 'parent', 'leader', 'active'],
+  },
+  custom: {
+    searchSubtitle: ((doc) => LEVEL_OPTIONS.find((l) => l.value === doc.level)?.label) satisfies SearchSubtitle,
   },
   endpoints: importEndpoints('units'),
   access: {
@@ -75,14 +89,7 @@ export const Units: CollectionConfig = {
       name: 'level',
       type: 'select',
       required: true,
-      options: [
-        { label: 'Direktorat', value: 'directorate' },
-        { label: 'Divisjon', value: 'division' },
-        { label: 'Stab', value: 'support' },
-        { label: 'Tilsyn', value: 'authority' },
-        { label: 'Avdeling', value: 'department' },
-        { label: 'Seksjon', value: 'section' },
-      ],
+      options: [...LEVEL_OPTIONS],
       access: { update: importOnly },
     },
     {

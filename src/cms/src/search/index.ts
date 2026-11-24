@@ -1,11 +1,12 @@
 import { searchPlugin } from '@payloadcms/plugin-search'
 import type { BeforeSync } from '@payloadcms/plugin-search/types'
-import type { CollectionSlug, Payload } from 'payload'
+import type { CollectionSlug } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { collectionGroups } from '../collections/groups'
+import type { SearchSubtitle } from './subtitle'
 
 // One search across ilag (FS-01): teams, units, people (FO-03), roles and
 // tools. Payload's search plugin keeps a document in `sok` for each of them,
@@ -25,59 +26,24 @@ export const SEARCH_SLUG = 'sok'
 // Whoever may read a document must find it, and nobody else:
 // tests/int/searchAccess.int.spec.ts checks every collection here against the
 // read access of `sok`. Adding one needs test data for it there, and a change
-// to `read` below if the collection's own read access differs.
+// to `read` below if the collection's own read access differs. Its hits are
+// titled by its `admin.useAsTitle`; for a line of context under the title,
+// give it a `custom.searchSubtitle`.
 export const SEARCHED_COLLECTIONS = ['team', 'enheter', 'personer', 'roller', 'verktoy'] as const satisfies CollectionSlug[]
 
 export type SearchedCollection = (typeof SEARCHED_COLLECTIONS)[number]
 
-/** The label of a select field's value, as the admin panel shows it. */
-const optionLabel = (payload: Payload, collection: CollectionSlug, field: string, value: unknown): string | null => {
-  const config = payload.collections[collection]?.config.flattenedFields.find((f) => f.name === field)
-  if (!config || config.type !== 'select' || typeof value !== 'string') return null
-  const option = config.options.find((o) => (typeof o === 'string' ? o : o.value) === value)
-  if (!option) return null
-  if (typeof option === 'string') return option
-  return typeof option.label === 'string' ? option.label : value
-}
-
-/** The team type's name, from the populated relationship or by looking it up. */
-const teamTypeName = async (teamType: unknown, beforeSyncArgs: Parameters<BeforeSync>[0]): Promise<string | null> => {
-  if (teamType && typeof teamType === 'object' && 'name' in teamType) return String(teamType.name)
-  if (typeof teamType !== 'number' && typeof teamType !== 'string') return null
-  const { payload, req } = beforeSyncArgs
-  try {
-    const type = await payload.findByID({ collection: 'teamtyper', id: teamType, depth: 0, req, select: { name: true } })
-    return type.name
-  } catch {
-    return null
-  }
-}
-
-/** The line under the name in a result, such as a person's title or a unit's level. */
-const subtitleOf = async (args: Parameters<BeforeSync>[0]): Promise<string | null> => {
-  const { collectionSlug, originalDoc: doc, payload } = args
-  switch (collectionSlug) {
-    case 'team':
-      return teamTypeName(doc.teamType, args)
-    case 'enheter':
-      return optionLabel(payload, 'enheter', 'level', doc.level)
-    case 'personer':
-      return doc.title || null
-    case 'verktoy':
-      return optionLabel(payload, 'verktoy', 'toolType', doc.toolType)
-    default:
-      return null
-  }
-}
-
-const beforeSync: BeforeSync = async (args) => {
-  const { collectionSlug, originalDoc: doc, searchDoc } = args
+// The name and the line of context the searched collection gives its
+// documents (search/subtitle.ts), and whether the source is active. Teams,
+// units and people can be inactive; their documents stay, so that they come
+// back when the source does, and the search leaves them out.
+const beforeSync: BeforeSync = async ({ collectionSlug, originalDoc: doc, payload, req, searchDoc }) => {
+  const { admin, custom } = payload.collections[collectionSlug as SearchedCollection].config
+  const subtitle = custom?.searchSubtitle as SearchSubtitle | undefined
   return {
     doc: searchDoc.doc,
-    title: (collectionSlug === 'personer' ? doc.fullName : doc.name) || '',
-    subtitle: await subtitleOf(args),
-    // Teams, units and people can be inactive. Their documents stay, so that
-    // they come back when the source does, and the search leaves them out.
+    title: (admin.useAsTitle && doc[admin.useAsTitle]) || '',
+    subtitle: (await subtitle?.(doc, req)) || null,
     active: typeof doc.active === 'boolean' ? doc.active : true,
   }
 }
@@ -126,7 +92,6 @@ export const search = searchPlugin({
         name: 'active',
         label: 'Aktiv',
         type: 'checkbox',
-        index: true,
         defaultValue: true,
         admin: { readOnly: true, position: 'sidebar' },
       },

@@ -4,11 +4,11 @@ import config from '@/payload.config'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { Location, SearchResult, TeamType, User } from '@/payload-types'
+import { SEARCH_SLUG, SEARCHED_COLLECTIONS } from '@/search'
 
 let payload: Payload
 let user: User
 let admin: User
-let integration: User
 let location: Location
 let productTeam: TeamType
 
@@ -20,7 +20,7 @@ const as = (u: User) => ({ user: { ...u, collection: 'brukere' as const }, overr
 /** The search documents for one document, read past access control. */
 const indexOf = async (collection: SearchResult['doc']['relationTo'], id: number) => {
   const { docs } = await payload.find({
-    collection: 'sok',
+    collection: SEARCH_SLUG,
     where: { 'doc.relationTo': { equals: collection }, 'doc.value': { equals: id } },
     depth: 0,
   })
@@ -54,10 +54,6 @@ describe('Search (FS-01)', () => {
       collection: 'brukere',
       data: { email: `${prefix}@example.com`, password: 'test-password' },
     })
-    integration = await payload.create({
-      collection: 'brukere',
-      data: { email: `${prefix}-integration@example.com`, password: 'test-password', roles: ['integration'] },
-    })
     location = await payload.create({
       collection: 'lokasjoner',
       data: { code: `${prefix}-LEI`, name: 'Leikanger' },
@@ -84,14 +80,12 @@ describe('Search (FS-01)', () => {
       collection: 'team',
       data: { name: `${prefix} Plattform`, teamType: productTeam.id } as RequiredDataFromCollectionSlug<'team'>,
     })
-    let [doc] = await indexOf('team', team.id)
-    expect(doc).toMatchObject({ title: `${prefix} Plattform`, subtitle: `${prefix} Produktteam`, active: true })
+    expect(await indexOf('team', team.id)).toMatchObject([
+      { title: `${prefix} Plattform`, subtitle: `${prefix} Produktteam`, active: true },
+    ])
 
     await payload.update({ collection: 'team', id: team.id, data: { name: `${prefix} Plattformen` } })
-    const docs = await indexOf('team', team.id)
-    expect(docs).toHaveLength(1)
-    ;[doc] = docs
-    expect(doc.title).toBe(`${prefix} Plattformen`)
+    expect(await indexOf('team', team.id)).toMatchObject([{ title: `${prefix} Plattformen` }])
   })
 
   it('keeps an inactive team in the index, marked inactive', async () => {
@@ -160,39 +154,35 @@ describe('Search (FS-01)', () => {
 
   it('orders the types by priority: teams, units, people, roles, tools', async () => {
     const { docs } = await payload.find({
-      collection: 'sok',
+      collection: SEARCH_SLUG,
       where: { title: { like: prefix } },
       sort: ['priority', 'title'],
       pagination: false,
       depth: 0,
     })
     const order = docs.map((d) => d.doc.relationTo).filter((t, i, all) => all.indexOf(t) === i)
-    expect(order).toEqual(['team', 'enheter', 'personer', 'roller', 'verktoy'])
+    expect(order).toEqual([...SEARCHED_COLLECTIONS])
   })
 
-  it('lets those signed in search, by any word of the name', async () => {
+  // Who may search is checked for every collection in searchAccess.int.spec.ts.
+  it('finds a name by any of its words, in any order', async () => {
     const { docs } = await payload.find({
-      collection: 'sok',
+      collection: SEARCH_SLUG,
       where: { title: { like: `kari ${prefix}` } },
       ...as(user),
     })
     expect(docs.map((d) => d.doc.relationTo)).toContain('personer')
   })
 
-  it('keeps the index from anonymous visitors and the integration user', async () => {
-    await expect(payload.find({ collection: 'sok', overrideAccess: false })).rejects.toThrow()
-    await expect(payload.find({ collection: 'sok', ...as(integration) })).rejects.toThrow()
-  })
-
   it('lets nobody but administrators change the index, which reindexing needs', async () => {
-    const [doc] = (await payload.find({ collection: 'sok', where: { title: { like: prefix } }, limit: 1 })).docs
+    const [doc] = (await payload.find({ collection: SEARCH_SLUG, where: { title: { like: prefix } }, limit: 1 })).docs
     await expect(
-      payload.update({ collection: 'sok', id: doc.id, data: { title: 'Endret' }, ...as(user) }),
+      payload.update({ collection: SEARCH_SLUG, id: doc.id, data: { title: 'Endret' }, ...as(user) }),
     ).rejects.toThrow()
-    await expect(payload.delete({ collection: 'sok', id: doc.id, ...as(user) })).rejects.toThrow()
+    await expect(payload.delete({ collection: SEARCH_SLUG, id: doc.id, ...as(user) })).rejects.toThrow()
     await expect(
       payload.create({
-        collection: 'sok',
+        collection: SEARCH_SLUG,
         data: { title: 'Ny', doc: { relationTo: 'team', value: doc.id } },
         ...as(admin),
       }),

@@ -84,9 +84,10 @@ const fixtures: Record<SearchedCollection, () => Promise<{ id: number }[]>> = {
   ],
 }
 
-// The kinds of user whose rights differ. Undefined is a visitor who is not
-// logged in.
-const users: Record<string, User | undefined> = {}
+// The kinds of user whose rights differ. The anonymous one is a visitor who
+// is not logged in.
+const WHO = ['anonymous', 'integration', 'signedIn', 'teamMember', 'teamLead', 'admin'] as const
+const users = {} as Record<(typeof WHO)[number], User | undefined>
 const docs = {} as Record<SearchedCollection, number[]>
 
 const asUser = (user: User | undefined) => ({
@@ -181,7 +182,7 @@ describe('Search access follows the searched collections', () => {
   it('indexes exactly the collections the tests know', () => {
     const docField = payload.collections[SEARCH_SLUG].config.fields.find((f) => 'name' in f && f.name === 'doc')
     const indexed = docField && 'relationTo' in docField ? [docField.relationTo].flat() : []
-    expect([...indexed].sort()).toEqual([...SEARCHED_COLLECTIONS].sort())
+    expect(indexed.sort()).toEqual([...SEARCHED_COLLECTIONS].sort())
   })
 
   it.each(SEARCHED_COLLECTIONS)('has test data for %s', (collection) => {
@@ -196,13 +197,14 @@ describe('Search access follows the searched collections', () => {
     expect(await found(collection, ids, users.admin)).toEqual([...ids].sort())
   })
 
-  const cases = SEARCHED_COLLECTIONS.flatMap((collection) =>
-    ['anonymous', 'integration', 'signedIn', 'teamMember', 'teamLead', 'admin'].map((who) => [collection, who] as const),
-  )
+  const cases = SEARCHED_COLLECTIONS.flatMap((collection) => WHO.map((who) => [collection, who] as const))
 
   it.each(cases)('%s: %s finds what they may read, and nothing else', async (collection, who) => {
     const ids = docs[collection] ?? []
-    const user = users[who]
-    expect(await found(collection, ids, user)).toEqual(await readable(collection, ids, user))
+    const [inSearch, inCollection] = await Promise.all([
+      found(collection, ids, users[who]),
+      readable(collection, ids, users[who]),
+    ])
+    expect(inSearch).toEqual(inCollection)
   })
 })
