@@ -18,6 +18,7 @@ import { TeamTypes } from './collections/TeamTypes'
 import { TeamTypeWizard } from './collections/TeamTypeWizard'
 import { TeamMemberships } from './collections/TeamMemberships'
 import { Tools } from './collections/Tools'
+import { Concepts } from './collections/Concepts'
 import { ImportRuns } from './collections/ImportRuns'
 import { Feedback } from './collections/Feedback'
 import { isAdmin } from './access/isAdmin'
@@ -74,6 +75,7 @@ export default buildConfig({
     TeamTypes,
     TeamTypeWizard,
     Tools,
+    Concepts,
     People,
     Units,
     Locations,

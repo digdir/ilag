@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import Team from '../src/pages/organisering/team/[id].astro'
+import { concepts, teammandat } from './concepts'
 import { cookie, json, nettverk, skjemabygger } from './teams'
 import { backLink, trail } from './breadcrumbs'
 
@@ -143,6 +144,68 @@ describe('team page', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(nettverk)))
 
     expect(await (await render('8')).text()).toContain('Ingen verktøy registrert ennå.')
+  })
+
+  it('BG-06: explains a concept in the description in a popover, read once as the visitor', async () => {
+    const fetchMock = vi.fn(async (url: string, _init?: RequestInit) =>
+      new URL(url).pathname === '/api/begreper'
+        ? json({ docs: concepts })
+        : json({ ...skjemabygger, description: 'Teamet bruker OKR og <b>OKR</b> igjen.' }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const html = await (await render('7')).text()
+
+    const reads = fetchMock.mock.calls.filter(([url]) => new URL(url).pathname === '/api/begreper')
+    expect(reads).toHaveLength(1)
+    expect(new Headers(reads[0]![1]?.headers).get('Authorization')).toBe('JWT visitor-token')
+    // The first use only, as a button opening the concept's popover.
+    const buttons = [...html.matchAll(/<button type="button" data-popover="inline" popovertarget="([^"]+)"[^>]*>([^<]+)<\/button>/g)]
+    expect(buttons.map((m) => m[2])).toEqual(['OKR'])
+    const id = buttons[0]![1]
+    expect(html).toMatch(new RegExp(`<div class="ds-popover[^"]*" id="${id}" popover[^>]*>[\\s\\S]*?Objectives and key results`))
+    // «Teamet» is a concept that isn't explained automatically, and the text is escaped.
+    expect(html).not.toMatch(/<button[^>]*>Teamet<\/button>/)
+    expect(html).toContain('&lt;b&gt;OKR&lt;/b&gt;')
+  })
+
+  it('BG-06: explains both concepts when they share a word, in one popover', async () => {
+    const enhetsmandat = { id: 6, name: 'Enhetsmandat', definition: 'Beskriver hvorfor enheten finnes.', variants: ['mandatet'], autoLink: true }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        new URL(url).pathname === '/api/begreper'
+          ? json({ docs: [{ ...teammandat, variants: ['mandatet'] }, enhetsmandat] })
+          : json({ ...skjemabygger, description: 'Mandatet er godkjent.' }),
+      ),
+    )
+
+    const html = await (await render('7')).text()
+
+    const ids = [...html.matchAll(/class="ds-popover[^"]*" id="([^"]+)"/g)].map((m) => m[1])
+    expect(ids).toHaveLength(1)
+    expect(html).toContain(`popovertarget="${ids[0]}"`)
+    const popover = html.slice(html.indexOf(`id="${ids[0]}"`))
+    expect(popover).toMatch(/Enhetsmandat[\s\S]*Beskriver hvorfor enheten finnes[\s\S]*Teammandat[\s\S]*Beskriver hvorfor teamet finnes/)
+  })
+
+  it('BG-06: shows the description unmarked when the concepts can’t be read', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        new URL(url).pathname === '/api/begreper'
+          ? json({ errors: [{ message: 'Feil' }] }, 500)
+          : json({ ...skjemabygger, description: 'Teamet bruker OKR.' }),
+      ),
+    )
+
+    const res = await render('7')
+    const html = await res.text()
+
+    expect(res.status).toBe(200)
+    expect(html).toContain('Teamet bruker OKR.')
+    expect(html).not.toContain('popovertarget')
   })
 
   it('answers 404 when the CMS has no such team', async () => {

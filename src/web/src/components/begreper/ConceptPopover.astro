@@ -1,0 +1,49 @@
+---
+import type { ConceptSummary } from '../../types/concept'
+
+// The concepts a word names, explained where it is used (BG-06): each one's
+// name and definition. Usually one concept; more when they share the word.
+// Opened by the word's button in Prose.
+
+interface Props {
+  concepts: ConceptSummary[]
+  id: string
+}
+
+const { concepts, id } = Astro.props
+---
+
+<div class="ds-popover concept" id={id} popover data-placement="top">
+  {
+    concepts.map((concept) => (
+      <div class="entry">
+        <p class="ds-paragraph" data-size="sm">
+          <strong>{concept.name}</strong>
+        </p>
+        <p class="ds-paragraph" data-size="sm">
+          {concept.definition}
+        </p>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .concept {
+    --dsc-popover-max-width: 22rem;
+  }
+
+  .entry > * {
+    margin: 0;
+  }
+
+  .entry > * + * {
+    margin-block-start: var(--ds-size-2);
+  }
+
+  .entry + .entry {
+    margin-block-start: var(--ds-size-4);
+    padding-block-start: var(--ds-size-4);
+    border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+  }
+</style>

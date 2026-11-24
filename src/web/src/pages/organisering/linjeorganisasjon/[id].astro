@@ -1,4 +1,5 @@
 ---
+import Prose from '../../../components/Prose.astro'
 import Tag from '../../../components/Tag.astro'
 import SubUnits from '../../../components/linjeorganisasjon/SubUnits.astro'
 import UnitEmployees from '../../../components/linjeorganisasjon/UnitEmployees.astro'
@@ -6,7 +7,8 @@ import UnitLeader from '../../../components/linjeorganisasjon/UnitLeader.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getUnit, levelLabels } from '../../../lib/cms/units'
 
-const unit = await getUnit(Astro.params.id!, Astro.request.headers.get('cookie'))
+const cookie = Astro.request.headers.get('cookie')
+const unit = await getUnit(Astro.params.id!, cookie)
 if (!unit) Astro.response.status = 404
 
 // The units above it, between Linjeorganisasjon and the unit in the breadcrumbs.
@@ -39,9 +41,7 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
             <h1 class="ds-heading" data-size="lg">
               {unit.name}
             </h1>
-            {unit.description.map((paragraph) => (
-              <p class="ds-paragraph description">{paragraph}</p>
-            ))}
+            <Prose text={unit.description} />
             {unit.advisesAllOfDigdir && (
               <Tag>Bistår og rådgir hele Digdir</Tag>
             )}
@@ -111,10 +111,6 @@ const count = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
     align-items: baseline;
     justify-content: space-between;
     gap: var(--ds-size-4);
-  }
-
-  .description {
-    margin: 0;
   }
 
   .meta {

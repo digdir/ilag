@@ -1,4 +1,5 @@
 ---
+import Prose from '../../../components/Prose.astro'
 import Tag from '../../../components/Tag.astro'
 import MemberList from '../../../components/team/MemberList.astro'
 import TeamOwner from '../../../components/team/TeamOwner.astro'
@@ -8,7 +9,8 @@ import { ROLE_CODES } from '../../../lib/cms/roles'
 import { getTeam } from '../../../lib/cms/teams'
 import { teamTypeHref } from '../../../lib/teamTypes'
 
-const team = await getTeam(Astro.params.id!, Astro.request.headers.get('cookie'))
+const cookie = Astro.request.headers.get('cookie')
+const team = await getTeam(Astro.params.id!, cookie)
 if (!team) Astro.response.status = 404
 
 // The owner has a box of their own; everyone else is in «Hvem er vi?».
@@ -23,7 +25,7 @@ const isOwner = (m: { roleCodes: string[] }) => m.roleCodes.includes(ROLE_CODES.
           <header>
             {team.teamType && <Tag href={teamTypeHref(team.teamType.id)}>{team.teamType.name}</Tag>}
             <h1 class="ds-heading" data-size="lg">{team.name}</h1>
-            {team.description && <p class="ds-paragraph">{team.description}</p>}
+            <Prose text={team.description} />
           </header>
           <div class="sections">
             <section class="ds-card" data-color="neutral">

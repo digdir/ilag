@@ -576,6 +576,159 @@ export const teams = [
   },
 ] as const
 
+// Concepts from the prototype (TERMS), with the inflected forms to match
+// (BG-06). Explained automatically where the prototype did (TERM_TIPS); common
+// words like «team» are not.
+export const concepts = [
+  {
+    name: 'Rammeverk',
+    definition:
+      'En overordnet struktur, et sett med regler, retningslinjer eller standarder som brukes som grunnlag for å bygge eller organisere noe annet. ilag beskriver hvordan vi i Digdir ønsker å jobbe for best mulig å levere på formålet vårt.',
+    variants: ['rammeverket'],
+    autoLink: true,
+  },
+  {
+    name: 'Team',
+    definition:
+      'En gruppe Digdir-medarbeidere, og eventuelt eksterne, som arbeider sammen om leveranser.',
+    variants: ['teamet', 'teamene'],
+    autoLink: false,
+  },
+  {
+    name: 'Enhet',
+    definition:
+      'En gruppe Digdir-medarbeidere i linjeorganisasjonen: divisjon, avdeling eller seksjon.',
+    variants: ['enheten', 'enheter', 'enhetene'],
+    autoLink: false,
+  },
+  {
+    name: 'Leveranse',
+    definition:
+      'Alt som skapes av eller kommer ut av et team eller prosjekt. Kan være et digitalt produkt, en rapport, et arrangement, en prosess eller daglig drift.',
+    variants: ['leveransen', 'leveranser', 'leveransene'],
+    autoLink: false,
+  },
+  {
+    name: 'Teammandat',
+    definition:
+      'Beskriver hvorfor teamet finnes, teamets ansvar, handlingsrom og hvordan det skal skape verdi over tid.',
+    variants: ['teammandatet', 'teammandater'],
+    autoLink: true,
+  },
+  {
+    name: 'Teamkontrakt',
+    definition:
+      'Beskriver samarbeidet innad i teamet: hvordan medlemmene skal jobbe sammen for å lykkes med mandatet.',
+    variants: ['teamkontrakten', 'teamkontrakter'],
+    autoLink: true,
+  },
+  {
+    name: 'RAMO',
+    definition:
+      'Rolle, ansvar, myndighet og oppgaver. Strukturmodell som gir en tydelig beskrivelse av hva en rolle innebærer.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'OKR',
+    definition:
+      'Objectives and key results. Målstyringsverktøy som hjelper team å fokusere på hva de ønsker å oppnå og hvordan suksess måles.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Innsatsområde',
+    definition:
+      'Prioritert strategisk område opprettet av porteføljestyret, med egen områdeansvarlig som koordinerer relevante tverrgående team mot felles mål.',
+    variants: ['innsatsområdet', 'innsatsområder', 'innsatsområdene'],
+    autoLink: true,
+  },
+  {
+    name: 'Tverrgående team',
+    definition:
+      'Team satt sammen av ressurser fra flere divisjoner, for eksempel et produktteam med medlemmer fra PRT og TDU.',
+    variants: ['tverrgående teamet', 'tverrgående teamene'],
+    autoLink: true,
+  },
+  {
+    name: 'Porteføljestyret',
+    definition:
+      'Toppledergruppen i rollen der de beslutter strategisk retning og prioriteringer, og oppretter, følger opp og legger ned innsatsområder og programmer.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Tight-loose-tight',
+    definition:
+      'Ledelsesform der mål og rammer er tydelige, mens teamet selv velger hvordan arbeidet gjøres, og resultatet følges opp.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Produkteier',
+    definition:
+      'En produkteier har ansvar for å sikre at produktteamet jobber med de riktige behovene og prioriteringene innenfor produktets mål, mandat og rammer. Produkteieren har vanligvis ansvar for å forvalte og prioritere produktkøen, avklare behov og forventninger med interessenter, og sørge for at teamets arbeid henger sammen med produktstrategien og virksomhetens mål.',
+    variants: ['produkteieren', 'produkteiere'],
+    autoLink: true,
+  },
+  {
+    name: 'Retrospektiv',
+    definition:
+      'Retrospektiv er en metode der teamet ser tilbake på arbeidet og arbeidsmetode for å lære og forbedre seg. Teamet vurderer hva som fungerte godt, hva som bør forbedres, og hvilke tiltak som kan gjøre neste arbeidsrunde bedre.',
+    variants: ['retrospektivet', 'retrospektiver'],
+    autoLink: true,
+  },
+  {
+    name: 'Produkttrio',
+    definition:
+      'Et produktteam bør normalt dekke minst tre perspektiver: fag/forvaltning, brukeropplevelse/design og teknologi/data. I offentlig tjenesteutvikling er det ofte også behov for juridisk kompetanse, og når dette perspektivet legges til omtales det noen ganger som en produktkvartett.',
+    variants: ['produkttrioen'],
+    autoLink: true,
+  },
+  {
+    name: 'Teknisk gjeld',
+    definition:
+      'Vedlikeholdsetterslep som oppstår over tid dersom man ikke setter av nok tid og ressurser til å forbedre og rydde opp i den tekniske løsningen fortløpende. Teknisk gjeld gjør det gradvis vanskeligere og dyrere å endre eller videreutvikle produktet.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Smidig styring',
+    definition:
+      'En måte å lede og prioritere utviklingsarbeid på der en styrer etter mål og effekt, fremfor detaljerte planer og milepæler. Målet er å få bedre flyt, raskere forbedringer og mer kontroll gjennom hyppig oppfølging og brukerinnsikt.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Produktorganisering',
+    definition:
+      'Tverrfaglig organisering av utvikling og forvaltning rundt et produkt, eller tjeneste, istedenfor funksjonelle avdelinger eller midlertidige strukturer som prosjekter. Produktorganisering skifter fokus fra funksjonelle siloer og midlertidige prosjekter til varige, autonome produktteam som trinnvis forbedrer helhetlige produkter basert på brukernes tilbakemeldinger.',
+    variants: [],
+    autoLink: true,
+  },
+  {
+    name: 'Helsesjekk',
+    definition:
+      'En regelmessig evaluering av teamets trivsel, samarbeid og arbeidsforhold. Teamet vurderer ulike områder som motivasjon, kommunikasjon, kvalitet og flyt, for å avdekke utfordringer tidlig og iverksette forbedringstiltak.',
+    variants: ['helsesjekken', 'helsesjekker'],
+    autoLink: true,
+  },
+  {
+    name: 'Kanban',
+    definition:
+      'Kanban er en smidig metode som brukes for å visualisere arbeid, begrense pågående arbeid og skape bedre flyt. Arbeidet vises ofte på en tavle der oppgaver flyttes mellom ulike steg.',
+    variants: [],
+    autoLink: false,
+  },
+  {
+    name: 'Sprint',
+    definition:
+      'En sprint er en fast tidsboks i Scrum. I løpet av sprinten prioriterer, planlegger og leverer teamet et inkrement eller en del av en større løsning. En sprint varer ofte to, tre eller fire uker.',
+    variants: ['sprinten', 'sprinter'],
+    autoLink: false,
+  },
+] as const
+
 // Users to log in as with a password, linked to people in the teams above.
 export const users = [
   { person: '1008', email: 'teamleder@example.com', description: 'teamleder for Team Skjemabygger' },
