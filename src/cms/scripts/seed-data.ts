@@ -393,6 +393,81 @@ export const wizardQuestions = [
 // Every team type by name, for the tools that suit all of them.
 const allTeamTypes = teamTypes.map((type) => type.name)
 
+// The principles in Vedlegg 6 of the specification. 1–7 apply to everyone,
+// 8 and 9 are leadership principles and 10 is an architecture principle.
+export const principles = [
+  {
+    number: 1,
+    title: 'Vi løser reelle brukerbehov',
+    area: 'felles',
+    description:
+      'Vi starter med å forstå hvem vi gjør det for og blir kjent med brukeren vår – innbygger, næringsliv, offentlig sektor eller egne kolleger - gjennom brukerorientering. Vi kartlegger behov, tester løsninger og prioriterer det som skaper mest verdi for flest, med hensyn prinsipper for digital inkludering.',
+  },
+  {
+    number: 2,
+    title: 'Vi jobber helhetlig og tverrfaglig',
+    area: 'felles',
+    description:
+      'Vi etterstreber å levere med et tverrfaglig perspektiv der det er hensiktsmessig. Vi ser hvordan våre leveranser henger sammen med andre team, produkter, tjenester og brukerreiser. Vi koordinerer avhengigheter aktivt og jobber for at brukeren opplever en sømløs tjeneste – uavhengig av hvor mange team eller miljøer som er involvert.',
+  },
+  {
+    number: 3,
+    title: 'Vi bygger stabile team med riktig kapasitet og god forankring',
+    area: 'felles',
+    description:
+      'Vi etablerer team med faste medlemmer og tilstrekkelig kapasitet til å levere. Vi unngår å «tynne ut» team med for mange parallelle oppgaver eller hyppige bytter av medlemmer. Stabilitet gir bedre flyt, mindre kontekstbytte og høyere kvalitet. Alle team har egen teameier og teamleder samt definert handlingsrom gjennom eget mandat og teamkontrakt. Team som er definert som produktteam bør ha en produkteier (kombinert med teamlederrollen eller i tillegg) og følger prinsipper for produktorganisering.',
+  },
+  {
+    number: 4,
+    title: 'Vi måler effekt, ikke bare aktivitet gjennom tydelige mål og frihet under ansvar',
+    area: 'felles',
+    description:
+      'Team og medarbeidere får klare mål knyttet til effekt og samfunnsnytte gjennom nyttestyring, ikke detaljerte oppgavelister. Innenfor disse målene har teamet og medarbeiderne myndighet til å velge hvordan de jobber – så lenge de holder seg innenfor avtalte rammer og søker avklaring når det trengs, i tråd med Tight-loose-tight ledelse. Vi følger opp team på resultater og samfunnseffekt, ikke på hvor mange oppgaver som er utført. I Digdir bruker vi OKR-er som målingssystem for å holde fokus på det som virkelig betyr noe for brukerne og samfunnet.',
+  },
+  {
+    number: 5,
+    title: 'Vi leverer i korte, læringsdrevne sykluser',
+    area: 'felles',
+    description:
+      'Vi jobber iterativt, tester tidlig og ofte, og tilpasser oss basert på tilbakemeldinger og data i tråd med smidige arbeidsmetoder. Korte sykluser i form av sprinter og MVPer gir oss mulighet til å lære underveis, redusere risiko og øke farten på det som virker.',
+  },
+  {
+    number: 6,
+    title: 'Vi deler åpent og lærer sammen',
+    area: 'felles',
+    description:
+      'Kode, dokumentasjon, metoder og lærdommer deles åpent internt. Vi feirer både suksesser og feil – så lenge vi lærer av dem. Vi har en kultur hvor det er trygt å stille spørsmål, si ifra og utfordre hverandre respektfullt. Alle team gjennomfører retrospektive øvelser og/eller helsesjekk med jevne mellomrom og bidrar i demoer eller erfaringsutveksling for å systematisere læring.',
+  },
+  {
+    number: 7,
+    title: 'Vi utvikler medarbeiderskap sammen',
+    area: 'felles',
+    description:
+      'Medarbeiderskap handler om hvordan vi forholder oss til oppgavene våre, til Digdir og til hverandre. Det er et forpliktende samspill der vi som medarbeidere og ledere sammen tar ansvar for samarbeid, utvikling og resultater. Når vi eier egne oppgaver, bidrar på tvers og handler i tråd med Digdirs verdier, skaper vi en kultur preget av tillit, engasjement og gode resultater.',
+  },
+  {
+    number: 8,
+    title: 'Vi leder gjennom tydelig retning og handlingsrom',
+    area: 'ledelse',
+    description:
+      'Ledere setter tydelige mål og rammer – og gir team og medarbeidere frihet til å finne løsninger innenfor dem. Vi leder etter tight-loose-tight-prinsippet: stramme nok rammer til å sikre retning og samspill, løse nok til å gi autonomi og eierskap, og tett nok oppfølging til å lære underveis og justere kursen når det trengs. Ledere tar initiativ som styrker samarbeid, involvering og leveranser.',
+  },
+  {
+    number: 9,
+    title: 'Vi prioriterer i fellesskap',
+    area: 'ledelse',
+    description:
+      'Porteføljestyret samordner tiltak som går på tvers av divisjonene, og delegerer det divisjonene kan eie selv. Prioritering skjer i dialog, ikke gjennom parallelle køer.',
+  },
+  {
+    number: 10,
+    title: 'Vi gjenbruker før vi bygger nytt',
+    area: 'arkitektur',
+    description:
+      'Vi ser etter nasjonale fellesløsninger, felles komponenter og eksisterende data før vi lager noe eget. Nye løsninger skal passe inn i nasjonal arkitektur og følge etablerte standarder.',
+  },
+] as const
+
 // The toolbox in the prototype (TOOLS), with team types by name from its «For
 // hvem». A tool every team can use is linked to every team type, as the roles
 // are. Links only where the prototype names a real site.

@@ -27,6 +27,19 @@ describe('list filter', () => {
     expect(html).not.toContain('type="radio"')
   })
 
+  it('leaves out the search field without a label, to filter only by the chips', async () => {
+    const html = await render({
+      count: 2,
+      label: undefined,
+      placeholder: undefined,
+      chips: [{ key: 'type', legend: 'Type', options: [{ value: '7', label: 'Sju' }] }],
+    })
+
+    expect(html).not.toContain('type="search"')
+    expect(html).not.toContain('ting-search')
+    expect(html).toContain('data-chip-row="type"')
+  })
+
   it('counts with the singular or plural noun', async () => {
     expect(await render({ count: 1 })).toContain('1 ting<')
     expect(await render({ count: 4 })).toContain('4 tinger')

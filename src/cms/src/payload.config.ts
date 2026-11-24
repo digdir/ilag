@@ -13,6 +13,7 @@ import { People } from './collections/People'
 import { Locations } from './collections/Locations'
 import { Units } from './collections/Units'
 import { Roles } from './collections/Roles'
+import { Principles } from './collections/Principles'
 import { Teams } from './collections/Teams'
 import { TeamTypes } from './collections/TeamTypes'
 import { TeamTypeWizard } from './collections/TeamTypeWizard'
@@ -72,6 +73,7 @@ export default buildConfig({
   },
   // In the order of their groups in the admin panel's navigation (collections/groups.ts).
   collections: [
+    Principles,
     Teams,
     TeamMemberships,
     Mandates,

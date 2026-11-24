@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { getPayload, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
+import { getPayload, type CollectionSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
 import config from '@payload-config'
 
 import type { ImportError } from '../src/imports/csv'
@@ -20,18 +20,6 @@ import * as data from './seed-data'
 // again, and `pnpm db:seed:clear` only deletes it. They pass `reset` and
 // `clear` without dashes, since `payload run` only hands the script arguments
 // that aren't flags.
-
-type Slug =
-  | 'brukere'
-  | 'lokasjoner'
-  | 'enheter'
-  | 'personer'
-  | 'roller'
-  | 'teamtyper'
-  | 'teamtype-veiviser'
-  | 'team'
-  | 'teammedlemskap'
-  | 'mandater'
 
 // An administrator to log in to the admin panel with.
 const ADMIN = { email: 'admin@example.com', password: 'ilag' }
@@ -52,7 +40,7 @@ const readFiles = () => ({
   people: valid('personer.csv', readPeopleFile(file('personer.csv'))),
 })
 
-const findId = async (payload: Payload, collection: Slug, where: Where) => {
+const findId = async (payload: Payload, collection: CollectionSlug, where: Where) => {
   const { docs } = await payload.find({ collection, where, limit: 1, depth: 0 })
   return docs[0]?.id
 }
@@ -74,8 +62,8 @@ const importFile = async (payload: Payload, kind: 'units' | 'people', text: stri
 
 const seed = async (payload: Payload) => {
   const files = readFiles()
-  const created: Partial<Record<Slug, number>> = {}
-  const count = (collection: Slug) => (created[collection] = (created[collection] ?? 0) + 1)
+  const created: Partial<Record<CollectionSlug, number>> = {}
+  const count = (collection: CollectionSlug) => (created[collection] = (created[collection] ?? 0) + 1)
 
   let adminId = await findId(payload, 'brukere', { email: { equals: ADMIN.email } })
   if (!adminId) {
@@ -211,6 +199,13 @@ const seed = async (payload: Payload) => {
     toolIds.set(tool.name, id)
   }
 
+  for (const principle of data.principles) {
+    if (!(await findId(payload, 'prinsipper', { title: { equals: principle.title } }))) {
+      await payload.create({ collection: 'prinsipper', data: { ...principle } })
+      count('prinsipper')
+    }
+  }
+
   for (const concept of data.concepts) {
     if (!(await findId(payload, 'begreper', { name: { equals: concept.name } }))) {
       await payload.create({ collection: 'begreper', data: { ...concept, variants: [...concept.variants] } })
@@ -295,7 +290,7 @@ const seed = async (payload: Payload) => {
     const team = 'team' in item ? await findId(payload, 'team', { name: { equals: item.team } }) : undefined
     const unit =
       'unit' in item ? await findId(payload, 'enheter', { externalUnitId: { equals: item.unit } }) : undefined
-    const page = team ? `/organisering/team/${team}` : unit ? `/organisering/linjeorganisasjon/${unit}` : item.page
+    const page = team ? `/organisering/team/${team}` : unit ? `/organisering/linjeorganisasjon/${unit}` : 'page' in item ? item.page : undefined
     const reporter =
       'reporter' in item
         ? (await payload.find({ collection: 'brukere', where: { email: { equals: item.reporter } } })).docs[0]
@@ -319,13 +314,14 @@ const removeSeed = async (payload: Payload) => {
   const files = readFiles()
   const employeeNumbers = files.people.people.map((p) => p.employeeNumber)
   const unitIds = files.units.units.map((u) => u.externalUnitId)
-  const deletes: [Slug | 'importkjoringer', Where][] = [
+  const deletes: [CollectionSlug, Where][] = [
     ['tilbakemeldinger', { text: { in: data.feedback.map((f) => f.text) } }],
     // Deleting a team deletes its memberships and its mandate.
     ['team', { name: { in: data.teams.map((t) => t.name) } }],
     ['mandater', { 'unit.externalUnitId': { in: unitIds } }],
     ['teammedlemskap', { 'person.employeeNumber': { in: employeeNumbers } }],
     ['verktoy', { name: { in: data.tools.map((t) => t.name) } }],
+    ['prinsipper', { title: { in: data.principles.map((p) => p.title) } }],
     ['begreper', { name: { in: data.concepts.map((c) => c.name) } }],
     ['roller', { code: { in: data.roles.map((r) => r.code) } }],
     ['teamtype-veiviser', { title: { in: data.wizardQuestions.map((q) => q.title) } }],
@@ -333,7 +329,7 @@ const removeSeed = async (payload: Payload) => {
     ['personer', { employeeNumber: { in: employeeNumbers } }],
     // Children before parents, so no unit is left pointing at a deleted one.
     ...(['section', 'department', 'support', 'authority', 'division', 'directorate'] as const).map(
-      (level): [Slug, Where] => ['enheter', { externalUnitId: { in: unitIds }, level: { equals: level } }],
+      (level): [CollectionSlug, Where] => ['enheter', { externalUnitId: { in: unitIds }, level: { equals: level } }],
     ),
     ['lokasjoner', { code: { in: data.locations.map((l) => l.code) } }],
     ['importkjoringer', { 'sender.email': { equals: ADMIN.email } }],

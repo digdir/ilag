@@ -1,0 +1,98 @@
+---
+import ListFilter from '../../../components/ListFilter.astro'
+import PrincipleCard from '../../../components/prinsipper/PrincipleCard.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getPrinciples } from '../../../lib/cms/principles'
+import { PRINCIPLE_AREA_LABELS } from '../../../lib/principles'
+
+const principles = await getPrinciples(Astro.request.headers.get('cookie'))
+
+// Filter by area (PR-03). There are few principles, so no search.
+const chips = [
+  {
+    key: 'area',
+    legend: 'Område',
+    options: Object.entries(PRINCIPLE_AREA_LABELS).map(([value, label]) => ({ value, label })),
+  },
+]
+---
+
+<Layout title="Prinsipper — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Prinsipper</h1>
+      <p class="ds-paragraph">
+        Grunnleggende prinsipper vi etterstreber å leve etter i hverdagen – når vi leder og når vi
+        jobber sammen for å levere.
+      </p>
+    </header>
+    {
+      principles.length ? (
+        <>
+          <ListFilter
+            list="prinsipper"
+            empty="prinsipper-tom"
+            count={principles.length}
+            noun={{ one: 'prinsipp', other: 'prinsipper' }}
+            chips={chips}
+          />
+          <ul class="principles" id="prinsipper">
+            {principles.map((principle) => (
+              <li data-search data-filter-area={principle.area}>
+                <PrincipleCard principle={principle} />
+              </li>
+            ))}
+          </ul>
+          <p class="ds-paragraph empty" id="prinsipper-tom" hidden>
+            Ingen prinsipper passer filtrene. Prøv en annen kombinasjon.
+          </p>
+        </>
+      ) : (
+        <p class="ds-paragraph">Ingen prinsipper er registrert ennå.</p>
+      )
+    }
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-6);
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+    max-width: 45rem;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
+    gap: var(--ds-size-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .principles > li {
+    display: grid;
+  }
+
+  .principles > li[hidden] {
+    display: none;
+  }
+
+  .empty {
+    padding: var(--ds-size-8);
+    border: var(--ds-border-width-default) dashed var(--ds-color-border-subtle);
+    border-radius: var(--ds-border-radius-md);
+    text-align: center;
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+</style>
