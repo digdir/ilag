@@ -73,9 +73,9 @@ export default buildConfig({
   // In the order of their groups in the admin panel's navigation (collections/groups.ts).
   collections: [
     Principles,
+    Mandates,
     Teams,
     TeamMemberships,
-    Mandates,
     TeamTypes,
     TeamTypeWizard,
     Tools,

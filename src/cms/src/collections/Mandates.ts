@@ -197,7 +197,7 @@ export const Mandates: CollectionConfig = {
     interface: 'Mandate',
   },
   admin: {
-    group: collectionGroups.team,
+    group: collectionGroups.governance,
     // The first column links to the mandate, so it names the owner.
     defaultColumns: ['title', '_status', 'approvedAt', 'updatedAt'],
     // Team editors see the mandates of their own teams, as they do with teams
