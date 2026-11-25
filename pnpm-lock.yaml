@@ -132,6 +132,9 @@ importers:
       '@ilag/shared':
         specifier: workspace:*
         version: link:../shared
+      '@navikt/aksel-icons':
+        specifier: ^8.23.1
+        version: 8.23.1
       astro:
         specifier: ^7.4.2
         version: 7.4.12(@types/node@24.19.2)(esbuild@0.28.2)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1)
@@ -1625,6 +1628,9 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1 || 2.0.0-beta.2 || 2.0.0-beta.3
       '@emnapi/runtime': ^1.7.1 || 2.0.0-beta.2 || 2.0.0-beta.3
+
+  '@navikt/aksel-icons@8.23.1':
+    resolution: {integrity: sha512-c07DAdYtpt0DO/pfmLMXM31DPVI+m7mkA3qZ+zY/RuDCDgwlHpNsMFN23ddF1kbf/YXsTvMbxx0x42cBzCKqdQ==}
 
   '@next/env@15.5.28':
     resolution: {integrity: sha512-xxW5EBI8fMPuVTPBW7LL980IRbuDXlbkUAwp9DDhtb4Lnich3nJ13uYpvrX4VE74hWPf6AvHHAMmGCidcHjbfg==}
@@ -6965,6 +6971,8 @@ snapshots:
       '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.4
     optional: true
+
+  '@navikt/aksel-icons@8.23.1': {}
 
   '@next/env@15.5.28': {}
 

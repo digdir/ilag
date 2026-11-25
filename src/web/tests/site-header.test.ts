@@ -14,9 +14,9 @@ const render = async (props: { user?: App.Locals['user']; pathname: string }) =>
   return container.renderToString(SiteHeader, { props })
 }
 
-// The <a> of the menu item with this label.
+// The <a> of the menu item with this label, after its icon if it has one.
 const menuLink = (html: string, label: string) =>
-  html.match(new RegExp(`<a [^>]*>\\s*${label}\\s*</a>`))?.[0]
+  html.match(new RegExp(`<a [^>]*>\\s*(?:<svg [^>]*>(?:(?!</svg>)[^])*</svg>\\s*)?${label}\\s*</a>`))?.[0]
 
 describe('site header', () => {
   it('shows the logged-in user and a way to log out', async () => {
@@ -88,7 +88,17 @@ describe('site header', () => {
     expect(menuLink(html, 'Linjeorganisasjon')).toContain('href="/organisering/linjeorganisasjon"')
   })
 
-  it('shows only the logo when nobody is logged in', async () => {
+  it('shows an icon before each main menu item, as in the prototype, hidden from screen readers', async () => {
+    const html = await render({ user: kari, pathname: '/' })
+
+    for (const label of ['Styring', 'Folk', 'Organisering', 'Verktøy']) {
+      const icon = menuLink(html, label)?.match(/<svg [^>]*>/)?.[0]
+      expect(icon, label).toContain('aria-hidden="true"')
+      expect(icon, label).toContain('class="icon"')
+    }
+  })
+
+    it('shows only the logo when nobody is logged in', async () => {
     const html = await render({ pathname: '/logg-inn' })
 
     expect(html).toContain('alt="Digdir"')
