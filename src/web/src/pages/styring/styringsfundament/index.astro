@@ -1,6 +1,5 @@
 ---
 import Prose from '../../../components/Prose.astro'
-import CardGrid from '../../../components/styringsfundament/CardGrid.astro'
 import GoalCards from '../../../components/styringsfundament/GoalCards.astro'
 import MarkdownCard from '../../../components/styringsfundament/MarkdownCard.astro'
 import MissionCard from '../../../components/styringsfundament/MissionCard.astro'
@@ -41,14 +40,14 @@ const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPla
       values?.length ? (
         <section aria-labelledby="verdiar">
           <SectionLabel id="verdiar">Våre verdiar</SectionLabel>
-          <CardGrid columns={3}>
+          <div class="values">
             {values.map((value) => (
               <article class="ds-card" data-color="neutral" data-variant="tinted">
                 <h3 class="ds-heading" data-size="sm">{value.name}</h3>
                 <Prose text={value.text} />
               </article>
             ))}
-          </CardGrid>
+          </div>
         </section>
       ) : null
     }
@@ -82,15 +81,29 @@ const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPla
     gap: var(--ds-size-4);
   }
 
+  /* The values three across, all the same size. */
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: var(--ds-size-4);
+  }
+
   .pair {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--ds-size-4);
   }
 
+  /* In one column, equal heights only add empty space. */
   @media (width < 40rem) {
+    .values,
     .pair {
       grid-template-columns: 1fr;
+    }
+
+    .values {
+      grid-auto-rows: auto;
     }
   }
 
