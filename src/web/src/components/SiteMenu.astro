@@ -67,6 +67,7 @@ const groups = mainMenu().filter(hasSubMenu)
       const button = document.createElement('button')
       button.type = 'button'
       button.className = link.className
+      if (link.dataset.testid) button.dataset.testid = link.dataset.testid
       button.append(...link.childNodes) // The icon and the label.
       button.setAttribute('aria-controls', id)
       if (link.hasAttribute('data-current')) button.dataset.current = ''

@@ -22,6 +22,7 @@ const { pathname } = Astro.props
       mainMenu().map((group) => {
         const current = isWithin(pathname, group.path)
         const href = group.pages.find((page) => page.built)!.href
+        const testId = `menu-${group.path.slice(1)}`
         const Icon = group.icon && icons[group.icon]
         const label = (
           <>
@@ -32,11 +33,17 @@ const { pathname } = Astro.props
         return (
           <li>
             {hasSubMenu(group) ? (
-              <a class="item" href={href} data-submenu={subMenuId(group)} data-current={current || undefined}>
+              <a
+                class="item"
+                href={href}
+                data-submenu={subMenuId(group)}
+                data-current={current || undefined}
+                data-testid={testId}
+              >
                 {label}
               </a>
             ) : (
-              <a class="item" href={href} aria-current={current ? 'page' : undefined}>
+              <a class="item" href={href} aria-current={current ? 'page' : undefined} data-testid={testId}>
                 {label}
               </a>
             )}
