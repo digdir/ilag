@@ -33,3 +33,12 @@
   first. Your own CSS goes in the component's `<style>`, with `--ds-*` tokens.
 - **Tests:** every page gets a render test in `tests/`, through Astro's
   container API with `fetch` stubbed (see `tests/team.test.ts`).
+- **Finding elements in tests:** give an element a test needs to find a
+  `data-testid` and find it by that: `parse` and `byTestId` from
+  `tests/dom.ts` in render tests, `page.getByTestId()` in the Playwright tests.
+  Don't match rendered HTML with regular expressions or find elements by their
+  text; both break when markup or wording changes. Name the id after what the
+  element is, in lowercase kebab-case with Norwegian path segments, as
+  `menu-organisering` and `submenu-organisering-team` in the site menu. A
+  script that swaps an element for another, such as `SiteMenu`'s, copies the
+  id. Existing tests that match HTML move to this when they are next changed.
