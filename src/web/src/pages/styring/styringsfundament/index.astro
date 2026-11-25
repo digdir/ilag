@@ -1,7 +1,7 @@
 ---
 import Prose from '../../../components/Prose.astro'
 import CardGrid from '../../../components/styringsfundament/CardGrid.astro'
-import GoalCard from '../../../components/styringsfundament/GoalCard.astro'
+import GoalCards from '../../../components/styringsfundament/GoalCards.astro'
 import MarkdownCard from '../../../components/styringsfundament/MarkdownCard.astro'
 import MissionCard from '../../../components/styringsfundament/MissionCard.astro'
 import PlanCard from '../../../components/styringsfundament/PlanCard.astro'
@@ -32,13 +32,7 @@ const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPla
       (goals?.length || hasPlan) && (
         <section aria-labelledby="malbilde">
           <SectionLabel id="malbilde">Vårt målbilde</SectionLabel>
-          {goals?.length ? (
-            <CardGrid columns={2}>
-              {goals.map((goal, index) => (
-                <GoalCard goal={goal} index={index} />
-              ))}
-            </CardGrid>
-          ) : null}
+          {goals?.length ? <GoalCards goals={goals} /> : null}
           {plan && hasPlan && <PlanCard plan={plan} />}
         </section>
       )

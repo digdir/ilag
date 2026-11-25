@@ -1242,7 +1242,7 @@ export interface GovernanceFoundation {
     | {
         title: string;
         /**
-         * Vises bak «Vis delmål». Ta med lenken «Les meir om målet». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         * Vises når målbildet åpnes med knappen i midten. Ta med lenken «Les meir om målet». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
          */
         details?: string | null;
         id?: string | null;

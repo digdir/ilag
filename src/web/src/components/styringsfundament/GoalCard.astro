@@ -11,34 +11,97 @@ interface Props {
 
 const tints = ['accent', 'warning', 'danger', 'neutral']
 
-// A goal, with its sub-goals and «Les meir om målet» behind «Vis delmål».
+// A goal: a tinted tile while closed, and its sub-goals and «Les meir om
+// målet» when GoalCards' button opens them all. The sub-goals keep the
+// page's own colours, not the goal's tint.
 const { goal, index } = Astro.props
 ---
 
-<article class="ds-card" data-color={tints[index % tints.length]} data-variant="tinted">
-  <div class="ds-card__block">
-    <h3 class="ds-heading" data-size="xs">{goal.title}</h3>
-  </div>
+<article data-color={tints[index % tints.length]}>
+  <h3 class="ds-heading" data-size="xs">{goal.title}</h3>
   {
     goal.details && (
-      <details class="ds-details">
-        <summary>Vis delmål</summary>
+      <div class="more" data-color="accent">
         <div>
           <Markdown text={goal.details} />
         </div>
-      </details>
+      </div>
     )
   }
 </article>
 
 <style>
-  /* The toggles sit at the bottom of their cards, so they line up. */
   article {
     display: flex;
     flex-direction: column;
+    min-height: 12rem;
+    overflow: hidden;
+    border: var(--ds-border-width-default) solid var(--ds-color-neutral-border-subtle);
+    border-radius: var(--ds-border-radius-lg);
+    background: var(--ds-color-background-tinted);
+    color: var(--ds-color-text-default);
+    transition:
+      background 0.4s ease,
+      min-height 0.4s ease;
   }
 
-  .ds-card__block {
-    flex: 1;
+  h3 {
+    flex: 1 0 auto;
+    display: flex;
+    align-items: center;
+    padding: var(--ds-size-6);
+    background: var(--ds-color-background-tinted);
+    transition:
+      flex-grow 0.4s ease,
+      padding 0.4s ease;
+  }
+
+  /* Closed, the sub-goals take no room and can't be reached; they slide open. */
+  .more {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.4s ease,
+      opacity 0.3s ease,
+      visibility 0s 0.4s;
+  }
+
+  .more > div {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .more :global(.markdown) {
+    padding: var(--ds-size-5) var(--ds-size-6) var(--ds-size-6);
+  }
+
+  :global(.goals:has(.toggle:checked)) article {
+    min-height: 0;
+    background: var(--ds-color-neutral-background-default);
+  }
+
+  :global(.goals:has(.toggle:checked)) h3 {
+    flex-grow: 0;
+    padding: var(--ds-size-4) var(--ds-size-6);
+  }
+
+  :global(.goals:has(.toggle:checked)) .more {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      grid-template-rows 0.4s ease,
+      opacity 0.4s ease 0.1s,
+      visibility 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    article,
+    h3,
+    .more {
+      transition: none;
+    }
   }
 </style>

@@ -1,0 +1,107 @@
+---
+import type { GovernanceFoundation } from '@ilag/shared'
+
+import GoalCard from './GoalCard.astro'
+
+interface Props {
+  goals: NonNullable<GovernanceFoundation['goals']>
+}
+
+// The goals 2×2, with one round button in the middle that opens all of them
+// to show their sub-goals, as in the prototype. The button is a checkbox, so
+// it works without JavaScript; GoalCard animates on its state.
+const { goals } = Astro.props
+---
+
+<div class="goals">
+  <input class="toggle" type="checkbox" id="malbilde-detaljer" aria-label="Vis detaljer om målbildet" />
+  <label class="button" for="malbilde-detaljer" aria-hidden="true">
+    <svg class="expand" viewBox="0 0 24 24" width="22" height="22"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+    <svg class="collapse" viewBox="0 0 24 24" width="22" height="22"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+  </label>
+  {goals.map((goal, index) => <GoalCard goal={goal} index={index} />)}
+</div>
+
+<style>
+  .goals {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-size-4);
+  }
+
+  /* The checkbox lies invisible over the button, so it takes the clicks and the focus. */
+  .toggle,
+  .button {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    width: var(--ds-size-14);
+    height: var(--ds-size-14);
+    margin: 0;
+    border-radius: var(--ds-border-radius-full);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+
+  .toggle {
+    z-index: 2;
+    opacity: 0;
+  }
+
+  .button {
+    display: grid;
+    place-items: center;
+    background: var(--ds-color-neutral-background-default);
+    border: var(--ds-border-width-default) solid var(--ds-color-neutral-border-subtle);
+    box-shadow: var(--ds-shadow-md);
+    color: var(--ds-color-accent-text-subtle);
+    transition: transform 0.2s ease;
+  }
+
+  .toggle:hover + .button {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  .toggle:focus-visible + .button {
+    outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
+    box-shadow: 0 0 0 calc(var(--ds-border-width-focus) * 2) var(--ds-color-focus-inner);
+  }
+
+  svg {
+    grid-area: 1 / 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .collapse,
+  .toggle:checked + .button .expand {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+
+  .toggle:checked + .button .collapse {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (width < 40rem) {
+    .goals {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button,
+    svg {
+      transition: none;
+    }
+  }
+</style>

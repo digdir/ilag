@@ -72,14 +72,16 @@ describe('styringsfundament page', () => {
     const html = await render()
 
     expect(html).toMatch(
-      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vårt samfunnsoppdrag[\s\S]*Vi bidrar til ein samordna[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vi fremmer samordning[\s\S]*Vis delmål[\s\S]*Leverer fellesløysingar[\s\S]*Vi leder an i bruk av data[\s\S]*Virksomhetsplanen[\s\S]*Våre verdiar[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Næringslivet[\s\S]*Vi jobbar brukerretta[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Inspirert av kompasset[\s\S]*Sist oppdatert/,
+      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vårt samfunnsoppdrag[\s\S]*Vi bidrar til ein samordna[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vis detaljer om målbildet[\s\S]*Vi fremmer samordning[\s\S]*Leverer fellesløysingar[\s\S]*Vi leder an i bruk av data[\s\S]*Virksomhetsplanen[\s\S]*Våre verdiar[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Næringslivet[\s\S]*Vi jobbar brukerretta[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Inspirert av kompasset[\s\S]*Sist oppdatert/,
     )
     expect(html).not.toContain('ikke registrert')
-    // The vision is dark; the goals are tinted by position. A goal with no sub-goals has no toggle.
+    // The vision is dark; the goals are tinted by position, and one button opens them all.
     expect(html).toMatch(/data-color-scheme="dark"[^>]*>[\s\S]*?Vår visjon/)
-    expect(html).toMatch(/data-color="accent" data-variant="tinted"[^>]*>[\s\S]*?Vi fremmer samordning/)
-    expect(html).toMatch(/data-color="warning" data-variant="tinted"[^>]*>[\s\S]*?Vi leder an i bruk av data/)
-    expect(html.match(/<summary[^>]*>Vis delmål<\/summary>/g)).toHaveLength(1)
+    expect(html).toMatch(/<article data-color="accent"[^>]*>[\s\S]*?Vi fremmer samordning/)
+    expect(html).toMatch(/<article data-color="warning"[^>]*>[\s\S]*?Vi leder an i bruk av data/)
+    expect(html.match(/type="checkbox"[^>]*aria-label="Vis detaljer om målbildet"/g)).toHaveLength(1)
+    // A goal with no sub-goals has nothing to open.
+    expect(html).toMatch(/Vi leder an i bruk av data<\/h3>\s*<\/article>/)
     // The user groups and the roles as markdown lists.
     expect(html).toMatch(/<ul class="ds-list">\s*<li>Innbyggarar<\/li>\s*<li>Næringslivet<\/li>/)
     expect(html).toMatch(/<ul class="ds-list">\s*<li>Forvaltar av Norges digitale grunnmur<\/li>/)

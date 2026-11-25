@@ -2,8 +2,8 @@ import type { Field, GlobalConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
-import { MARKDOWN_HELP } from '../collections/Mandates'
 import { collectionGroups } from '../collections/groups'
+import { MARKDOWN_HELP } from '../utils/helptexts'
 
 /** Text in markdown, such as a list or links, rendered without raw HTML (ADR-0007). */
 const markdown = (name: string, label: string, description?: string): Field => ({
@@ -83,7 +83,7 @@ export const GovernanceFoundation: GlobalConfig = {
               labels: { singular: 'Mål', plural: 'Mål' },
               fields: [
                 { name: 'title', label: 'Mål', type: 'text', required: true },
-                markdown('details', 'Delmål', 'Vises bak «Vis delmål». Ta med lenken «Les meir om målet».'),
+                markdown('details', 'Delmål', 'Vises når målbildet åpnes med knappen i midten. Ta med lenken «Les meir om målet».'),
               ],
             },
             {
