@@ -140,9 +140,11 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    styringsfundament: GovernanceFoundation;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
+    styringsfundament: StyringsfundamentSelect<false> | StyringsfundamentSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -1207,6 +1209,128 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament".
+ */
+export interface GovernanceFoundation {
+  id: number;
+  intro?: string | null;
+  sections?: (StatementBox | CardsBox | ListBox | TextWithFilesBox | DocumentsBox)[] | null;
+  /**
+   * Vises nederst på siden.
+   */
+  footnote?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatementBox".
+ */
+export interface StatementBox {
+  heading: string;
+  text: string;
+  style: 'dark' | 'accent';
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statement';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardsBox".
+ */
+export interface CardsBox {
+  heading: string;
+  colors: 'neutral' | 'varied';
+  /**
+   * Vises på kort som har mer tekst, for eksempel «Vis delmål».
+   */
+  detailsLabel?: string | null;
+  cards?:
+    | {
+        title: string;
+        text?: string | null;
+        /**
+         * Vises bak knappen. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ListBox".
+ */
+export interface ListBox {
+  heading: string;
+  /**
+   * Én per linje. Vises som merkelapper over teksten.
+   */
+  chips?: string | null;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  text?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'list';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextWithFilesBox".
+ */
+export interface TextWithFilesBox {
+  heading: string;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  text?: string | null;
+  /**
+   * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+   */
+  files?: (number | Media)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textWithFiles';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DocumentsBox".
+ */
+export interface DocumentsBox {
+  /**
+   * Teksten på knappen som viser dokumentene.
+   */
+  heading: string;
+  documents?:
+    | {
+        title: string;
+        /**
+         * For eksempel «Varig» eller «Årlig».
+         */
+        tag?: string | null;
+        summary?: string | null;
+        /**
+         * Vises bak «Les mer». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        /**
+         * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+         */
+        files?: (number | Media)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'documents';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1222,6 +1346,98 @@ export interface PayloadJobsStat {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament_select".
+ */
+export interface StyringsfundamentSelect<T extends boolean = true> {
+  intro?: T;
+  sections?:
+    | T
+    | {
+        statement?: T | StatementBoxSelect<T>;
+        cards?: T | CardsBoxSelect<T>;
+        list?: T | ListBoxSelect<T>;
+        textWithFiles?: T | TextWithFilesBoxSelect<T>;
+        documents?: T | DocumentsBoxSelect<T>;
+      };
+  footnote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatementBox_select".
+ */
+export interface StatementBoxSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  style?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardsBox_select".
+ */
+export interface CardsBoxSelect<T extends boolean = true> {
+  heading?: T;
+  colors?: T;
+  detailsLabel?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        details?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ListBox_select".
+ */
+export interface ListBoxSelect<T extends boolean = true> {
+  heading?: T;
+  chips?: T;
+  text?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextWithFilesBox_select".
+ */
+export interface TextWithFilesBoxSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  files?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DocumentsBox_select".
+ */
+export interface DocumentsBoxSelect<T extends boolean = true> {
+  heading?: T;
+  documents?:
+    | T
+    | {
+        title?: T;
+        tag?: T;
+        summary?: T;
+        details?: T;
+        files?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

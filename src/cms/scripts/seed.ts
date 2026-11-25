@@ -304,6 +304,12 @@ const seed = async (payload: Payload) => {
     count('tilbakemeldinger')
   }
 
+  // A global can't be created or deleted, only filled in.
+  if (!(await payload.findGlobal({ slug: 'styringsfundament' })).sections?.length) {
+    await payload.updateGlobal({ slug: 'styringsfundament', data: { ...data.governanceFoundation, _status: 'published' } })
+    console.log('Filled in styringsfundament')
+  }
+
   return created
 }
 
@@ -340,6 +346,14 @@ const removeSeed = async (payload: Payload) => {
     if (docs.length) console.log(`Deleted ${docs.length} from ${collection}`)
     for (const { message } of errors) console.error(`  ${collection}: ${message}`)
   }
+  // Empties every field, keeping the versions (SF-05).
+  const empty = Object.fromEntries(
+    Object.entries(data.governanceFoundation).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? [] : typeof value === 'object' ? {} : null,
+    ]),
+  )
+  await payload.updateGlobal({ slug: 'styringsfundament', data: { ...empty, _status: 'published' } })
 }
 
 if (process.env.NODE_ENV === 'production') {

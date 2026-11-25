@@ -1,0 +1,54 @@
+---
+import type { DocumentsBox } from '@ilag/shared'
+
+import Markdown from '../Markdown.astro'
+import Prose from '../Prose.astro'
+import Tag from '../Tag.astro'
+import FileLinks from './FileLinks.astro'
+
+interface Props {
+  document: NonNullable<DocumentsBox['documents']>[number]
+}
+
+// An external governing document, such as the allocation letter (SF-01):
+// a summary, and the points and links behind «Les mer».
+const { document } = Astro.props
+const more = Boolean(document.details || document.files?.length)
+---
+
+<article class="ds-card" data-color="neutral">
+  <div class="ds-card__block">
+    <div class="top">
+      <h3 class="ds-heading" data-size="xs">{document.title}</h3>
+      {document.tag && <Tag color="neutral">{document.tag}</Tag>}
+    </div>
+    <Prose text={document.summary} />
+  </div>
+  {
+    more && (
+      <details class="ds-details">
+        <summary>Les mer</summary>
+        <div class="more">
+          <Markdown text={document.details} />
+          <FileLinks files={document.files} />
+        </div>
+      </details>
+    )
+  }
+</article>
+
+<style>
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ds-size-2) var(--ds-size-3);
+  }
+
+  .more {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+</style>

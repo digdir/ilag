@@ -1,0 +1,43 @@
+---
+import type { ListBox } from '@ilag/shared'
+
+import Markdown from '../Markdown.astro'
+import Tag from '../Tag.astro'
+import BoxHeading from './BoxHeading.astro'
+
+interface Props {
+  box: ListBox
+  id: string
+}
+
+// A short list, such as the user groups as chips or the roles as points.
+const { box, id } = Astro.props
+const chips = box.chips?.split('\n').map((line) => line.trim()).filter(Boolean) ?? []
+---
+
+<section class="ds-card" aria-labelledby={id}>
+  <BoxHeading id={id}>{box.heading}</BoxHeading>
+  {
+    chips.length > 0 && (
+      <div class="chips">
+        {chips.map((chip) => (
+          <Tag>{chip}</Tag>
+        ))}
+      </div>
+    )
+  }
+  <Markdown text={box.text} />
+</section>
+
+<style>
+  section {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+  }
+</style>

@@ -886,3 +886,185 @@ export const feedback = [
     text: 'Verktøykassen mangler en mal for retrospektiv.',
   },
 ] as const
+
+// The styringsfundament (SF-01), with the prototype's texts. The prototype's
+// PDFs are linked in the markdown where GitHub Pages publishes the prototype,
+// so the seed needs no uploads.
+const prototypeDoc = (name: string) => `https://digdir.github.io/ilag/assets/docs/${name}.pdf`
+const link = (label: string, href: string) => `[${label}](${href})`
+const bullets = (...items: string[]) => items.map((item) => `- ${item}`).join('\n')
+const paragraphs = (...items: string[]) => items.join('\n\n')
+
+export const governanceFoundation = {
+  intro:
+    'Digdirs visjon, samfunnsoppdrag, målbilde, verdier, brukergrupper og institusjonelle roller, samlet på én side.',
+  footnote:
+    'Styringsfundamentet er inspirert av kompasset til Mattilsynet og strategy house-modellen, og samler Digdirs strategiske og kulturmessige ambisjonar på éin stad.',
+  sections: [
+    {
+      blockType: 'statement' as const,
+      heading: 'Vår visjon',
+      style: 'dark' as const,
+      text: 'ilag for ein enklare digital kvardag',
+    },
+    {
+      blockType: 'statement' as const,
+      heading: 'Vårt samfunnsoppdrag',
+      style: 'accent' as const,
+      text: 'Vi bidrar til ein effektiv, brukerretta og samordna digitalisering av offentleg sektor',
+    },
+    {
+      blockType: 'documents' as const,
+      heading: 'Vis eksterne styrende dokumenter',
+      documents: [
+        {
+          title: 'Regelverk',
+          tag: 'Varig',
+          summary:
+            'Bevilgningsreglementet, økonomireglementet og bestemmelsene om økonomistyring i staten gir føringene for virksomhetsstyringen',
+          details: paragraphs(
+            bullets(
+              'Digdir er et ordinært forvaltningsorgan og en bruttobudsjettert virksomhet.',
+              'Regelverket gjelder for hele staten og er grunnlaget for budsjett, regnskap og fullmakter.',
+            ),
+            link(
+              'Bevilgningsreglementet',
+              'https://www.regjeringen.no/no/tema/okonomi-og-budsjett/statlig-okonomistyring/bevilgningsreglementet/id439274/',
+            ),
+            link(
+              'Reglement og bestemmelser om økonomistyring i staten',
+              'https://www.regjeringen.no/no/tema/okonomi-og-budsjett/statlig-okonomistyring/reglement-for-okonomistyring-i-staten/id438887/',
+            ),
+          ),
+        },
+        {
+          title: 'Hovedinstruksen',
+          tag: 'Varig',
+          summary:
+            'Hovedinstruksen fastsettes av Digdirs eierdepartementet, Digitaliserings- og forvaltningsdepartementet (DFD)',
+          details: paragraphs(
+            bullets(
+              'Beskriver Digdirs samfunnsoppdrag, myndighet og ansvar.',
+              'Fastsetter krav til styringsdialog og rapportering (kap. 3.3).',
+              'Gjeldende instruks er fra 8. januar 2025.',
+            ),
+            link('Hovudinstruks for Digdir 2025 (PDF)', prototypeDoc('hovudinstruks-2025')),
+          ),
+        },
+        {
+          title: 'Tildelingsbrevet',
+          tag: 'Årlig',
+          summary:
+            'Gjennom tildelingsbrevet gir DFD resultatmål, prioriteringer, oppdrag, rapporteringskrav og økonomiske rammer for det enkelte budsjettår',
+          details: paragraphs(
+            'Gjennom året kommer supplerende tildelingsbrev og egne oppdragsbrev.',
+            link('Tildelingsbrev 2026 (PDF)', prototypeDoc('tildelingsbrev-2026')),
+            link('Supplerende tildelingsbrev nr. 1 (PDF)', prototypeDoc('tildelingsbrev-2026-supplerende-1')),
+            link('Supplerende tildelingsbrev nr. 2 (PDF)', prototypeDoc('tildelingsbrev-2026-supplerende-2')),
+            link('Utredningsoppdrag om tungregning for KI (PDF)', prototypeDoc('utredningsoppdrag-tungregning-ki')),
+          ),
+        },
+      ],
+    },
+    {
+      blockType: 'cards' as const,
+      heading: 'Vårt målbilde',
+      colors: 'varied' as const,
+      detailsLabel: 'Vis delmål',
+      cards: [
+        {
+          title: 'Vi fremmer samordning og prioritering for en mer effektiv offentleg sektor',
+          details: paragraphs(
+            bullets(
+              'Er den føretrekte kunnskapskjelda for tverrgåande digitaliseringsbehov.',
+              'Utarbeider og forvaltar eit nasjonalt vegkart for digitaliseringsstrategien.',
+              'Gir tydelege råd om korleis digitalisering kan gi størst samfunnsnytte.',
+              'Utviklar nye modellar for finansiering, styring og samarbeid om felles digitalisering.',
+              'Leverer sikre, effektive og nyttige fellesløysingar',
+            ),
+            link('Les meir om målet', 'https://www.digdir.no/digdir/vi-fremmer-samordning-og-prioritering-en-mer-effektiv-offentlig-sektor/7213'),
+          ),
+        },
+        {
+          title: 'Vi leder an i ansvarleg og innovativ bruk av data og kunstig intelligens',
+          details: paragraphs(
+            bullets(
+              'Vidareutviklar felles infrastruktur og arkitektur for sikker og effektiv deling og bruk av data på tvers av offentleg og privat sektor.',
+              'Gir rettleiing, byggjer kompetanse og deler erfaringar som gjer det enklare å ta i bruk data og KI.',
+              'Bruker KI-Noreg til å styrkje innsatsen på området og gi rettleiing for trygg og ansvarleg bruk av KI.',
+              'Vidareutviklar, saman med andre, nasjonale standardar, referansearkitektur og felleskomponentar for ansvarleg og innovativ bruk av KI i offentleg sektor.',
+            ),
+            link('Les meir om målet', 'https://www.digdir.no/digdir/vi-leder-i-ansvarlig-og-innovativ-bruk-av-data-og-kunstig-intelligens/7313'),
+          ),
+        },
+        {
+          title: 'Vi sikrar trygg tilgang til digitale tenester for alle',
+          details: paragraphs(
+            bullets(
+              'Sikrar tilgang til digitale tenester for alle gjennom innføring av digital identitets-lommebok og fullmaktsløsninger for de som ikkje kan eller vil bruke eID.',
+              'Legger til rette for at offentleg og privat sektor innoverer og hentar ut gevinstar av nye moglegheiter for datadeling i økosystemet for digitale lommebøker.',
+              'Samordnar arbeidet med digital identitet gjennom implementering av eIDAS 2.0 og ivaretakast av norske interesser opp mot EU.',
+            ),
+            link('Les meir om målet', 'https://www.digdir.no/digdir/vi-sikrer-trygg-tilgang-til-digitale-tjenester-alle/7314'),
+          ),
+        },
+        {
+          title: 'Vi løyser komplekse utfordringar saman og tilpassar oss en verden i rask endring',
+          details: paragraphs(
+            bullets(
+              'Samarbeider tett med næringsliv, frivillig sektor og andre sentrale aktørar.',
+              'Tek utgangspunkt i brukarane sine behov og løyser komplekse oppgåver som eitt samla direktorat.',
+              'Arbeider datadrive og smidig for å vere meir tilpassingsdyktige og betre rusta til å møte nye utfordringar.',
+              'Legg vekt på tidleg utprøving og læring for å utvikle gode løysingar.',
+              'Er ein attraktiv arbeidsplass der tilsette trivst, utviklar seg og byggjer kompetanse.',
+            ),
+            link('Les meir om målet', 'https://www.digdir.no/digdir/vi-loser-komplekse-utfordringer-sammen-og-tilpasser-oss-en-verden-i-rask-endring/7315'),
+          ),
+        },
+      ],
+    },
+    {
+      blockType: 'textWithFiles' as const,
+      heading: 'Virksomhetsplanen',
+      text: paragraphs(
+        'Virksomhetsplanen, inkl. budsjettfordeling beskriver overordnede mål og rammer for virksomheten, hovedprioriteringer og føringer, intern budsjettfordeling, samt drifts- og utviklingsoppgaver. OKR på avdelingsnivå inkluderes i virksomhetsplan.',
+        link('Virksomhetsplan 2026 (PDF)', prototypeDoc('virksomhetsplan-2026')),
+      ),
+    },
+    {
+      blockType: 'cards' as const,
+      heading: 'Våre verdiar',
+      colors: 'neutral' as const,
+      cards: [
+        {
+          title: 'Påliteleg',
+          text: 'Vi er til å stole på, tek ansvar for heilheta og leverer kvalitet. Vi fremmer samarbeid, sikrar gjenbruk og tenkjer langsiktig.',
+        },
+        {
+          title: 'Inkluderande',
+          text: 'Vi jobbar brukerretta, tek utgangspunkt i behova til brukargruppene våre og tek hensyn til ulike perspektiv. Alle skal kunne finne, forstå og løyse brukaroppgåvene sine.',
+        },
+        {
+          title: 'Uredd',
+          text: 'Vi er framtidsretta, vågar å utfordre, og har leiarar som stolar på dei som er nærast arbeidet. Vi utforskar og utviklar oss løpande gjennom innsikt, innovasjon og ærleg, open deling.',
+        },
+      ],
+    },
+    {
+      blockType: 'list' as const,
+      heading: 'Våre brukarar',
+      chips: ['Offentleg sektor', 'Innbyggarar', 'Næringslivet', 'Frivillig sektor', 'Interne'].join('\n'),
+      text: 'Vi jobbar brukerretta, tek utgangspunkt i behova til brukargruppene våre og tek hensyn til ulike perspektiv.',
+    },
+    {
+      blockType: 'list' as const,
+      heading: 'Våre roller',
+      text: bullets(
+        'Ledestjerne for digitalisering i offentleg sektor',
+        'Pådrivar for digital samhandling og innovasjon',
+        'Forvaltar av Norges digitale grunnmur',
+        'Forkjempar for digital inkludering',
+      ),
+    },
+  ],
+}

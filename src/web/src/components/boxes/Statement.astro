@@ -1,0 +1,33 @@
+---
+import type { StatementBox } from '@ilag/shared'
+
+import BoxHeading from './BoxHeading.astro'
+
+interface Props {
+  box: StatementBox
+  id: string
+}
+
+// A short statement shown large: dark, like the vision, or blue, like the mission.
+const { box, id } = Astro.props
+const dark = box.style === 'dark'
+---
+
+<section
+  class:list={['ds-card', { dark }]}
+  data-color={dark ? undefined : 'accent'}
+  data-variant={dark ? undefined : 'tinted'}
+  data-color-scheme={dark ? 'dark' : undefined}
+  aria-labelledby={id}
+>
+  <BoxHeading id={id}>{box.heading}</BoxHeading>
+  <p class="ds-heading" data-size={dark ? 'lg' : 'sm'}>{box.text}</p>
+</section>
+
+<style>
+  .dark {
+    background: var(--ds-color-neutral-background-default);
+    color: var(--ds-color-neutral-text-default);
+    padding: var(--ds-size-8);
+  }
+</style>

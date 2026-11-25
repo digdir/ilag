@@ -1,0 +1,30 @@
+---
+import type { DocumentsBox } from '@ilag/shared'
+
+import DocumentCard from './DocumentCard.astro'
+
+interface Props {
+  box: DocumentsBox
+}
+
+// Governing documents as cards, behind a toggle with the heading as its text.
+const { box } = Astro.props
+---
+
+<section class="ds-card" data-color="accent" data-variant="tinted">
+  <details class="ds-details">
+    <summary>{box.heading}</summary>
+    <div class="documents">
+      {box.documents?.map((document) => <DocumentCard document={document} />)}
+    </div>
+  </details>
+</section>
+
+<style>
+  .documents {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--ds-size-4);
+    align-items: start;
+  }
+</style>
