@@ -18,9 +18,10 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
   the middle, the supervisory authority (tilsyn) to the left with a dashed line,
   since it is independent, and the staff (stab) to the right. The divisions are
   in a row under, each with its departments and sections. Nested lists, so it
-  reads as a tree without the lines.
+  reads as a tree without the lines. Designsystemet's small size, so the boxes
+  have the prototype's 12–14px text while the rest of the page keeps its size.
 -->
-<div class="chart">
+<div class="chart" data-size="sm">
   <div class="top">
     <div class="spine">
       <div class="director">
@@ -34,7 +35,7 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
           <ul aria-label="Tilsyn">
             {authorities.map((unit) => (
               <li>
-                <UnitColumn unit={unit} />
+                <UnitColumn unit={unit} tiles />
               </li>
             ))}
           </ul>
@@ -73,7 +74,7 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
 <style>
   .chart {
     --line-width: calc(2 * var(--ds-border-width-default));
-    --line: var(--line-width) solid var(--ds-color-border-subtle);
+    --line: var(--line-width) solid var(--ds-color-neutral-border-subtle);
     /* Where the lines to the sides meet the director's line. */
     --link-top: var(--ds-size-10);
     display: flex;
@@ -112,22 +113,27 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: var(--ds-size-1);
-    padding: var(--ds-size-3) var(--ds-size-6);
+    box-sizing: border-box;
+    min-inline-size: 15rem;
+    min-block-size: 5.5rem;
+    padding: var(--ds-size-2) var(--ds-size-6);
     border-radius: var(--ds-border-radius-md);
-    background: var(--ds-color-accent-base-default);
-    color: var(--ds-color-accent-base-contrast-default);
+    background: var(--ds-color-neutral-base-default);
+    color: var(--ds-color-neutral-base-contrast-default);
     text-align: center;
   }
 
   .label {
-    font-size: var(--ds-body-sm-font-size);
+    font-size: var(--ds-body-md-font-size);
     font-weight: var(--ds-font-weight-semibold);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
   .name {
+    font-size: var(--ds-body-sm-font-size);
     font-weight: var(--ds-font-weight-medium);
   }
 
@@ -160,7 +166,7 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
 
   /* Dashed to the tilsyn, which is independent of the line. */
   .authority .link {
-    border-block-start: var(--line-width) dashed var(--ds-color-border-default);
+    border-block-start: var(--line-width) dashed var(--ds-color-neutral-border-default);
   }
 
   .staff .link {
@@ -169,7 +175,7 @@ const divisions = directorate.children.filter((u) => u.level !== 'authority' && 
 
   .divisions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
     gap: var(--ds-size-2);
     padding-block-start: var(--ds-size-4);
     border-block-start: var(--line);

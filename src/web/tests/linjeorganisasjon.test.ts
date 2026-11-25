@@ -1,18 +1,29 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
+import { within } from '@testing-library/dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { buildChart } from '../src/lib/cms/units'
 import Linjeorganisasjon from '../src/pages/organisering/linjeorganisasjon/index.astro'
+import { parse } from './dom'
 import { cookie, json } from './teams'
 
 const render = async () => {
   const container = await AstroContainer.create()
-  return container.renderToString(Linjeorganisasjon, {
-    request: new Request('http://localhost/organisering/linjeorganisasjon', {
-      headers: { cookie },
+  return parse(
+    await container.renderToString(Linjeorganisasjon, {
+      request: new Request('http://localhost/organisering/linjeorganisasjon', {
+        headers: { cookie },
+      }),
     }),
-  })
+  )
 }
+
+// Whether `a` comes before `b` in the page.
+const before = (a: Node, b: Node) => (a.compareDocumentPosition(b) & 4) !== 0 // DOCUMENT_POSITION_FOLLOWING
+
+// The box at the top of a unit's column: code, size, name and leader.
+const head = (page: Awaited<ReturnType<typeof render>>, name: string) =>
+  within(page.getByRole('link', { name }).parentElement!)
 
 type Level = 'directorate' | 'division' | 'support' | 'authority' | 'department' | 'section'
 const unit = (id: number, name: string, level: Level, parent: number | null, extra = {}) => ({
@@ -79,74 +90,96 @@ describe('organisation chart', () => {
   it('LO-01: shows the director, and each division with its code, size and leader', async () => {
     vi.stubGlobal('fetch', cms({ units, people }))
 
-    const html = await render()
+    const page = await render()
 
-    expect(html).toMatch(/Direktør<\/span>\s*<span[^>]*>Ingrid Berg</)
-    expect(html).toMatch(/>FEL<\/span>\s*<span[^>]*>4 ansatte</)
-    expect(html).toMatch(/>DSS<\/span>\s*<span[^>]*>0 ansatte</)
-    expect(html).toContain('Kari Nordmann')
-    expect(html.indexOf('Digital strategi og samordning')).toBeLessThan(
-      html.indexOf('Fellesløsninger'),
-    )
+    expect(page.getByText('Direktør').nextElementSibling!.textContent).toBe('Ingrid Berg')
+    const fel = head(page, 'Fellesløsninger')
+    expect(fel.getByText('FEL')).toBeTruthy()
+    expect(fel.getByText('Kari Nordmann')).toBeTruthy()
+    const divisions = within(page.getByRole('list', { name: 'Divisjoner' }))
+    expect(
+      before(divisions.getByRole('link', { name: 'Digital strategi og samordning' }), fel.getByText('FEL')),
+    ).toBe(true)
+  })
+
+  it('LO-01: shows the size as a number, with «ansatte» for screen readers, and nothing when it is 0', async () => {
+    vi.stubGlobal('fetch', cms({ units, people }))
+
+    const page = await render()
+
+    const size = head(page, 'Fellesløsninger').getByTitle('Antall ansatte')
+    expect(size.firstChild!.textContent).toBe('4')
+    expect(size.textContent).toBe('4 ansatte')
+    expect(size.querySelector('.ds-sr-only')!.textContent).toBe(' ansatte')
+    expect(head(page, 'Digital strategi og samordning').queryByTitle('Antall ansatte')).toBeNull()
+  })
+
+  it('LO-01: says when a unit has no leader registered', async () => {
+    vi.stubGlobal('fetch', cms({ units, people }))
+
+    const page = await render()
+
+    expect(head(page, 'Digital strategi og samordning').getByText('Leder ikke registrert')).toBeTruthy()
+    expect(head(page, 'Fellesløsninger').queryByText('Leder ikke registrert')).toBeNull()
   })
 
   it('LO-01: lists the departments under their division, and the sections under them', async () => {
     vi.stubGlobal('fetch', cms({ units, people }))
 
-    const html = await render()
+    const page = await render()
 
-    expect(html).toContain('aria-label="Divisjoner"')
-    expect(html).toMatch(/aria-label="Enheter i Fellesløsninger"[\s\S]*FEL – Utvikling/)
-    expect(html).toMatch(/aria-label="Enheter i FEL – Utvikling"[\s\S]*FEL – Backend/)
+    const departments = within(page.getByRole('list', { name: 'Enheter i Fellesløsninger' }))
+    expect(departments.getByRole('link', { name: 'FEL – Utvikling' })).toBeTruthy()
+    const sections = within(page.getByRole('list', { name: 'Enheter i FEL – Utvikling' }))
+    expect(sections.getByRole('link', { name: 'FEL – Backend' })).toBeTruthy()
   })
 
   it('LO-01: places the tilsyn to the left of the director and the stab to the right, as in the prototype', async () => {
     vi.stubGlobal('fetch', cms({ units, people }))
 
-    const html = await render()
+    const page = await render()
 
-    const tilsyn = html.indexOf('aria-label="Tilsyn"')
-    const director = html.indexOf('Ingrid Berg')
-    const stab = html.indexOf('aria-label="Stab"')
-    const divisions = html.indexOf('aria-label="Divisjoner"')
-    expect(tilsyn).toBeGreaterThan(-1)
-    expect(stab).toBeGreaterThan(-1)
+    const director = page.getByText('Ingrid Berg')
+    const tilsyn = page.getByRole('list', { name: 'Tilsyn' })
+    const stab = page.getByRole('list', { name: 'Stab' })
+    const divisions = page.getByRole('list', { name: 'Divisjoner' })
     // In the markup the director comes first, then the sides, then the
     // divisions; CSS puts the tilsyn to the left.
-    expect(director).toBeLessThan(tilsyn)
-    expect(tilsyn).toBeLessThan(stab)
-    expect(stab).toBeLessThan(divisions)
-    expect(html.slice(tilsyn, stab)).toContain('Tilsyn for universell utforming av IKT')
-    expect(html.slice(stab, divisions)).toContain('Kommunikasjon')
-    expect(html.slice(stab, divisions)).toContain('data-variant="light"')
-    expect(html.slice(divisions)).not.toContain('Kommunikasjon')
-    expect(html.slice(divisions)).not.toContain('Tilsyn for universell')
+    expect(before(director, tilsyn)).toBe(true)
+    expect(before(tilsyn, stab)).toBe(true)
+    expect(before(stab, divisions)).toBe(true)
+    expect(within(tilsyn).getByRole('link', { name: 'Tilsyn for universell utforming av IKT' })).toBeTruthy()
+    const kommunikasjon = within(stab).getByRole('link', { name: 'Kommunikasjon' })
+    expect(kommunikasjon.closest('[data-variant]')!.getAttribute('data-variant')).toBe('light')
+    expect(within(divisions).queryByRole('link', { name: 'Kommunikasjon' })).toBeNull()
+    expect(within(divisions).queryByRole('link', { name: /Tilsyn for universell/ })).toBeNull()
   })
 
   it('LO-05: links each division, department and section to its unit page', async () => {
     vi.stubGlobal('fetch', cms({ units, people }))
 
-    const html = await render()
+    const page = await render()
 
+    const hrefs = page.getAllByRole('link').map((link) => link.getAttribute('href'))
     for (const id of [2, 3, 5, 6, 7]) {
-      expect(html).toContain(`href="/organisering/linjeorganisasjon/${id}"`)
+      expect(hrefs).toContain(`/organisering/linjeorganisasjon/${id}`)
     }
   })
 
   it('leaves out the sides when there is no tilsyn or stab', async () => {
     vi.stubGlobal('fetch', cms({ units: units.slice(0, 5), people }))
 
-    const html = await render()
+    const page = await render()
 
-    expect(html).not.toContain('aria-label="Tilsyn"')
-    expect(html).not.toContain('aria-label="Stab"')
-    expect(html).toContain('aria-label="Divisjoner"')
+    expect(page.queryByRole('list', { name: 'Tilsyn' })).toBeNull()
+    expect(page.queryByRole('list', { name: 'Stab' })).toBeNull()
+    expect(page.getByRole('list', { name: 'Divisjoner' })).toBeTruthy()
   })
 
   it('says so when there are no units', async () => {
     vi.stubGlobal('fetch', cms({ units: [], people: [] }))
 
-    expect(await render()).toContain('Ingen enheter er registrert ennå.')
+    expect((await render()).getByText('Ingen enheter er registrert ennå.')).toBeTruthy()
   })
 })
 

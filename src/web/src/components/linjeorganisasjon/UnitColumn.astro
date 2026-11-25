@@ -6,10 +6,11 @@ interface Props {
   unit: OrgUnit
   /** Light for the staff, like the prototype; dark for the rest. */
   variant?: 'dark' | 'light'
+  /** The units under it as small tiles, two to a row, as for the tilsyn in the prototype. */
+  tiles?: boolean
 }
 
-const { unit, variant = 'dark' } = Astro.props
-const size = (n: number) => (n === 1 ? '1 ansatt' : `${n} ansatte`)
+const { unit, variant = 'dark', tiles = false } = Astro.props
 // Each unit links to its page (LO-05).
 const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
 ---
@@ -19,14 +20,23 @@ const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
   <div class="head" data-variant={variant}>
     <span class="top">
       {unit.code && <span class="code">{unit.code}</span>}
-      <span class="size">{size(unit.size)}</span>
+      {
+        /* Only the number, as in the prototype; «ansatte» for screen readers.
+           Nothing when nobody is registered in the unit yet. */
+        unit.size > 0 && (
+          <span class="size" title="Antall ansatte">
+            {unit.size}
+            <span class="ds-sr-only">{unit.size === 1 ? ' ansatt' : ' ansatte'}</span>
+          </span>
+        )
+      }
     </span>
     <a class="name" href={href(unit)}>{unit.name}</a>
-    {unit.leader && <span class="leader">{unit.leader}</span>}
+    <span class="leader">{unit.leader ?? 'Leder ikke registrert'}</span>
   </div>
   {
     unit.children.length > 0 && (
-      <ul class="departments" aria-label={`Enheter i ${unit.name}`}>
+      <ul class:list={['departments', { tiles }]} aria-label={`Enheter i ${unit.name}`}>
         {unit.children.map((department) => (
           <li>
             <a class="department" href={href(department)}>
@@ -51,6 +61,8 @@ const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
 </div>
 
 <style>
+  /* Sizes from the prototype, with the chart at data-size="sm": body-xs is
+     12px, body-sm 14px. */
   .unit {
     display: flex;
     flex-direction: column;
@@ -61,23 +73,37 @@ const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-1);
-    padding: var(--ds-size-3) var(--ds-size-4);
+    padding: var(--ds-size-3);
     border-radius: var(--ds-border-radius-md);
     background: var(--ds-color-neutral-base-default);
     color: var(--ds-color-neutral-base-contrast-default);
   }
 
   .head[data-variant='light'] {
-    border: var(--ds-border-width-default) solid var(--ds-color-border-default);
-    background: var(--ds-color-neutral-surface-default);
-    color: var(--ds-color-text-default);
+    border: var(--ds-border-width-default) solid var(--ds-color-neutral-border-subtle);
+    background: var(--ds-color-neutral-background-default);
+    color: var(--ds-color-neutral-text-default);
+  }
+
+  .top,
+  .leader {
+    font-size: var(--ds-body-xs-font-size);
+  }
+
+  /* Softer than the name, as in the prototype. */
+  .head[data-variant='dark'] :is(.top, .leader) {
+    opacity: 0.8;
+  }
+
+  .head[data-variant='light'] :is(.top, .leader) {
+    color: var(--ds-color-neutral-text-subtle);
   }
 
   .top {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     gap: var(--ds-size-2);
-    font-size: var(--ds-body-sm-font-size);
   }
 
   .code {
@@ -107,12 +133,9 @@ const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
   }
 
   .name {
-    font-weight: var(--ds-font-weight-semibold);
-    line-height: var(--ds-line-height-sm);
-  }
-
-  .leader {
     font-size: var(--ds-body-sm-font-size);
+    font-weight: var(--ds-font-weight-semibold);
+    line-height: 1.3;
   }
 
   ul {
@@ -130,28 +153,47 @@ const href = (u: OrgUnit) => `/organisering/linjeorganisasjon/${u.id}`
   .department {
     display: block;
     padding: var(--ds-size-2) var(--ds-size-3);
-    border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+    border: var(--ds-border-width-default) solid var(--ds-color-neutral-border-subtle);
     border-radius: var(--ds-border-radius-md);
-    background: var(--ds-color-neutral-surface-default);
+    background: var(--ds-color-neutral-background-default);
+    color: var(--ds-color-neutral-text-default);
     font-size: var(--ds-body-sm-font-size);
+    font-weight: var(--ds-font-weight-medium);
+    line-height: 1.4;
   }
 
   .sections {
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-1);
-    margin-block-start: var(--ds-size-1);
-    margin-inline-start: var(--ds-size-2);
+    margin-block-start: var(--ds-size-2);
     padding-inline-start: var(--ds-size-2);
-    border-inline-start: calc(2 * var(--ds-border-width-default)) solid var(--ds-color-border-subtle);
+    border-inline-start: calc(2 * var(--ds-border-width-default)) solid var(--ds-color-neutral-border-subtle);
   }
 
-  .section {
+  .section,
+  .tiles .department {
     display: block;
     padding: var(--ds-size-1) var(--ds-size-2);
-    border-radius: var(--ds-border-radius-sm);
+    border: none;
+    border-radius: var(--ds-border-radius-md);
     background: var(--ds-color-neutral-background-tinted);
-    color: var(--ds-color-text-subtle);
+    color: var(--ds-color-neutral-text-subtle);
+    font-size: var(--ds-body-xs-font-size);
+    font-weight: normal;
+    line-height: 1.5;
+  }
+
+  /* The tilsyn's units: two small tiles to a row, the names centred. */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-size-1);
+  }
+
+  .tiles .department {
+    padding-block: var(--ds-size-2);
     font-size: var(--ds-body-sm-font-size);
+    text-align: center;
   }
 </style>
