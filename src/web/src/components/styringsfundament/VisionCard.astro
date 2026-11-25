@@ -1,22 +1,21 @@
 ---
-
 interface Props {
   vision: string
 }
 
-// The vision, large on a dark card.
+// The vision, large on a dark navy card, as in the prototype.
 const { vision } = Astro.props
 ---
 
-<section class="ds-card" data-color-scheme="dark" aria-labelledby="visjon">
+<section class="ds-card" data-color="accent" data-color-scheme="dark" aria-labelledby="visjon">
   <h2 class="ds-heading" data-size="2xs" id="visjon">Vår visjon</h2>
   <p class="ds-heading" data-size="lg">{vision}</p>
 </section>
 
 <style>
   section {
-    background: var(--ds-color-neutral-background-default);
-    color: var(--ds-color-neutral-text-default);
+    background: var(--ds-color-surface-tinted);
+    color: var(--ds-color-text-default);
     padding: var(--ds-size-8);
   }
 </style>
