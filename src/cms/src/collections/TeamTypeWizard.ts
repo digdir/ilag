@@ -20,7 +20,7 @@ export const TeamTypeWizard: CollectionConfig = {
     interface: 'TeamTypeWizardQuestion',
   },
   admin: {
-    group: collectionGroups.team,
+    group: collectionGroups.tools,
     hidden: hiddenFromEditors,
     useAsTitle: 'title',
     defaultColumns: ['title', 'isStart'],

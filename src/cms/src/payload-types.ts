@@ -72,9 +72,9 @@ export interface Config {
     team: Team;
     teammedlemskap: TeamMembership;
     teamtyper: TeamType;
-    'teamtype-veiviser': TeamTypeWizardQuestion;
     verktoy: Tool;
     begreper: Concept;
+    'teamtype-veiviser': TeamTypeWizardQuestion;
     personer: Person;
     enheter: Unit;
     lokasjoner: Location;
@@ -118,9 +118,9 @@ export interface Config {
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
-    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     verktoy: VerktoySelect<false> | VerktoySelect<true>;
     begreper: BegreperSelect<false> | BegreperSelect<true>;
+    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     personer: PersonerSelect<false> | PersonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
@@ -458,6 +458,28 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "begreper".
+ */
+export interface Concept {
+  id: number;
+  name: string;
+  /**
+   * Kort og tydelig, i noen få setninger. Vises også når begrepet forklares i teksten.
+   */
+  definition: string;
+  /**
+   * Bøyningsformer og andre skrivemåter som skal forklares som dette begrepet, som «teamet» og «teamene». Navnet er alltid med.
+   */
+  variants?: string[] | null;
+  /**
+   * Slå av for vanlige ord, som «team», som ellers blir markert i nesten hver tekst.
+   */
+  autoLink: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "teamtype-veiviser".
  */
 export interface TeamTypeWizardQuestion {
@@ -489,28 +511,6 @@ export interface TeamTypeWizardQuestion {
         } | null);
     id?: string | null;
   }[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "begreper".
- */
-export interface Concept {
-  id: number;
-  name: string;
-  /**
-   * Kort og tydelig, i noen få setninger. Vises også når begrepet forklares i teksten.
-   */
-  definition: string;
-  /**
-   * Bøyningsformer og andre skrivemåter som skal forklares som dette begrepet, som «teamet» og «teamene». Navnet er alltid med.
-   */
-  variants?: string[] | null;
-  /**
-   * Slå av for vanlige ord, som «team», som ellers blir markert i nesten hver tekst.
-   */
-  autoLink: boolean;
   updatedAt: string;
   createdAt: string;
 }
@@ -756,16 +756,16 @@ export interface PayloadLockedDocument {
         value: number | TeamType;
       } | null)
     | ({
-        relationTo: 'teamtype-veiviser';
-        value: number | TeamTypeWizardQuestion;
-      } | null)
-    | ({
         relationTo: 'verktoy';
         value: number | Tool;
       } | null)
     | ({
         relationTo: 'begreper';
         value: number | Concept;
+      } | null)
+    | ({
+        relationTo: 'teamtype-veiviser';
+        value: number | TeamTypeWizardQuestion;
       } | null)
     | ({
         relationTo: 'personer';
@@ -915,26 +915,6 @@ export interface TeamtyperSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teamtype-veiviser_select".
- */
-export interface TeamtypeVeiviserSelect<T extends boolean = true> {
-  title?: T;
-  isStart?: T;
-  intro?: T;
-  considerations?: T;
-  answers?:
-    | T
-    | {
-        label?: T;
-        hint?: T;
-        leadsTo?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "verktoy_select".
  */
 export interface VerktoySelect<T extends boolean = true> {
@@ -963,6 +943,26 @@ export interface BegreperSelect<T extends boolean = true> {
   definition?: T;
   variants?: T;
   autoLink?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser_select".
+ */
+export interface TeamtypeVeiviserSelect<T extends boolean = true> {
+  title?: T;
+  isStart?: T;
+  intro?: T;
+  considerations?: T;
+  answers?:
+    | T
+    | {
+        label?: T;
+        hint?: T;
+        leadsTo?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

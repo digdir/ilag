@@ -21,7 +21,7 @@ export const Concepts: CollectionConfig = {
     interface: 'Concept',
   },
   admin: {
-    group: collectionGroups.team,
+    group: collectionGroups.tools,
     hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name', 'variants', 'autoLink'],
