@@ -1,5 +1,6 @@
-import type { CollectionConfig, FieldAccess } from 'payload'
+import type { CollectionConfig } from 'payload'
 
+import { importOnly } from '../access/fields'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { isSignedIn } from '../access/isSignedIn'
@@ -17,9 +18,6 @@ import { collectionGroups } from './groups'
 //
 // The import matches units on externalUnitId, and sets `parent` from the
 // codes in the file. The field mapping is in docs/integrations/unit-import.md.
-
-// For the fields the import sets.
-const importOnly: FieldAccess = () => false
 
 export const Units: CollectionConfig = {
   slug: 'enheter',
