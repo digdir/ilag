@@ -16,23 +16,20 @@ const { group, pathname, hidden = false } = Astro.props
 <nav id={subMenuId(group)} aria-label={group.label} hidden={hidden}>
   <ul>
     {
-      group.pages.map((page) => {
-        const testId = `submenu-${page.href.slice(1).replaceAll('/', '-')}`
-        return (
-          <li>
-            {page.built ? (
-              <a href={page.href} aria-current={isWithin(pathname, page.href) ? 'page' : undefined} data-testid={testId}>
-                {page.label}
-              </a>
-            ) : (
-              <span title="Kommer snart" data-testid={testId}>
-                {page.label}
-                <span class="ds-sr-only"> (kommer snart)</span>
-              </span>
-            )}
-          </li>
-        )
-      })
+      group.pages.map((page) => (
+        <li>
+          {page.built ? (
+            <a href={page.href} aria-current={isWithin(pathname, page.href) ? 'page' : undefined}>
+              {page.label}
+            </a>
+          ) : (
+            <span title="Kommer snart">
+              {page.label}
+              <span class="ds-sr-only"> (kommer snart)</span>
+            </span>
+          )}
+        </li>
+      ))
     }
   </ul>
 </nav>
