@@ -40,7 +40,7 @@ export const MANDATE_FIELDS = [
 
 type MandateField = (typeof MANDATE_FIELDS)[number]['name']
 
-const MARKDOWN_HELP = 'Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.'
+export const MARKDOWN_HELP = 'Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.'
 
 const ownerOf = (doc: Partial<Mandate> | undefined) => ({ team: idOf(doc?.team), unit: idOf(doc?.unit) })
 
