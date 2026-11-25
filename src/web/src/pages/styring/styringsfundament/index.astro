@@ -1,10 +1,9 @@
 ---
 import Prose from '../../../components/Prose.astro'
 import GoalCards from '../../../components/styringsfundament/GoalCards.astro'
-import MarkdownCard from '../../../components/styringsfundament/MarkdownCard.astro'
+import MarkdownCard from '../../../components/MarkdownCard.astro'
 import MissionCard from '../../../components/styringsfundament/MissionCard.astro'
 import PlanCard from '../../../components/styringsfundament/PlanCard.astro'
-import SectionLabel from '../../../components/styringsfundament/SectionLabel.astro'
 import VisionCard from '../../../components/styringsfundament/VisionCard.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getGovernanceFoundation } from '../../../lib/cms/governanceFoundation'
@@ -30,7 +29,7 @@ const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPla
     {
       (goals?.length || hasPlan) && (
         <section aria-labelledby="malbilde">
-          <SectionLabel id="malbilde">Vårt målbilde</SectionLabel>
+          <h2 class="ds-heading" data-size="2xs" id="malbilde">Vårt målbilde</h2>
           {goals?.length ? <GoalCards goals={goals} /> : null}
           {plan && hasPlan && <PlanCard plan={plan} />}
         </section>
@@ -39,7 +38,7 @@ const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPla
     {
       values?.length ? (
         <section aria-labelledby="verdiar">
-          <SectionLabel id="verdiar">Våre verdiar</SectionLabel>
+          <h2 class="ds-heading" data-size="2xs" id="verdiar">Våre verdiar</h2>
           <div class="values">
             {values.map((value) => (
               <article class="ds-card" data-color="neutral" data-variant="tinted">

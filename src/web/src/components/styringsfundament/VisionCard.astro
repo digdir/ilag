@@ -1,5 +1,4 @@
 ---
-import SectionLabel from './SectionLabel.astro'
 
 interface Props {
   vision: string
@@ -10,7 +9,7 @@ const { vision } = Astro.props
 ---
 
 <section class="ds-card" data-color-scheme="dark" aria-labelledby="visjon">
-  <SectionLabel id="visjon">Vår visjon</SectionLabel>
+  <h2 class="ds-heading" data-size="2xs" id="visjon">Vår visjon</h2>
   <p class="ds-heading" data-size="lg">{vision}</p>
 </section>
 

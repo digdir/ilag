@@ -2,7 +2,6 @@
 import type { GovernanceFoundation } from '@ilag/shared'
 
 import DocumentCard from './DocumentCard.astro'
-import SectionLabel from './SectionLabel.astro'
 
 interface Props {
   mission: GovernanceFoundation['mission']
@@ -15,7 +14,7 @@ const { mission, documents } = Astro.props
 
 <section class="ds-card" data-color="accent" data-variant="tinted" aria-labelledby="samfunnsoppdrag">
   <div class="ds-card__block">
-    <SectionLabel id="samfunnsoppdrag">Vårt samfunnsoppdrag</SectionLabel>
+    <h2 class="ds-heading" data-size="2xs" id="samfunnsoppdrag">Vårt samfunnsoppdrag</h2>
     {mission && <p class="ds-heading" data-size="sm">{mission}</p>}
   </div>
   {
