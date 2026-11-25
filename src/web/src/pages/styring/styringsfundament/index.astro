@@ -1,46 +1,73 @@
 ---
 import Prose from '../../../components/Prose.astro'
-import Cards from '../../../components/boxes/Cards.astro'
-import Documents from '../../../components/boxes/Documents.astro'
-import List from '../../../components/boxes/List.astro'
-import Statement from '../../../components/boxes/Statement.astro'
-import TextWithFiles from '../../../components/boxes/TextWithFiles.astro'
+import CardGrid from '../../../components/styringsfundament/CardGrid.astro'
+import GoalCard from '../../../components/styringsfundament/GoalCard.astro'
+import MarkdownCard from '../../../components/styringsfundament/MarkdownCard.astro'
+import MissionCard from '../../../components/styringsfundament/MissionCard.astro'
+import PlanCard from '../../../components/styringsfundament/PlanCard.astro'
+import SectionLabel from '../../../components/styringsfundament/SectionLabel.astro'
+import VisionCard from '../../../components/styringsfundament/VisionCard.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getGovernanceFoundation } from '../../../lib/cms/governanceFoundation'
 import { formatDate } from '../../../lib/dates'
 
-// Digdir's styringsfundament (SF-01), as administrators fill it in (SF-02):
-// the boxes they chose, in their order.
+// Digdir's styringsfundament (SF-01), as administrators fill it in (SF-02),
+// in the prototype's layout. A section whose fields are empty is left out.
 const sf = await getGovernanceFoundation(Astro.request.headers.get('cookie'))
-const sections = sf.sections ?? []
-const boxes = { statement: Statement, cards: Cards, list: List, textWithFiles: TextWithFiles, documents: Documents }
+const { intro, vision, mission, documents, goals, plan, values, audiences, roles, footnote } = sf
+const hasPlan = Boolean(plan?.text || plan?.files?.length)
+const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPlan, values?.length, audiences, roles, footnote].some(Boolean)
 ---
 
 <Layout title="Styringsfundament — ilag" wide>
   <div class="page">
     <header>
       <h1 class="ds-heading" data-size="lg">Styringsfundament</h1>
-      <Prose text={sf.intro} />
+      <Prose text={intro} />
     </header>
+    {empty && <p class="ds-paragraph">Styringsfundamentet er ikke registrert ennå.</p>}
+    {vision && <VisionCard vision={vision} />}
+    {(mission || documents?.length) && <MissionCard mission={mission} documents={documents} />}
     {
-      sections.length === 0 ? (
-        <p class="ds-paragraph">Styringsfundamentet er ikke registrert ennå.</p>
-      ) : (
-        <div class="boxes">
-          {sections.map((section, i) => {
-            const Box = boxes[section.blockType]
-            return (
-              <div class:list={['box', { half: section.blockType === 'list' }]}>
-                {/* Each component takes the box of its own type. */}
-                <Box box={section as never} id={`boks-${i + 1}`} />
-              </div>
-            )
-          })}
+      (goals?.length || hasPlan) && (
+        <section aria-labelledby="malbilde">
+          <SectionLabel id="malbilde">Vårt målbilde</SectionLabel>
+          {goals?.length ? (
+            <CardGrid columns={2}>
+              {goals.map((goal, index) => (
+                <GoalCard goal={goal} index={index} />
+              ))}
+            </CardGrid>
+          ) : null}
+          {plan && hasPlan && <PlanCard plan={plan} />}
+        </section>
+      )
+    }
+    {
+      values?.length ? (
+        <section aria-labelledby="verdiar">
+          <SectionLabel id="verdiar">Våre verdiar</SectionLabel>
+          <CardGrid columns={3}>
+            {values.map((value) => (
+              <article class="ds-card" data-color="neutral" data-variant="tinted">
+                <h3 class="ds-heading" data-size="sm">{value.name}</h3>
+                <Prose text={value.text} />
+              </article>
+            ))}
+          </CardGrid>
+        </section>
+      ) : null
+    }
+    {
+      (audiences || roles) && (
+        <div class="pair">
+          {audiences && <MarkdownCard id="brukarar" label="Våre brukarar" text={audiences} />}
+          {roles && <MarkdownCard id="roller" label="Våre roller" text={roles} />}
         </div>
       )
     }
     <footer>
-      {sf.footnote && <p class="ds-paragraph" data-size="sm">{sf.footnote}</p>}
+      {footnote && <p class="ds-paragraph" data-size="sm">{footnote}</p>}
       {sf.updatedAt && <p class="ds-paragraph" data-size="sm">Sist oppdatert {formatDate(sf.updatedAt)}</p>}
     </footer>
   </div>
@@ -54,30 +81,22 @@ const boxes = { statement: Statement, cards: Cards, list: List, textWithFiles: T
     max-width: 56rem;
   }
 
-  header {
+  header,
+  section {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-size-3);
+    gap: var(--ds-size-4);
   }
 
-  /* Every box takes the whole width, except lists, which sit side by side when next to each other. */
-  .boxes {
+  .pair {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--ds-size-7) var(--ds-size-4);
-  }
-
-  .box {
-    grid-column: 1 / -1;
-  }
-
-  .box.half {
-    grid-column: auto;
+    gap: var(--ds-size-4);
   }
 
   @media (width < 40rem) {
-    .box.half {
-      grid-column: 1 / -1;
+    .pair {
+      grid-template-columns: 1fr;
     }
   }
 

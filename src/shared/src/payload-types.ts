@@ -1214,98 +1214,11 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface GovernanceFoundation {
   id: number;
   intro?: string | null;
-  sections?: (StatementBox | CardsBox | ListBox | TextWithFilesBox | DocumentsBox)[] | null;
+  vision?: string | null;
+  mission?: string | null;
   /**
-   * Vises nederst på siden.
+   * Vises under samfunnsoppdraget, bak «Vis eksterne styrende dokumenter».
    */
-  footnote?: string | null;
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatementBox".
- */
-export interface StatementBox {
-  heading: string;
-  text: string;
-  style: 'dark' | 'accent';
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statement';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CardsBox".
- */
-export interface CardsBox {
-  heading: string;
-  colors: 'neutral' | 'varied';
-  /**
-   * Vises på kort som har mer tekst, for eksempel «Vis delmål».
-   */
-  detailsLabel?: string | null;
-  cards?:
-    | {
-        title: string;
-        text?: string | null;
-        /**
-         * Vises bak knappen. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-         */
-        details?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'cards';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ListBox".
- */
-export interface ListBox {
-  heading: string;
-  /**
-   * Én per linje. Vises som merkelapper over teksten.
-   */
-  chips?: string | null;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
-  text?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'list';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TextWithFilesBox".
- */
-export interface TextWithFilesBox {
-  heading: string;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
-  text?: string | null;
-  /**
-   * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
-   */
-  files?: (number | Media)[] | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'textWithFiles';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "DocumentsBox".
- */
-export interface DocumentsBox {
-  /**
-   * Teksten på knappen som viser dokumentene.
-   */
-  heading: string;
   documents?:
     | {
         title: string;
@@ -1325,9 +1238,49 @@ export interface DocumentsBox {
         id?: string | null;
       }[]
     | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'documents';
+  goals?:
+    | {
+        title: string;
+        /**
+         * Vises bak «Vis delmål». Ta med lenken «Les meir om målet». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  plan?: {
+    title?: string | null;
+    /**
+     * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+     */
+    text?: string | null;
+    /**
+     * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+     */
+    files?: (number | Media)[] | null;
+  };
+  values?:
+    | {
+        name: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For eksempel én brukargruppe per punkt, og en tekst under. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  audiences?: string | null;
+  /**
+   * For eksempel én rolle per punkt. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  roles?: string | null;
+  /**
+   * Vises nederst på siden.
+   */
+  footnote?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1353,79 +1306,8 @@ export interface PayloadJobsStat {
  */
 export interface StyringsfundamentSelect<T extends boolean = true> {
   intro?: T;
-  sections?:
-    | T
-    | {
-        statement?: T | StatementBoxSelect<T>;
-        cards?: T | CardsBoxSelect<T>;
-        list?: T | ListBoxSelect<T>;
-        textWithFiles?: T | TextWithFilesBoxSelect<T>;
-        documents?: T | DocumentsBoxSelect<T>;
-      };
-  footnote?: T;
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatementBox_select".
- */
-export interface StatementBoxSelect<T extends boolean = true> {
-  heading?: T;
-  text?: T;
-  style?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CardsBox_select".
- */
-export interface CardsBoxSelect<T extends boolean = true> {
-  heading?: T;
-  colors?: T;
-  detailsLabel?: T;
-  cards?:
-    | T
-    | {
-        title?: T;
-        text?: T;
-        details?: T;
-        id?: T;
-      };
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ListBox_select".
- */
-export interface ListBoxSelect<T extends boolean = true> {
-  heading?: T;
-  chips?: T;
-  text?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TextWithFilesBox_select".
- */
-export interface TextWithFilesBoxSelect<T extends boolean = true> {
-  heading?: T;
-  text?: T;
-  files?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "DocumentsBox_select".
- */
-export interface DocumentsBoxSelect<T extends boolean = true> {
-  heading?: T;
+  vision?: T;
+  mission?: T;
   documents?:
     | T
     | {
@@ -1436,8 +1318,34 @@ export interface DocumentsBoxSelect<T extends boolean = true> {
         files?: T;
         id?: T;
       };
-  id?: T;
-  blockName?: T;
+  goals?:
+    | T
+    | {
+        title?: T;
+        details?: T;
+        id?: T;
+      };
+  plan?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        files?: T;
+      };
+  values?:
+    | T
+    | {
+        name?: T;
+        text?: T;
+        id?: T;
+      };
+  audiences?: T;
+  roles?: T;
+  footnote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,0 +1,19 @@
+---
+import type { GovernanceFoundation } from '@ilag/shared'
+
+import Markdown from '../Markdown.astro'
+import FileLinks from './FileLinks.astro'
+
+interface Props {
+  plan: NonNullable<GovernanceFoundation['plan']>
+}
+
+// The Virksomhetsplan: a text and its documents.
+const { plan } = Astro.props
+---
+
+<article class="ds-card">
+  <h3 class="ds-heading" data-size="xs">{plan.title || 'Virksomhetsplanen'}</h3>
+  <Markdown text={plan.text} />
+  <FileLinks files={plan.files} />
+</article>

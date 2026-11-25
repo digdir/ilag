@@ -1,0 +1,23 @@
+---
+import SectionLabel from './SectionLabel.astro'
+
+interface Props {
+  vision: string
+}
+
+// The vision, large on a dark card.
+const { vision } = Astro.props
+---
+
+<section class="ds-card" data-color-scheme="dark" aria-labelledby="visjon">
+  <SectionLabel id="visjon">Vår visjon</SectionLabel>
+  <p class="ds-heading" data-size="lg">{vision}</p>
+</section>
+
+<style>
+  section {
+    background: var(--ds-color-neutral-background-default);
+    color: var(--ds-color-neutral-text-default);
+    padding: var(--ds-size-8);
+  }
+</style>

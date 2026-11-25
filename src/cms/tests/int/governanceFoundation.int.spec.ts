@@ -15,14 +15,8 @@ let user: User
 const prefix = `int-governance-${Date.now()}`
 const slug = 'styringsfundament'
 const as = (u: User) => ({ user: { ...u, collection: 'brukere' as const }, overrideAccess: false })
-// The page with only a vision box, and the vision a page shows.
-const withVision = (text: string) => ({
-  sections: [{ blockType: 'statement' as const, heading: 'Vår visjon', style: 'dark' as const, text }],
-})
-const visionOf = (doc: GovernanceFoundation) => {
-  const box = doc.sections?.[0]
-  return box?.blockType === 'statement' ? box.text : undefined
-}
+const withVision = (vision: string) => ({ vision })
+const visionOf = (doc: GovernanceFoundation) => doc.vision
 
 describe('Styringsfundament', () => {
   beforeAll(async () => {
@@ -67,17 +61,5 @@ describe('Styringsfundament', () => {
     const { totalDocs, docs } = await payload.findGlobalVersions({ slug, sort: '-updatedAt', ...as(admin) })
     expect(totalDocs).toBe(before + 1)
     expect(visionOf(docs[0].version)).toBe('Ny visjon')
-  })
-
-  it('SF-01: takes boxes of the same kind more than once, in the order given', async () => {
-    const cards = (heading: string) => ({ blockType: 'cards' as const, heading, colors: 'neutral' as const, cards: [] })
-
-    const saved = await payload.updateGlobal({
-      slug,
-      data: { sections: [cards('Våre verdiar'), ...withVision('Visjon').sections, cards('Vårt målbilde')] },
-      ...as(admin),
-    })
-
-    expect(saved.sections?.map((box) => box.heading)).toEqual(['Våre verdiar', 'Vår visjon', 'Vårt målbilde'])
   })
 })

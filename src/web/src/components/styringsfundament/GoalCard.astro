@@ -1,0 +1,44 @@
+---
+import type { GovernanceFoundation } from '@ilag/shared'
+
+import Markdown from '../Markdown.astro'
+
+interface Props {
+  goal: NonNullable<GovernanceFoundation['goals']>[number]
+  /** Its place among the goals, which picks its tint, as in the prototype. */
+  index: number
+}
+
+const tints = ['accent', 'warning', 'danger', 'neutral']
+
+// A goal, with its sub-goals and «Les meir om målet» behind «Vis delmål».
+const { goal, index } = Astro.props
+---
+
+<article class="ds-card" data-color={tints[index % tints.length]} data-variant="tinted">
+  <div class="ds-card__block">
+    <h3 class="ds-heading" data-size="xs">{goal.title}</h3>
+  </div>
+  {
+    goal.details && (
+      <details class="ds-details">
+        <summary>Vis delmål</summary>
+        <div>
+          <Markdown text={goal.details} />
+        </div>
+      </details>
+    )
+  }
+</article>
+
+<style>
+  /* The toggles sit at the bottom of their cards, so they line up. */
+  article {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ds-card__block {
+    flex: 1;
+  }
+</style>

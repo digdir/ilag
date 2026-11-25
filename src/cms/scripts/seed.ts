@@ -305,7 +305,7 @@ const seed = async (payload: Payload) => {
   }
 
   // A global can't be created or deleted, only filled in.
-  if (!(await payload.findGlobal({ slug: 'styringsfundament' })).sections?.length) {
+  if (!(await payload.findGlobal({ slug: 'styringsfundament' })).vision) {
     await payload.updateGlobal({ slug: 'styringsfundament', data: { ...data.governanceFoundation, _status: 'published' } })
     console.log('Filled in styringsfundament')
   }
@@ -350,7 +350,7 @@ const removeSeed = async (payload: Payload) => {
   const empty = Object.fromEntries(
     Object.entries(data.governanceFoundation).map(([key, value]) => [
       key,
-      Array.isArray(value) ? [] : typeof value === 'object' ? {} : null,
+      Array.isArray(value) ? [] : typeof value === 'object' ? Object.fromEntries(Object.keys(value).map((k) => [k, null])) : null,
     ]),
   )
   await payload.updateGlobal({ slug: 'styringsfundament', data: { ...empty, _status: 'published' } })

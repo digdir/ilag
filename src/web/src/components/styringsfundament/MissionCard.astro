@@ -1,0 +1,42 @@
+---
+import type { GovernanceFoundation } from '@ilag/shared'
+
+import DocumentCard from './DocumentCard.astro'
+import SectionLabel from './SectionLabel.astro'
+
+interface Props {
+  mission: GovernanceFoundation['mission']
+  documents: GovernanceFoundation['documents']
+}
+
+// The mission on a blue card, with the external governing documents behind a toggle.
+const { mission, documents } = Astro.props
+---
+
+<section class="ds-card" data-color="accent" data-variant="tinted" aria-labelledby="samfunnsoppdrag">
+  <div class="ds-card__block">
+    <SectionLabel id="samfunnsoppdrag">Vårt samfunnsoppdrag</SectionLabel>
+    {mission && <p class="ds-heading" data-size="sm">{mission}</p>}
+  </div>
+  {
+    documents?.length ? (
+      <details class="ds-details">
+        <summary>Vis eksterne styrende dokumenter</summary>
+        <div class="documents">
+          {documents.map((document) => (
+            <DocumentCard document={document} />
+          ))}
+        </div>
+      </details>
+    ) : null
+  }
+</section>
+
+<style>
+  .documents {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--ds-size-4);
+    align-items: start;
+  }
+</style>

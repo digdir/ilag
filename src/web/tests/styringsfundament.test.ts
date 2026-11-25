@@ -11,55 +11,38 @@ const render = async () => {
   })
 }
 
-// One box of each kind, two card boxes, in another order than the seed's.
+// Every field filled in.
 const foundation = {
   id: 1,
   intro: 'Digdirs visjon og mål, samlet på én side.',
-  footnote: 'Inspirert av kompasset til Mattilsynet.',
-  sections: [
-    { blockType: 'list', heading: 'Våre roller', text: '- Forvaltar av Norges digitale grunnmur' },
+  vision: 'ilag for ein enklare digital kvardag',
+  mission: 'Vi bidrar til ein samordna digitalisering',
+  documents: [
     {
-      blockType: 'cards',
-      heading: 'Våre verdier',
-      colors: 'neutral',
-      cards: [{ title: 'Uredd', text: 'Vi vågar å utfordre.' }],
-    },
-    { blockType: 'statement', heading: 'Vår visjon', style: 'dark', text: 'ilag for ein enklare digital kvardag' },
-    {
-      blockType: 'documents',
-      heading: 'Vis eksterne styrende dokumenter',
-      documents: [
-        {
-          title: 'Tildelingsbrevet',
-          tag: 'Årlig',
-          summary: 'Resultatmål og rammer for budsjettåret.',
-          details:
-            '**Innhold**\n\n- Rapporteringskrav.\n\nSupplerende brev kommer gjennom året.\n\n[Oppdragsbrev](https://example.com/oppdrag.pdf)',
-          files: [
-            { id: 3, alt: 'Tildelingsbrev 2026 (PDF)', url: 'http://localhost:3000/api/medier/file/tildelingsbrev.pdf' },
-            // A file the visitor may not read comes back as its ID only.
-            4,
-          ],
-        },
+      title: 'Tildelingsbrevet',
+      tag: 'Årlig',
+      summary: 'Resultatmål og rammer for budsjettåret.',
+      details: '- Rapporteringskrav.\n\n[Oppdragsbrev](https://example.com/oppdrag.pdf)',
+      files: [
+        { id: 3, alt: 'Tildelingsbrev 2026 (PDF)', url: 'http://localhost:3000/api/medier/file/tildelingsbrev.pdf' },
+        // A file the visitor may not read comes back as its ID only.
+        4,
       ],
     },
-    {
-      blockType: 'cards',
-      heading: 'Vårt målbilde',
-      colors: 'varied',
-      detailsLabel: 'Vis delmål',
-      cards: [
-        { title: 'Vi fremmer samordning', details: '- Leverer fellesløysingar.\n\n[Les meir om målet](https://www.digdir.no/mal-1)' },
-        { title: 'Vi leder an i bruk av data' },
-      ],
-    },
-    {
-      blockType: 'textWithFiles',
-      heading: 'Virksomhetsplanen',
-      text: 'Mål og rammer for virksomheten.\n\n[Virksomhetsplan 2026 (PDF)](https://example.com/vp.pdf)',
-    },
-    { blockType: 'list', heading: 'Våre brukarar', chips: 'Innbyggarar\n Næringslivet \n\n', text: 'Vi jobbar brukerretta.' },
   ],
+  goals: [
+    { title: 'Vi fremmer samordning', details: '- Leverer fellesløysingar.\n\n[Les meir om målet](https://www.digdir.no/mal-1)' },
+    { title: 'Vi leder an i bruk av data' },
+  ],
+  plan: {
+    title: 'Virksomhetsplanen',
+    text: 'Mål og rammer for virksomheten.\n\n[Virksomhetsplan 2026 (PDF)](https://example.com/vp.pdf)',
+    files: [],
+  },
+  values: [{ name: 'Uredd', text: 'Vi vågar å utfordre.' }],
+  audiences: '- Innbyggarar\n- Næringslivet\n\nVi jobbar brukerretta.',
+  roles: '- Forvaltar av Norges digitale grunnmur',
+  footnote: 'Inspirert av kompasset til Mattilsynet.',
   updatedAt: '2026-11-24T23:30:00.000Z',
 }
 
@@ -83,33 +66,30 @@ describe('styringsfundament page', () => {
     expect(new Headers(init?.headers).get('Authorization')).toBe('JWT visitor-token')
   })
 
-  it('SF-01: shows the boxes in the order and with the headings the editor chose', async () => {
+  it('SF-01: shows every section in the prototype’s order', async () => {
     vi.stubGlobal('fetch', cms(foundation))
 
     const html = await render()
 
     expect(html).toMatch(
-      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Våre verdier[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Innhold[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vi fremmer samordning[\s\S]*Vis delmål[\s\S]*Leverer fellesløysingar[\s\S]*Virksomhetsplanen[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Vi jobbar brukerretta[\s\S]*Inspirert av kompasset/,
+      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vårt samfunnsoppdrag[\s\S]*Vi bidrar til ein samordna[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vi fremmer samordning[\s\S]*Vis delmål[\s\S]*Leverer fellesløysingar[\s\S]*Vi leder an i bruk av data[\s\S]*Virksomhetsplanen[\s\S]*Våre verdiar[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Næringslivet[\s\S]*Vi jobbar brukerretta[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Inspirert av kompasset[\s\S]*Sist oppdatert/,
     )
-    // In Norwegian time, the evening of the 24th UTC is the 25th.
-    expect(html).toContain('Sist oppdatert 25. november 2026')
-  })
-
-  it('shows each kind of box its own way', async () => {
-    vi.stubGlobal('fetch', cms(foundation))
-
-    const html = await render()
-
-    // A dark statement, and lists in half-width boxes.
+    expect(html).not.toContain('ikke registrert')
+    // The vision is dark; the goals are tinted by position. A goal with no sub-goals has no toggle.
     expect(html).toMatch(/data-color-scheme="dark"[^>]*>[\s\S]*?Vår visjon/)
-    expect(html.match(/class="box half"/g)).toHaveLength(2)
-    // Varied cards are tinted by position; grey ones all alike. A card with nothing more has no toggle.
     expect(html).toMatch(/data-color="accent" data-variant="tinted"[^>]*>[\s\S]*?Vi fremmer samordning/)
     expect(html).toMatch(/data-color="warning" data-variant="tinted"[^>]*>[\s\S]*?Vi leder an i bruk av data/)
     expect(html.match(/<summary[^>]*>Vis delmål<\/summary>/g)).toHaveLength(1)
-    // Markdown lists, and one chip per line.
+    // The user groups and the roles as markdown lists.
+    expect(html).toMatch(/<ul class="ds-list">\s*<li>Innbyggarar<\/li>\s*<li>Næringslivet<\/li>/)
     expect(html).toMatch(/<ul class="ds-list">\s*<li>Forvaltar av Norges digitale grunnmur<\/li>/)
-    expect(html.match(/class="ds-tag"[^>]*>\s*(Innbyggarar|Næringslivet)\s*</g)).toHaveLength(2)
+  })
+
+  it('SF-05: shows when it was last changed, in Norwegian time', async () => {
+    vi.stubGlobal('fetch', cms(foundation))
+
+    // The evening of the 24th UTC is the 25th in Norway.
+    expect(await render()).toContain('Sist oppdatert 25. november 2026')
   })
 
   it('SF-01: links to uploaded files in a new tab, leaves out files it can’t read, and renders markdown links', async () => {
@@ -124,11 +104,27 @@ describe('styringsfundament page', () => {
     expect(html).toContain('<a href="https://www.digdir.no/mal-1" class="ds-link">Les meir om målet</a>')
   })
 
-  it('says so when no boxes are added', async () => {
-    vi.stubGlobal('fetch', cms({ id: 1, sections: [] }))
+  it('leaves out sections whose fields are empty', async () => {
+    vi.stubGlobal(
+      'fetch',
+      cms({ id: 1, vision: 'ilag for ein enklare digital kvardag', documents: [], goals: [], plan: { title: 'Virksomhetsplanen' }, values: [] }),
+    )
+
+    const html = await render()
+
+    expect(html).toContain('Vår visjon')
+    for (const heading of ['Vårt samfunnsoppdrag', 'Vårt målbilde', 'Virksomhetsplanen', 'Våre verdiar', 'Våre brukarar', 'Våre roller']) {
+      expect(html).not.toContain(heading)
+    }
+    expect(html).not.toContain('ikke registrert')
+  })
+
+  it('says so when nothing is filled in', async () => {
+    vi.stubGlobal('fetch', cms({ id: 1, documents: [], goals: [], plan: { title: 'Virksomhetsplanen' }, values: [] }))
 
     const html = await render()
 
     expect(html).toContain('Styringsfundamentet er ikke registrert ennå.')
+    expect(html).not.toContain('Vår visjon')
   })
 })
