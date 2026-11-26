@@ -9,14 +9,20 @@ import {
 import { canEditSharedContent } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { isSignedIn } from '../access/isSignedIn'
+import { isAdmin } from '../access/isAdmin'
 import { TEAM_EDITOR_ROLES } from '../access/teamEditor'
 import { codeFromName, isCode } from '../utils/codes'
 import { collectionGroups } from './groups'
 
-// A new role without a code gets one from its name. Runs on the server before
-// validation, so the admin form may leave the code empty.
-const codeFromNameIfEmpty: FieldHook = ({ siblingData, value }) =>
-  value || (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
+// A new role without a code gets one from its name. A beforeChange hook, not
+// beforeValidate: Payload checks field access after the beforeValidate hooks
+// and drops the value when access is denied, so a code made there for a
+// redaktør would be thrown away. beforeChange runs after that check and before
+// validation. A role that already has a code keeps it.
+const codeFromNameIfEmpty: FieldHook = ({ originalDoc, siblingData, value }) =>
+  value ||
+  originalDoc?.code ||
+  (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
 
 // Empty passes: the admin form validates before the hook above has filled it.
 const validCode: Validate = (value) =>
@@ -90,9 +96,12 @@ export const Roles: CollectionConfig = {
       index: true,
       validate: validCode,
       hooks: {
-        beforeValidate: [codeFromNameIfEmpty],
+        beforeChange: [codeFromNameIfEmpty],
       },
       access: {
+        // Only administrators choose a code; for a redaktør it always comes
+        // from the name.
+        create: ({ req }) => isAdmin(req.user),
         // Not required in the schema, so the column could be added to
         // databases that already had roles; those may set it once.
         update: ({ doc }) => !doc?.code,

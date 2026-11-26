@@ -13,6 +13,7 @@ import type { Feedback, Role, Team, TeamType, User } from '@/payload-types'
 import { hiddenUnlessAdmin, hiddenUnlessSharedContentEditor } from '@/access/adminMenu'
 import { canEditSharedContent, isEditor } from '@/access/isEditor'
 import { TEAM_EDITOR_ROLES } from '@/access/teamEditor'
+import { codeFromName } from '@/utils/codes'
 
 // Redaktører maintain the shared content (tools, principles, concepts, team
 // types, the wizard and roles) alongside the administrators, read and handle
@@ -274,6 +275,32 @@ describe('Redaktører', () => {
       ...as(admin),
     })
     expect(updated.roles).toEqual(['editor'])
+  })
+
+  it('makes the code of a role from its name for a redaktør, and lets only an administrator choose it', async () => {
+    const byEditor = await payload.create({
+      collection: 'roller',
+      data: { name: `${prefix} Redaktørs rolle`, code: `${prefix}-valgt` },
+      ...as(editor),
+    })
+    createdRoles.push(byEditor.id)
+    expect(byEditor.code).toBe(codeFromName(`${prefix} Redaktørs rolle`))
+
+    const byAdmin = await payload.create({
+      collection: 'roller',
+      data: { name: `${prefix} Admins rolle`, code: `${prefix}-valgt` },
+      ...as(admin),
+    })
+    createdRoles.push(byAdmin.id)
+    expect(byAdmin.code).toBe(`${prefix}-valgt`)
+
+    const renamed = await payload.update({
+      collection: 'roller',
+      id: byEditor.id,
+      data: { name: `${prefix} Nytt navn` },
+      ...as(editor),
+    })
+    expect(renamed.code).toBe(byEditor.code)
   })
 
   it('refuses to delete the roles that decide who edits a team (RO-07)', async () => {
