@@ -27,6 +27,7 @@ import { isAdmin } from './access/isAdmin'
 import { isEditor } from './access/isEditor'
 import { importTasks } from './imports/tasks'
 import { health } from './endpoints/health'
+import { search } from './search'
 import { serverURL, webURL } from './urls'
 
 const filename = fileURLToPath(import.meta.url)
@@ -127,5 +128,5 @@ export default buildConfig({
     },
   }),
   sharp,
-  plugins: [],
+  plugins: [search],
 })

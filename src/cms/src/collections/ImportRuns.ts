@@ -1,5 +1,6 @@
-import { APIError, type CollectionConfig, type FieldAccess } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 
+import { importOnly } from '../access/fields'
 import { isAdmin } from '../access/isAdmin'
 import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { collectionGroups } from './groups'
@@ -8,9 +9,6 @@ import { collectionGroups } from './groups'
 // was applied (ADR-0003). The import endpoints create runs and the import jobs
 // update them. Administrators read them in the admin panel, and confirm a run
 // that was held because the file had far fewer rows than ilag has active.
-
-// Set by the import only.
-const importOnly: FieldAccess = () => false
 
 export const IMPORT_TASKS = { units: 'importUnits', people: 'importPeople' } as const
 

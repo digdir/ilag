@@ -3,6 +3,7 @@ import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { ownTeams } from '../access/teamEditor'
+import type { SearchSubtitle } from '../search/subtitle'
 import { collectionGroups } from './groups'
 
 // A team's memberships and mandate mean nothing without the team, and point
@@ -19,6 +20,19 @@ const deleteMembershipsAndMandate: CollectionBeforeDeleteHook = async ({ id, req
     where: { team: { equals: id } },
     req,
   })
+}
+
+// The team type's name, for the search. The team comes unpopulated.
+const teamTypeName: SearchSubtitle = async ({ teamType }, req) => {
+  if (teamType == null) return null
+  if (typeof teamType === 'object') return teamType.name
+  try {
+    const type = await req.payload.findByID({ collection: 'teamtyper', id: teamType, depth: 0, req, select: { name: true } })
+    return type.name
+  } catch {
+    // The team type is gone.
+    return null
+  }
 }
 
 // Teams in Digdir (TO-01). Administrators create and delete them. A team's
@@ -53,6 +67,9 @@ export const Teams: CollectionConfig = {
   },
   hooks: {
     beforeDelete: [deleteMembershipsAndMandate],
+  },
+  custom: {
+    searchSubtitle: teamTypeName,
   },
   defaultSort: 'name',
   fields: [
