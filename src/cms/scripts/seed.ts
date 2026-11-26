@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { isDeepStrictEqual } from 'util'
 
 import { getPayload, type CollectionSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
 import config from '@payload-config'
@@ -311,7 +312,55 @@ const seed = async (payload: Payload) => {
     count('tilbakemeldinger')
   }
 
+  // A global can't be created or deleted, only filled in, and only while
+  // nothing is there, not even a draft.
+  const foundation = await foundationState(payload)
+  if (foundation === 'empty') {
+    await payload.updateGlobal({ slug: 'styringsfundament', data: { ...data.governanceFoundation, _status: 'published' } })
+    console.log('Filled in styringsfundament')
+  } else if (foundation === 'edited') console.log('Left styringsfundament as it is: it has been edited')
+
   return created
+}
+
+// Leaves out what Payload adds and what is empty, so that the global can be
+// compared with the seed: the ids of array rows, and nulls, empty strings,
+// empty arrays and empty groups.
+const normalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    const items = value.map(normalize).filter((item) => item !== undefined)
+    return items.length ? items : undefined
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value)
+      .filter(([key]) => key !== 'id')
+      .map(([key, item]) => [key, normalize(item)] as const)
+      .filter(([, item]) => item !== undefined)
+    return entries.length ? Object.fromEntries(entries) : undefined
+  }
+  return value === null || value === '' ? undefined : value
+}
+
+// Whether the styringsfundament's latest version, a draft included, is
+// empty, still the seed's, or edited since. Only the fields the seed fills
+// in count, except the plan's title: Payload fills in its default even when
+// nothing is saved, and the seed uses the same title.
+const foundationState = async (payload: Payload): Promise<'empty' | 'seed' | 'edited'> => {
+  const stored = { ...(await payload.findGlobal({ slug: 'styringsfundament', draft: true, depth: 0 })) } as Record<string, unknown>
+  const content = (source: Record<string, unknown>) =>
+    normalize(
+      Object.fromEntries(
+        Object.keys(data.governanceFoundation).map((key) => {
+          const value = source[key]
+          if (key !== 'plan' || !value || typeof value !== 'object') return [key, value]
+          const { title: _title, ...plan } = value as Record<string, unknown>
+          return [key, plan]
+        }),
+      ),
+    )
+  const current = content(stored)
+  if (current === undefined) return 'empty'
+  return isDeepStrictEqual(current, content(data.governanceFoundation)) ? 'seed' : 'edited'
 }
 
 // Deletes what the seed creates, matched on the same keys: the memberships
@@ -347,6 +396,19 @@ const removeSeed = async (payload: Payload) => {
     if (docs.length) console.log(`Deleted ${docs.length} from ${collection}`)
     for (const { message } of errors) console.error(`  ${collection}: ${message}`)
   }
+  // Empties every field while the content is still the seed's, keeping the
+  // versions. Content an administrator has written is left as it is.
+  const foundation = await foundationState(payload)
+  if (foundation === 'edited') console.log('Left styringsfundament as it is: it has been edited')
+  if (foundation !== 'seed') return
+  const empty = Object.fromEntries(
+    Object.entries(data.governanceFoundation).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? [] : typeof value === 'object' ? Object.fromEntries(Object.keys(value).map((k) => [k, null])) : null,
+    ]),
+  )
+  await payload.updateGlobal({ slug: 'styringsfundament', data: { ...empty, _status: 'published' } })
+  console.log('Emptied styringsfundament')
 }
 
 if (process.env.NODE_ENV === 'production') {

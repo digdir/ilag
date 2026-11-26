@@ -142,9 +142,11 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    styringsfundament: GovernanceFoundation;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
+    styringsfundament: StyringsfundamentSelect<false> | StyringsfundamentSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -1266,6 +1268,81 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament".
+ */
+export interface GovernanceFoundation {
+  id: number;
+  intro?: string | null;
+  vision?: string | null;
+  mission?: string | null;
+  /**
+   * Vises under samfunnsoppdraget, bak «Vis eksterne styrende dokumenter».
+   */
+  documents?:
+    | {
+        title: string;
+        /**
+         * For eksempel «Varig» eller «Årlig».
+         */
+        tag?: string | null;
+        summary?: string | null;
+        /**
+         * Vises bak «Les mer». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        /**
+         * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+         */
+        files?: (number | Media)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  goals?:
+    | {
+        title: string;
+        /**
+         * Vises når målbildet åpnes med knappen i midten. Ta med lenken «Les meir om målet». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  plan?: {
+    title?: string | null;
+    /**
+     * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+     */
+    text?: string | null;
+    /**
+     * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+     */
+    files?: (number | Media)[] | null;
+  };
+  values?:
+    | {
+        name: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For eksempel én brukargruppe per punkt, og en tekst under. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  audiences?: string | null;
+  /**
+   * For eksempel én rolle per punkt. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  roles?: string | null;
+  /**
+   * Vises nederst på siden.
+   */
+  footnote?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1281,6 +1358,53 @@ export interface PayloadJobsStat {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament_select".
+ */
+export interface StyringsfundamentSelect<T extends boolean = true> {
+  intro?: T;
+  vision?: T;
+  mission?: T;
+  documents?:
+    | T
+    | {
+        title?: T;
+        tag?: T;
+        summary?: T;
+        details?: T;
+        files?: T;
+        id?: T;
+      };
+  goals?:
+    | T
+    | {
+        title?: T;
+        details?: T;
+        id?: T;
+      };
+  plan?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        files?: T;
+      };
+  values?:
+    | T
+    | {
+        name?: T;
+        text?: T;
+        id?: T;
+      };
+  audiences?: T;
+  roles?: T;
+  footnote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

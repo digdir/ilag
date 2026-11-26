@@ -23,6 +23,7 @@ import { Tools } from './collections/Tools'
 import { Concepts } from './collections/Concepts'
 import { ImportRuns } from './collections/ImportRuns'
 import { Feedback } from './collections/Feedback'
+import { GovernanceFoundation } from './globals/GovernanceFoundation'
 import { isAdmin } from './access/isAdmin'
 import { isEditor } from './access/isEditor'
 import { importTasks } from './imports/tasks'
@@ -101,6 +102,7 @@ export default buildConfig({
     ImportRuns,
     Media,
   ],
+  globals: [GovernanceFoundation],
   // The imports from the authoritative source (ADR-0003). Only administrators
   // may queue, run or cancel jobs through the API; the import endpoints queue
   // them through the Local API.

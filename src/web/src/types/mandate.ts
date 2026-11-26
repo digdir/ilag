@@ -7,8 +7,8 @@ import type { Mandate } from '@ilag/shared'
 export type MandateField = {
   name: 'problem' | 'outcomes' | 'expectations' | 'collaboration'
   label: string
-  /** The field as HTML from its markdown, or null if it isn't filled in. */
-  html: string | null
+  /** The field's markdown, or null if it isn't filled in. */
+  text: string | null
 }
 
 /** A team's or a unit's mandate, as the visitor may see it. */
