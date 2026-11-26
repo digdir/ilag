@@ -45,6 +45,7 @@ exploit a weakness that hasn't been fixed yet.
 | [0007](0007-mandates-with-versions-and-approval.md) | Mandates as a versioned collection with approval | Proposed |
 | [0008](0008-unit-memberships-with-roles.md) | Unit memberships with roles | Proposed |
 | [0009](0009-automatic-concept-marking.md) | Concepts are explained automatically where they are used | Accepted |
+| [0010](0010-search-with-payloads-search-plugin.md) | Search with Payload's search plugin | Proposed |
 
 ## Template
 
