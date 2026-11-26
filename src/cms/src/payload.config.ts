@@ -24,6 +24,7 @@ import { Concepts } from './collections/Concepts'
 import { ImportRuns } from './collections/ImportRuns'
 import { Feedback } from './collections/Feedback'
 import { isAdmin } from './access/isAdmin'
+import { isEditor } from './access/isEditor'
 import { importTasks } from './imports/tasks'
 import { health } from './endpoints/health'
 import { search } from './search'
@@ -46,7 +47,8 @@ export default buildConfig({
       actions: ['/components/GoToWebsite#GoToWebsite'],
     },
     // Teameiere and teamledere see only their own teams on the dashboard
-    // (TO-08, RO-06); administrators see Payload's cards for all collections.
+    // (TO-08, RO-06); administrators and redaktører see Payload's cards for the
+    // collections they may use.
     // Each user can change their own layout, which Payload then keeps.
     dashboard: {
       widgets: [
@@ -57,8 +59,17 @@ export default buildConfig({
           minWidth: 'full',
         },
       ],
-      defaultLayout: ({ req }) =>
-        isAdmin(req.user) ? [{ widgetSlug: 'collections', width: 'full' }] : [{ widgetSlug: 'my-teams', width: 'full' }],
+      // Redaktører get the cards for the collections they maintain, and their
+      // teams if they also edit teams; MyTeams shows nothing when they don't.
+      defaultLayout: ({ req }) => {
+        if (isAdmin(req.user)) return [{ widgetSlug: 'collections', width: 'full' }]
+        if (isEditor(req.user))
+          return [
+            { widgetSlug: 'my-teams', width: 'full' },
+            { widgetSlug: 'collections', width: 'full' },
+          ]
+        return [{ widgetSlug: 'my-teams', width: 'full' }]
+      },
     },
     meta: {
       titleSuffix: ' – ilag',

@@ -4,7 +4,7 @@ import type { CollectionSlug } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { collectionGroups } from '../collections/groups'
 import type { SearchSubtitle } from './subtitle'
 
@@ -76,7 +76,7 @@ export const search = searchPlugin({
     typescript: { interface: 'SearchResult' },
     admin: {
       group: collectionGroups.system,
-      hidden: hiddenFromEditors,
+      hidden: hiddenUnlessAdmin,
       // The source shows in the sidebar of each document. In the list it
       // would only say «<Ingen Doc>», as the plugin keeps it unpopulated.
       defaultColumns: ['title', 'subtitle', 'active'],

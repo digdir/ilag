@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isSignedIn } from '../access/isSignedIn'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { importEndpoints } from '../imports/endpoints'
 import type { SearchSubtitle } from '../search/subtitle'
 import { collectionGroups } from './groups'
@@ -30,8 +30,8 @@ export const People: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.organisation,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // Only administrators see it in the admin panel's menu.
+    hidden: hiddenUnlessAdmin,
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'title', 'units', 'location', 'isEmployee', 'active'],
   },

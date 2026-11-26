@@ -524,7 +524,7 @@ export interface User {
   id: number;
   firstName?: string | null;
   lastName?: string | null;
-  roles?: ('admin' | 'integration')[] | null;
+  roles?: ('admin' | 'editor' | 'integration')[] | null;
   /**
    * Settes ved innlogging fra personen med samme e-post.
    */
