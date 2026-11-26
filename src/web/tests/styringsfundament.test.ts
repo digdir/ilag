@@ -72,14 +72,15 @@ describe('styringsfundament page', () => {
     const html = await render()
 
     expect(html).toMatch(
-      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vårt samfunnsoppdrag[\s\S]*Vi bidrar til ein samordna[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vis detaljer om målbildet[\s\S]*Vi fremmer samordning[\s\S]*Leverer fellesløysingar[\s\S]*Vi leder an i bruk av data[\s\S]*Virksomhetsplanen[\s\S]*Våre verdiar[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Næringslivet[\s\S]*Vi jobbar brukerretta[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Inspirert av kompasset[\s\S]*Sist oppdatert/,
+      /Styringsfundament[\s\S]*Digdirs visjon og mål[\s\S]*Vår visjon[\s\S]*ilag for ein enklare digital kvardag[\s\S]*Vårt samfunnsoppdrag[\s\S]*Vi bidrar til ein samordna[\s\S]*Vis eksterne styrende dokumenter[\s\S]*Tildelingsbrevet[\s\S]*Årlig[\s\S]*Les mer[\s\S]*Rapporteringskrav[\s\S]*Vårt målbilde[\s\S]*Vi fremmer samordning[\s\S]*Leverer fellesløysingar[\s\S]*Vi leder an i bruk av data[\s\S]*Vis delmål[\s\S]*Virksomhetsplanen[\s\S]*Våre verdiar[\s\S]*Uredd[\s\S]*Vi vågar å utfordre[\s\S]*Våre brukarar[\s\S]*Innbyggarar[\s\S]*Næringslivet[\s\S]*Vi jobbar brukerretta[\s\S]*Våre roller[\s\S]*Forvaltar av Norges digitale grunnmur[\s\S]*Inspirert av kompasset[\s\S]*Sist oppdatert/,
     )
     expect(html).not.toContain('ikke registrert')
     // The vision is dark; the goals are tinted by position, and one button opens them all.
     expect(html).toMatch(/data-color-scheme="dark"[^>]*>[\s\S]*?Vår visjon/)
     expect(html).toMatch(/<article data-color="accent"[^>]*>[\s\S]*?Vi fremmer samordning/)
     expect(html).toMatch(/<article data-color="warning"[^>]*>[\s\S]*?Vi leder an i bruk av data/)
-    expect(html.match(/type="checkbox"[^>]*aria-label="Vis detaljer om målbildet"/g)).toHaveLength(1)
+    expect(html.match(/<label class="ds-button"[^>]*>\s*<input class="toggle" type="checkbox"/g)).toHaveLength(1)
+    expect(html).toMatch(/<span class="text"[^>]*>Vis delmål<\/span>/)
     // A goal with no sub-goals has nothing to open.
     expect(html).toMatch(/Vi leder an i bruk av data<\/h3>\s*<\/article>/)
     // The user groups and the roles as markdown lists.
@@ -87,7 +88,7 @@ describe('styringsfundament page', () => {
     expect(html).toMatch(/<ul class="ds-list">\s*<li>Forvaltar av Norges digitale grunnmur<\/li>/)
   })
 
-  it('SF-05: shows when it was last changed, in Norwegian time', async () => {
+  it('SF-01: shows when it was last changed, in Norwegian time', async () => {
     vi.stubGlobal('fetch', cms(foundation))
 
     // The evening of the 24th UTC is the 25th in Norway.
@@ -104,6 +105,38 @@ describe('styringsfundament page', () => {
     expect(html).toContain('<a href="https://example.com/vp.pdf" class="ds-link">Virksomhetsplan 2026 (PDF)</a>')
     expect(html).toContain('<a href="https://example.com/oppdrag.pdf" class="ds-link">Oppdragsbrev</a>')
     expect(html).toContain('<a href="https://www.digdir.no/mal-1" class="ds-link">Les meir om målet</a>')
+  })
+
+  it('SF-01: has no button to open the goals when none has sub-goals', async () => {
+    vi.stubGlobal(
+      'fetch',
+      cms({ ...foundation, goals: foundation.goals.map(({ title }) => ({ title })) }),
+    )
+
+    const html = await render()
+
+    expect(html).toContain('Vi fremmer samordning')
+    expect(html).not.toContain('type="checkbox"')
+  })
+
+  it('SF-01: shows no «Les mer» and no plan when the only files are ones the visitor can’t read', async () => {
+    vi.stubGlobal(
+      'fetch',
+      cms({
+        id: 1,
+        mission: 'Vi bidrar til ein samordna digitalisering',
+        documents: [{ title: 'Tildelingsbrevet', summary: 'Resultatmål og rammer.', files: [4] }],
+        goals: [],
+        plan: { title: 'Virksomhetsplanen', files: [5] },
+        values: [],
+      }),
+    )
+
+    const html = await render()
+
+    expect(html).toContain('Tildelingsbrevet')
+    expect(html).not.toContain('Les mer')
+    expect(html).not.toContain('Virksomhetsplanen')
   })
 
   it('leaves out sections whose fields are empty', async () => {

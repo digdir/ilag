@@ -1,5 +1,7 @@
 ---
 import type { GovernanceFoundation } from '@ilag/shared'
+import ExpandIcon from '@navikt/aksel-icons/svg/Expand.svg'
+import ShrinkIcon from '@navikt/aksel-icons/svg/Shrink.svg'
 
 import GoalCard from './GoalCard.astro'
 
@@ -7,100 +9,155 @@ interface Props {
   goals: NonNullable<GovernanceFoundation['goals']>
 }
 
-// The goals 2×2, with one round button in the middle that opens all of them
-// to show their sub-goals, as in the prototype. The button is a checkbox, so
-// it works without JavaScript; GoalCard animates on its state.
+// The goals 2×2, with one round button where the cards meet that opens all
+// of them to show their sub-goals, as in the prototype. The button sits on a
+// strip between the first row and the rest, so it stays on the crossing
+// however tall the rows grow, and moves under the cards, with its text
+// showing, in one column or with no second row. It is a checkbox in a
+// Designsystemet button, so it works without JavaScript; GoalCard animates on
+// its state. With no sub-goals there is nothing to open, and no button.
 const { goals } = Astro.props
+const first = goals.slice(0, 2)
+const rest = goals.slice(2)
+const button = goals.some((goal) => goal.details)
 ---
 
-<div class="goals">
-  <input class="toggle" type="checkbox" id="malbilde-detaljer" aria-label="Vis detaljer om målbildet" />
-  <label class="button" for="malbilde-detaljer" aria-hidden="true">
-    <svg class="expand" viewBox="0 0 24 24" width="22" height="22"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-    <svg class="collapse" viewBox="0 0 24 24" width="22" height="22"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
-  </label>
-  {goals.map((goal, index) => <GoalCard goal={goal} index={index} />)}
+<div class="goals" data-below={rest.length === 0 || undefined}>
+  <div class="row">
+    {first.map((goal, index) => <GoalCard goal={goal} index={index} />)}
+  </div>
+  {
+    button && (
+      <div class="control">
+        <label class="ds-button" data-variant="secondary" data-color="accent">
+          <input class="toggle" type="checkbox" />
+          <span class="icon">
+            <ExpandIcon class="expand" aria-hidden="true" />
+            <ShrinkIcon class="collapse" aria-hidden="true" />
+          </span>
+          <span class="text">Vis delmål</span>
+        </label>
+      </div>
+    )
+  }
+  {
+    rest.length > 0 && (
+      <div class="row">
+        {rest.map((goal, index) => <GoalCard goal={goal} index={index + first.length} />)}
+      </div>
+    )
+  }
 </div>
 
 <style>
   .goals {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+
+  .row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--ds-size-4);
   }
 
-  /* The checkbox lies invisible over the button, so it takes the clicks and the focus. */
-  .toggle,
-  .button {
-    position: absolute;
-    z-index: 1;
-    left: 50%;
-    top: 50%;
-    width: var(--ds-size-14);
-    height: var(--ds-size-14);
-    margin: 0;
-    border-radius: var(--ds-border-radius-full);
-    transform: translate(-50%, -50%);
-    cursor: pointer;
+  /* Under the cards: in the flow, with its text, covering nothing. */
+  .control {
+    order: 1;
+    align-self: center;
   }
 
-  .toggle {
-    z-index: 2;
-    opacity: 0;
-  }
-
-  .button {
-    display: grid;
-    place-items: center;
-    background: var(--ds-color-neutral-background-default);
-    border: var(--ds-border-width-default) solid var(--ds-color-neutral-border-subtle);
+  .ds-button {
+    --dsc-button-background: var(--ds-color-neutral-background-default);
+    --dsc-button-border-radius: var(--ds-border-radius-full);
+    position: relative;
     box-shadow: var(--ds-shadow-md);
-    color: var(--ds-color-accent-text-subtle);
-    transition: transform 0.2s ease;
   }
 
-  .toggle:hover + .button {
-    transform: translate(-50%, -50%) scale(1.06);
-  }
-
-  .toggle:focus-visible + .button {
+  .ds-button:has(.toggle:focus-visible) {
     outline: var(--ds-border-width-focus) solid var(--ds-color-focus-outer);
     box-shadow: 0 0 0 calc(var(--ds-border-width-focus) * 2) var(--ds-color-focus-inner);
   }
 
-  svg {
+  /* The checkbox lies invisible over the whole button, so it takes the clicks and the focus. */
+  .toggle {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .icon {
+    display: grid;
+  }
+
+  .icon :global(svg) {
     grid-area: 1 / 1;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
     transition:
       opacity 0.3s ease,
       transform 0.3s ease;
   }
 
-  .collapse,
-  .toggle:checked + .button .expand {
+  .icon :global(.collapse),
+  .ds-button:has(.toggle:checked) .icon :global(.expand) {
     opacity: 0;
     transform: rotate(-90deg);
   }
 
-  .toggle:checked + .button .collapse {
+  .ds-button:has(.toggle:checked) .icon :global(.collapse) {
     opacity: 1;
     transform: none;
   }
 
+  /* Where the cards meet: a strip with no height in the middle of the gap
+     between the rows, and a round button with only the icon. */
+  @media (width >= 40rem) {
+    .goals:not([data-below]) .control {
+      order: 0;
+      position: relative;
+      z-index: 1;
+      height: 0;
+      margin-block: calc(var(--ds-size-4) / -2);
+    }
+
+    .goals:not([data-below]) .ds-button {
+      --dsc-button-size: var(--ds-size-14);
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: var(--dsc-button-size);
+      height: var(--dsc-button-size);
+      padding: 0;
+      translate: -50% -50%;
+      transition: scale 0.2s ease;
+    }
+
+    .goals:not([data-below]) .ds-button:hover {
+      scale: 1.06;
+    }
+
+    /* As .ds-sr-only: read out, not shown. */
+    .goals:not([data-below]) .text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
   @media (width < 40rem) {
-    .goals {
+    .row {
       grid-template-columns: 1fr;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .button,
-    svg {
+    .ds-button,
+    .icon :global(svg) {
       transition: none;
     }
   }

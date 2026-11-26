@@ -18,6 +18,7 @@
     "@digdir/designsystemet-css": "^1.23.0",
     "@digdir/designsystemet-web": "^1.23.0",
     "@ilag/shared": "workspace:*",
+    "@navikt/aksel-icons": "^8.23.1",
     "astro": "^7.4.2",
     "markdown-it": "^15.0.3"
   },
