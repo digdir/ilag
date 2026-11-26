@@ -6,9 +6,9 @@ import {
   type Validate,
 } from 'payload'
 
-import { canEditSharedContent } from '../access/isEditor'
+import { adminOnly } from '../access/fields'
+import { sharedContentAccess } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
-import { isSignedIn } from '../access/isSignedIn'
 import { isAdmin } from '../access/isAdmin'
 import { TEAM_EDITOR_ROLES } from '../access/teamEditor'
 import { codeFromName, isCode } from '../utils/codes'
@@ -19,10 +19,30 @@ import { collectionGroups } from './groups'
 // and drops the value when access is denied, so a code made there for a
 // redaktør would be thrown away. beforeChange runs after that check and before
 // validation. A role that already has a code keeps it.
-const codeFromNameIfEmpty: FieldHook = ({ originalDoc, siblingData, value }) =>
-  value ||
-  originalDoc?.code ||
-  (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
+//
+// Only administrators may give a role one of the codes that decide who edits a
+// team (TEAM_EDITOR_ROLES): every membership with that role would get edit
+// rights on its team at once. A redaktør who names a role so that its code
+// would be one of them is refused. Scripts on the server, which run without a
+// user, still can.
+const codeFromNameIfEmpty: FieldHook = ({ originalDoc, req, siblingData, value }) => {
+  const code =
+    value ||
+    originalDoc?.code ||
+    (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
+  if (
+    req.user &&
+    !isAdmin(req.user) &&
+    code !== originalDoc?.code &&
+    TEAM_EDITOR_ROLES.includes(code)
+  ) {
+    throw new APIError(
+      `Koden «${code}» styrer hvem som kan redigere team, og kan bare gis av en administrator.`,
+      403,
+    )
+  }
+  return code
+}
 
 // Empty passes: the admin form validates before the hook above has filled it.
 const validCode: Validate = (value) =>
@@ -31,16 +51,16 @@ const validCode: Validate = (value) =>
     : 'Koden kan bare ha små bokstaver a–z, tall og bindestrek, som «teamleder».'
 
 // Who may edit a team follows the roles with these codes (TEAM_EDITOR_ROLES),
-// so deleting one would leave every team without editors. No user may delete
-// them, administrators included; their name and description can still change,
-// and the code never does. Scripts on the server, which run without a user
-// (the seed's clear, the tests' clean-up), still can.
+// so deleting one would leave every team without editors. Only administrators
+// may delete them (RO-07), as before redaktører could change roles; a
+// redaktør can still change their name and description, and the code never
+// changes. Scripts on the server, which run without a user, still can.
 const keepTeamEditorRoles: CollectionBeforeDeleteHook = async ({ id, req }) => {
-  if (!req.user) return
+  if (!req.user || isAdmin(req.user)) return
   const role = await req.payload.findByID({ collection: 'roller', id, depth: 0, req })
   if (role.code && TEAM_EDITOR_ROLES.includes(role.code)) {
     throw new APIError(
-      `Rollen «${role.name}» styrer hvem som kan redigere team, og kan ikke slettes.`,
+      `Rollen «${role.name}» styrer hvem som kan redigere team, og kan bare slettes av en administrator.`,
       403,
     )
   }
@@ -48,8 +68,9 @@ const keepTeamEditorRoles: CollectionBeforeDeleteHook = async ({ id, req }) => {
 
 // Roles a person can have in a team (RO-01), such as teamleder or produkteier,
 // described after RAMO: rolle, ansvar, myndighet og oppgaver (RO-02).
-// Administrators and redaktører maintain them (RO-07), and link each role to the team types
-// it is relevant for (RO-03).
+// Administrators and redaktører maintain them (RO-07), and link each role to
+// the team types it is relevant for (RO-03). Only administrators choose a
+// role's code or delete the roles that decide who edits a team.
 export const Roles: CollectionConfig = {
   slug: 'roller',
   dbName: 'roles',
@@ -70,12 +91,7 @@ export const Roles: CollectionConfig = {
   hooks: {
     beforeDelete: [keepTeamEditorRoles],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => canEditSharedContent(req.user),
-    update: ({ req }) => canEditSharedContent(req.user),
-    delete: ({ req }) => canEditSharedContent(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {
@@ -101,10 +117,10 @@ export const Roles: CollectionConfig = {
       access: {
         // Only administrators choose a code; for a redaktør it always comes
         // from the name.
-        create: ({ req }) => isAdmin(req.user),
+        create: adminOnly,
         // Not required in the schema, so the column could be added to
-        // databases that already had roles; those may set it once.
-        update: ({ doc }) => !doc?.code,
+        // databases that already had roles; an administrator may set it once.
+        update: ({ doc, req }) => isAdmin(req.user) && !doc?.code,
       },
       admin: {
         position: 'sidebar',
