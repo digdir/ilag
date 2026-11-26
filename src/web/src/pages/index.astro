@@ -1,26 +1,56 @@
 ---
-import { cmsFetch } from '@ilag/shared'
-
+import Changes from '../components/forside/Changes.astro'
+import Entries from '../components/forside/Entries.astro'
+import Hero from '../components/forside/Hero.astro'
+import NewTools from '../components/forside/NewTools.astro'
 import Layout from '../layouts/Layout.astro'
+import { getFrontPage } from '../lib/cms/frontPage'
+import { getNewestTools } from '../lib/cms/tools'
+import { readableFiles } from '../lib/files'
+import { newestChanges } from '../lib/frontPage'
 
-const cmsURL = import.meta.env.PUBLIC_CMS_URL
-
-let status: string
-try {
-  await cmsFetch<{ status: string }>('/health')
-  status = 'Connected — the CMS reached its database.'
-} catch (err) {
-  status = `Not reachable: ${err instanceof Error ? err.message : String(err)}`
-}
+// The front page (3.15), in the prototype's layout: the texts at the top,
+// the newest tools in the toolbox (FS-05), the changes in ilag (FS-06), and
+// the entrances for new employees (FS-02) and for those who are to set up a
+// team (FS-03). Administrators write the content in the global «Forside»;
+// a section with nothing in it is left out. The search across ilag (FS-01)
+// is in the header, on this page as on every other.
+const cookie = Astro.request.headers.get('cookie')
+const [page, tools] = await Promise.all([getFrontPage(cookie), getNewestTools(cookie)])
+const { eyebrow, title, intro, entries } = page
+const changes = newestChanges(page.changes)
+// Without an illustration of its own, or one the visitor may read, the page shows ilag's.
+const image = readableFiles(page.image ? [page.image] : [])[0]?.url ?? '/forside-illustrasjon.png'
+const hasHero = Boolean(eyebrow || title || intro)
+const empty = !hasHero && !tools.length && !changes.length && !entries?.length
 ---
 
-<Layout title="ilag — utviklingsmiljø">
-  <h1 class="ds-heading" data-size="xl">ilag</h1>
-  <p class="ds-paragraph"><a class="ds-link" href="/organisering/team">Teamoversikt</a></p>
-  <p class="ds-paragraph"><a class="ds-link" href="/organisering/linjeorganisasjon">Linjeorganisasjon</a></p>
-  <p class="ds-paragraph"><a class="ds-link" href="/folk">Folk</a></p>
-  <h2 class="ds-heading" data-size="md">Payload CMS</h2>
-  <p class="ds-paragraph">{cmsURL}</p>
-  <p class="ds-paragraph">{status}</p>
-  <p class="ds-paragraph"><a class="ds-link" href={`${cmsURL}/admin`}>Open the admin panel</a></p>
+<Layout title="ilag" wide>
+  <div class="page">
+    {hasHero ? <Hero eyebrow={eyebrow} title={title} intro={intro} image={image} /> : <h1 class="ds-heading" data-size="xl">ilag</h1>}
+    {empty && <p class="ds-paragraph">Forsiden er ikke fylt ut ennå.</p>}
+    {
+      (tools.length > 0 || changes.length > 0) && (
+        <div class="cards">
+          {tools.length > 0 && <NewTools tools={tools} />}
+          {changes.length > 0 && <Changes changes={changes} />}
+        </div>
+      )
+    }
+    {entries?.length ? <Entries entries={entries} /> : null}
+  </div>
 </Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: var(--ds-size-4);
+  }
+</style>

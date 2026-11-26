@@ -1,0 +1,52 @@
+---
+interface Props {
+  /** The id of the heading, which names the card. */
+  id: string
+  heading: string
+  /** A link to everything the card shows a part of, at the top right. */
+  more?: { label: string; href: string }
+}
+
+// A card on the front page with a heading and a list of rows separated by
+// thin lines, as in the prototype. The rows go in the slot, as <li>.
+const { id, heading, more } = Astro.props
+---
+
+<section class="ds-card" data-color="neutral" aria-labelledby={id}>
+  <div class="header">
+    <h2 class="ds-heading" data-size="xs" id={id}>{heading}</h2>
+    {more && <a class="ds-link" href={more.href}>{more.label}</a>}
+  </div>
+  <ul>
+    <slot />
+  </ul>
+</section>
+
+<style>
+  .ds-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--ds-size-3);
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  ul > :global(li) {
+    padding: var(--ds-size-3) var(--ds-size-1);
+    border-block-start: 1px solid var(--ds-color-neutral-border-subtle);
+  }
+</style>

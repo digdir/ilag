@@ -1,6 +1,6 @@
 import { authHeaders, PayloadSDKError, sdk, type Tool } from '@ilag/shared'
 
-import type { ToolWithTypes } from '../../types/tool'
+import type { NewTool, ToolWithTypes } from '../../types/tool'
 
 // The toolbox queries the pages use. Reads as the visitor, so Payload's access
 // control decides what comes back. Depth 1 brings each tool's team types;
@@ -58,3 +58,18 @@ const withTypes = ({ teamTypes, teams: _teams, ...tool }: Tool): ToolWithTypes =
     .flatMap((t) => (typeof t === 'object' ? [{ id: t.id, name: t.name }] : []))
     .sort((a, b) => a.name.localeCompare(b.name, 'nb')),
 })
+
+/** The tools most recently added to the toolbox, newest first (FS-05). */
+export async function getNewestTools(cookie: string | null, limit = 3): Promise<NewTool[]> {
+  const { docs } = await sdk.find(
+    {
+      collection: 'verktoy',
+      sort: '-createdAt',
+      limit,
+      depth: 0,
+      select: { name: true, toolType: true, description: true, createdAt: true },
+    },
+    { headers: authHeaders(cookie) },
+  )
+  return docs
+}

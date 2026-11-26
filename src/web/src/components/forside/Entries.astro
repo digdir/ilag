@@ -1,0 +1,64 @@
+---
+import type { Entry } from '../../types/frontPage'
+
+interface Props {
+  entries: Entry[]
+}
+
+// The entrances at the bottom of the front page, side by side on a tinted
+// panel: for new employees (FS-02), for those who are to set up a team
+// (FS-03), or whatever administrators add. Each link is a button; the first
+// is the main one.
+const { entries } = Astro.props
+---
+
+<div class="entries">
+  {
+    entries.map((entry, i) => (
+      <section aria-labelledby={`inngang-${i}`}>
+        <h2 class="ds-heading" data-size="sm" id={`inngang-${i}`}>
+          {entry.title}
+        </h2>
+        {entry.text && <p class="ds-paragraph">{entry.text}</p>}
+        {entry.links?.length ? (
+          <div class="buttons">
+            {entry.links.map((link, j) => (
+              <a class="ds-button" data-variant={j === 0 ? 'primary' : 'secondary'} data-size="sm" href={link.href}>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        ) : null}
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .entries {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--ds-size-7) var(--ds-size-10);
+    margin-block-start: var(--ds-size-10);
+    padding: var(--ds-size-8);
+    border-radius: var(--ds-border-radius-lg);
+    background: var(--ds-color-accent-surface-tinted);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+
+  .ds-paragraph {
+    color: var(--ds-color-neutral-text-subtle);
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-size-2);
+    margin-block-start: var(--ds-size-1);
+  }
+</style>

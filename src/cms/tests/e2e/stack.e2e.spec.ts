@@ -9,8 +9,9 @@ const testUser = { email: 'web@payloadcms.com', password: 'test' }
  * browser -> Astro SSR (:4321) -> Payload REST (:3000) -> PostgreSQL.
  *
  * The other suites stub or skip a link in it: the frontend tests stub fetch,
- * and the integration tests talk to Payload directly. The front page calls the
- * CMS health endpoint, which only answers once it has queried the database.
+ * and the integration tests talk to Payload directly. The front page reads
+ * its content and the newest tools from the CMS, which reads them from the
+ * database; it shows its heading only once both have answered.
  */
 test.describe('Full stack', () => {
   test.beforeAll(async () => {
@@ -25,7 +26,7 @@ test.describe('Full stack', () => {
     await page.goto('http://localhost:4321/')
 
     await expect(page).toHaveURL('http://localhost:4321/logg-inn?redirect=%2F')
-    await expect(page.locator('body')).not.toContainText('Connected')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Logg inn i ilag')
   })
 
   test('logs in with email and password and out again (NF-12)', async ({ page }) => {
@@ -38,7 +39,9 @@ test.describe('Full stack', () => {
     await page.getByRole('button', { name: 'Logg inn' }).click()
 
     await expect(page).toHaveURL('http://localhost:4321/')
-    await expect(page.locator('body')).toContainText('Connected — the CMS reached its database.')
+    // The front page's own heading, whatever its content says.
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).not.toHaveText('Logg inn i ilag')
     // The site header shows who is logged in, by name or else email.
     await expect(page.getByRole('banner')).toContainText(testUser.email)
 

@@ -1,0 +1,68 @@
+---
+interface Props {
+  eyebrow: string | null | undefined
+  title: string | null | undefined
+  intro: string | null | undefined
+  /** The illustration's address. */
+  image: string
+}
+
+// The top of the front page, as in the prototype: the texts on the left and
+// the illustration on the right, bottom-aligned. On a narrow screen the
+// illustration wraps below the texts. The illustration is decoration, so it
+// has no alternative text. The intro is not a single item's text, so its
+// concepts aren't marked (BG-06).
+const { eyebrow, title, intro, image } = Astro.props
+---
+
+<div class="hero">
+  <img src={image} alt="" />
+  <section>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1 class="ds-heading" data-size="xl">{title || 'ilag'}</h1>
+    {intro && <p class="ds-paragraph" data-size="lg">{intro}</p>}
+  </section>
+</div>
+
+<style>
+  .hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--ds-size-6) var(--ds-size-10);
+    padding-block-end: var(--ds-size-2);
+  }
+
+  img {
+    order: 2;
+    flex: 0 1 340px;
+    min-width: 0;
+    max-width: 340px;
+    height: auto;
+    margin-block-end: var(--ds-size-6);
+  }
+
+  section {
+    order: 1;
+    flex: 1 1 32rem;
+    min-width: 0;
+    max-width: 45rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+    padding-block: var(--ds-size-14) var(--ds-size-10);
+  }
+
+  .eyebrow {
+    margin: 0;
+    font-size: var(--ds-body-sm-font-size);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ds-color-accent-text-subtle);
+  }
+
+  .ds-paragraph {
+    color: var(--ds-color-neutral-text-subtle);
+  }
+</style>
