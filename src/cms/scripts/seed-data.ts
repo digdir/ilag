@@ -1056,3 +1056,56 @@ export const governanceFoundation = {
     'Forkjempar for digital inkludering',
   ),
 }
+
+// The front page (3.15), with the prototype's texts. The prototype's third
+// entrance is about OKR, which ilag doesn't have yet, and its changes are
+// about pages that aren't built, so these are changes ilag has had.
+const day = (date: string) => `${date}T00:00:00.000Z`
+
+export const frontPage = {
+  eyebrow: 'Rammeverk for team og leveranser',
+  title: 'Slik jobber vi sammen i Digdir',
+  intro:
+    'ilag er vår felles måte å jobbe sammen på – der vi bygger tillit, deler ansvar og drar i samme retning som ett lag.',
+  entries: [
+    {
+      title: 'Ny i Digdir?',
+      text: 'Start med organisasjonen og begrepene. Da blir resten av rammeverket lettere å lese.',
+      links: [
+        { label: 'Se organisasjonen', href: '/organisering/linjeorganisasjon' },
+        { label: 'Begreper', href: '/verktoy/begreper' },
+      ],
+    },
+    {
+      title: 'Skal du etablere et team?',
+      text: 'Veiviseren tar deg gjennom noen spørsmål og foreslår arbeidsform, mandatkrav og roller.',
+      links: [{ label: 'Start veiviseren', href: '/verktoy/veiviser' }],
+    },
+  ],
+  changes: [
+    {
+      date: day('2026-11-24'),
+      text: 'Prinsippene kan filtreres etter område.',
+      href: '/styring/prinsipper',
+    },
+    {
+      date: day('2026-11-20'),
+      text: 'Verktøyene som passer for en teamtype, vises på teamtypens side.',
+      href: '/verktoy/verktoykasse',
+    },
+    {
+      date: day('2026-11-18'),
+      text: 'Veiviseren hjelper deg å finne riktig teamtype.',
+      href: '/verktoy/veiviser',
+    },
+    {
+      date: day('2026-11-16'),
+      text: 'Team og enheter har fått mandat, som teameier godkjenner.',
+      href: '/organisering/team',
+    },
+    {
+      date: day('2026-11-06'),
+      text: 'Saman har byttet navn til ilag.',
+    },
+  ],
+}

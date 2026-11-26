@@ -143,10 +143,12 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     styringsfundament: GovernanceFoundation;
+    forside: FrontPage;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     styringsfundament: StyringsfundamentSelect<false> | StyringsfundamentSelect<true>;
+    forside: ForsideSelect<false> | ForsideSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -1343,6 +1345,63 @@ export interface GovernanceFoundation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forside".
+ */
+export interface FrontPage {
+  id: number;
+  /**
+   * Vises med små bokstaver over overskriften.
+   */
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  /**
+   * Vises ved siden av overskriften. Uten et bilde vises ilags egen illustrasjon.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Vises nederst på forsiden, side om side, for eksempel for nyansatte og for dem som skal etablere et team.
+   */
+  entries?:
+    | {
+        title: string;
+        text?: string | null;
+        /**
+         * Vises som knapper. Den første er hovedknappen.
+         */
+        links?:
+          | {
+              label: string;
+              /**
+               * En side i ilag, som «/verktoy/veiviser», eller en lenke som starter med https://.
+               */
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Forsiden viser de fem nyeste etter dato, uansett rekkefølge her.
+   */
+  changes?:
+    | {
+        date: string;
+        text: string;
+        /**
+         * Valgfri. En side i ilag, som «/verktoy/veiviser», eller en lenke som starter med https://.
+         */
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1401,6 +1460,42 @@ export interface StyringsfundamentSelect<T extends boolean = true> {
   audiences?: T;
   roles?: T;
   footnote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forside_select".
+ */
+export interface ForsideSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  image?: T;
+  entries?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  changes?:
+    | T
+    | {
+        date?: T;
+        text?: T;
+        href?: T;
+        id?: T;
+      };
   _status?: T;
   updatedAt?: T;
   createdAt?: T;
