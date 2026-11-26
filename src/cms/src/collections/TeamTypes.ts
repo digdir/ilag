@@ -1,8 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
-import { canEditSharedContent } from '../access/isEditor'
+import { sharedContentAccess } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
-import { isSignedIn } from '../access/isSignedIn'
 import { collectionGroups } from './groups'
 
 // The team types in Digdir (TK-01), such as produktteam or fagnettverk, with
@@ -25,12 +24,7 @@ export const TeamTypes: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => canEditSharedContent(req.user),
-    update: ({ req }) => canEditSharedContent(req.user),
-    delete: ({ req }) => canEditSharedContent(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {

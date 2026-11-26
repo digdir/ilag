@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { canEditSharedContent } from '../access/isEditor'
-import { isSignedIn } from '../access/isSignedIn'
+import { sharedContentAccess } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import type { SearchSubtitle } from '../search/subtitle'
 import { validHttpUrl } from '../utils/links'
@@ -41,12 +40,7 @@ export const Tools: CollectionConfig = {
   custom: {
     searchSubtitle: ((doc) => TOOL_TYPES.find((t) => t.value === doc.toolType)?.label) satisfies SearchSubtitle,
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => canEditSharedContent(req.user),
-    update: ({ req }) => canEditSharedContent(req.user),
-    delete: ({ req }) => canEditSharedContent(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {

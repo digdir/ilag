@@ -1,6 +1,9 @@
+import type { CollectionConfig } from 'payload'
+
 import type { User } from '../payload-types'
 
 import { isAdmin } from './isAdmin'
+import { isSignedIn } from './isSignedIn'
 
 // Redaktører maintain the content shared across Digdir that has no owner of
 // its own, such as tools, principles and concepts, alongside the
@@ -14,3 +17,13 @@ export const isEditor = (user: Pick<User, 'roles'> | null | undefined): boolean 
 // content.
 export const canEditSharedContent = (user: Pick<User, 'roles'> | null | undefined): boolean =>
   isAdmin(user) || isEditor(user)
+
+// The access of a collection of shared content: everyone logged in reads it,
+// administrators and redaktører create, change and delete it. One object, so
+// the collections that use it stay in step.
+export const sharedContentAccess = {
+  read: ({ req }) => isSignedIn(req.user),
+  create: ({ req }) => canEditSharedContent(req.user),
+  update: ({ req }) => canEditSharedContent(req.user),
+  delete: ({ req }) => canEditSharedContent(req.user),
+} satisfies CollectionConfig['access']

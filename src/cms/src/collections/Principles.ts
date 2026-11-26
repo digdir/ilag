@@ -1,7 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { canEditSharedContent } from '../access/isEditor'
-import { isSignedIn } from '../access/isSignedIn'
+import { sharedContentAccess } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
@@ -34,12 +33,7 @@ export const Principles: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['number', 'title', 'area'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => canEditSharedContent(req.user),
-    update: ({ req }) => canEditSharedContent(req.user),
-    delete: ({ req }) => canEditSharedContent(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'number',
   fields: [
     {

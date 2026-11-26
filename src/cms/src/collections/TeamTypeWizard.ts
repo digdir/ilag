@@ -1,8 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
-import { canEditSharedContent } from '../access/isEditor'
+import { sharedContentAccess } from '../access/isEditor'
 import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
-import { isSignedIn } from '../access/isSignedIn'
 import { collectionGroups } from './groups'
 
 // The questions in the team type wizard (TK-03). Each answer leads to another
@@ -25,12 +24,7 @@ export const TeamTypeWizard: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'isStart'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => canEditSharedContent(req.user),
-    update: ({ req }) => canEditSharedContent(req.user),
-    delete: ({ req }) => canEditSharedContent(req.user),
-  },
+  access: sharedContentAccess,
   fields: [
     { name: 'title', label: 'Spørsmål', type: 'text', required: true },
     {
