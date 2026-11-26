@@ -6,7 +6,10 @@ import type { PayloadRequest } from 'payload'
 // have no subtitle. The title is the collection's `admin.useAsTitle`.
 //
 // Only what everyone who may read the document may see: the index has no
-// field-level access (AL-04, NF-09).
+// field-level access (AL-04). And only the document's own fields, which are
+// synced when it is saved: a subtitle read from another document goes stale
+// when that one changes, until a reindex. A team's type name is the one
+// exception (ADR-0010).
 export type SearchSubtitle = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the document of any searched collection
   doc: Record<string, any>,

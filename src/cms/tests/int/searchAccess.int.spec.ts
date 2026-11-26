@@ -7,8 +7,8 @@ import { SEARCH_SLUG, SEARCHED_COLLECTIONS, type SearchedCollection } from '@/se
 import type { Person, Role, User } from '@/payload-types'
 
 // The search index is a copy, with read access of its own. Whoever may read a
-// document in its collection must find it in the search, and nobody else may
-// (FS-01, AL-04, NF-09). This checks every searched collection against every
+// document in its collection may read its search document, and nobody else
+// may (FS-01, AL-04). This checks every searched collection against every
 // kind of user, so a collection added to the search, or a change to the read
 // access of one, fails here until `sok` follows it.
 

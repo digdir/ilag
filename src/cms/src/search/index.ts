@@ -16,16 +16,18 @@ import type { SearchSubtitle } from './subtitle'
 // The index is a copy, so it has access rules of its own: only those signed in
 // read it, as with the collections it is made from. It holds no more than a
 // name, a line of context and whether the source is active, never contact
-// details, memberships or allocation (AL-04, NF-09).
+// details, memberships or allocation (AL-04). See ADR-0010.
 
 export const SEARCH_SLUG = 'sok'
 
 // The collections and their priorities, in the order their results are
 // listed: sorted by priority, each type's results stay together. The plugin
-// keeps a document's priority when it updates it, so give a new collection a
-// number between the others rather than renumbering them.
+// keeps a document's priority when it updates it, so a new collection, or a
+// changed priority, only reaches existing documents after a reindex in every
+// environment. Give a new collection a number between the others rather than
+// renumbering them.
 //
-// Whoever may read a document must find it, and nobody else:
+// Whoever may read a document may read its search document, and nobody else:
 // tests/int/searchAccess.int.spec.ts checks every collection here against the
 // read access of `sok`. Adding one needs test data for it there, and a change
 // to `read` below if the collection's own read access differs. Its hits are
@@ -47,7 +49,8 @@ export const SEARCHED_COLLECTIONS = Object.keys(PRIORITIES) as SearchedCollectio
 // The name and the line of context the searched collection gives its
 // documents (search/subtitle.ts), and whether the source is active. Teams,
 // units and people can be inactive; their documents stay, so that they come
-// back when the source does, and the search leaves them out.
+// back when the source does. The web search leaves them out with a filter in
+// its query, which decides what is shown, not who may read.
 const beforeSync: BeforeSync = async ({ collectionSlug, originalDoc: doc, payload, req, searchDoc }) => {
   const { admin, custom } = payload.collections[collectionSlug as SearchedCollection].config
   const subtitle = custom?.searchSubtitle as SearchSubtitle | undefined
