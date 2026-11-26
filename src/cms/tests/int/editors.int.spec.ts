@@ -1,6 +1,8 @@
 import {
   createLocalReq,
   getPayload,
+  initTransaction,
+  killTransaction,
   Payload,
   type CollectionSlug,
   type RequiredDataFromCollectionSlug,
@@ -16,9 +18,10 @@ import { TEAM_EDITOR_ROLES } from '@/access/teamEditor'
 import { codeFromName } from '@/utils/codes'
 
 // Redaktører maintain the shared content (tools, principles, concepts, team
-// types, the wizard and roles) alongside the administrators, read and handle
-// feedback on it (TB-02, TB-03), and see only those collections in the admin
-// panel. The roles that decide who edits a team can't be deleted.
+// types, the wizard and roles) alongside the administrators, and see only those
+// collections in the admin panel. Feedback stays with the administrators and
+// the owners of teams and units (TB-02). Only administrators choose a role's
+// code or delete the roles that decide who edits a team.
 
 let payload: Payload
 let admin: User
@@ -154,7 +157,7 @@ describe('Redaktører', () => {
     expect((await self(user)).canAccessAdmin).toBe(false)
   })
 
-  it('shows a redaktør only the shared content in the menu', () => {
+  it('shows a redaktør the shared content in the menu, and hides what only administrators change', () => {
     const args = (u: User) =>
       ({ user: { roles: u.roles } }) as unknown as Parameters<typeof hiddenUnlessAdmin>[0]
     expect(hiddenUnlessSharedContentEditor(args(editor))).toBe(false)
@@ -186,6 +189,12 @@ describe('Redaktører', () => {
       'importkjoringer',
     ] as const) {
       expect(hidden(slug), slug).toBe(true)
+    }
+    // In the menu for everyone who uses the admin panel; their lists show only
+    // what the user owns (`baseFilter` and read access), so they are empty
+    // for a redaktør who edits no team and leads no unit.
+    for (const slug of ['team', 'teammedlemskap', 'mandater', 'tilbakemeldinger'] as const) {
+      expect(hidden(slug), slug).toBe(false)
     }
   })
 
@@ -303,24 +312,76 @@ describe('Redaktører', () => {
     expect(renamed.code).toBe(byEditor.code)
   })
 
-  it('refuses to delete the roles that decide who edits a team (RO-07)', async () => {
+  it('refuses a redaktør a code that decides who edits a team (TO-08, RO-06)', async () => {
+    for (const code of TEAM_EDITOR_ROLES) {
+      // A name whose code is one of them, as a new role or on an existing role
+      // that has no code yet.
+      await expect(
+        payload.create({ collection: 'roller', data: { name: code.toUpperCase() }, ...as(editor) }),
+        code,
+      ).rejects.toThrow(/kan bare gis av en administrator/)
+
+      const uncoded = await payload.create({
+        collection: 'roller',
+        data: { name: `${prefix} Uten kode ${code}` },
+      })
+      createdRoles.push(uncoded.id)
+      await payload.db.updateOne({ collection: 'roller', id: uncoded.id, data: { code: null } })
+
+      await expect(
+        payload.update({
+          collection: 'roller',
+          id: uncoded.id,
+          data: { name: code.toUpperCase() },
+          ...as(editor),
+        }),
+        code,
+      ).rejects.toThrow(/kan bare gis av en administrator/)
+
+      // A code typed by a redaktør is dropped, and the role gets one from its name.
+      const updated = await payload.update({
+        collection: 'roller',
+        id: uncoded.id,
+        data: { code },
+        ...as(editor),
+      })
+      expect(updated.code, code).toBe(codeFromName(uncoded.name))
+    }
+  })
+
+  it('lets only an administrator delete the roles that decide who edits a team (RO-07)', async () => {
     for (const code of TEAM_EDITOR_ROLES) {
       const role = await roleWithCode(code)
-      for (const u of [admin, editor]) {
-        await expect(
-          payload.delete({ collection: 'roller', id: role.id, ...as(u) }),
-          `${code} as ${u.email}`,
-        ).rejects.toThrow(/kan ikke slettes/)
+      await expect(
+        payload.delete({ collection: 'roller', id: role.id, ...as(editor) }),
+        code,
+      ).rejects.toThrow(/kan bare slettes av en administrator/)
+
+      // The administrator's delete runs in a transaction that is rolled back,
+      // so the role is still there for the other tests.
+      const req = await createLocalReq({ user: { ...admin, collection: 'brukere' } }, payload)
+      await initTransaction(req)
+      try {
+        await payload.delete({ collection: 'roller', id: role.id, req, overrideAccess: false })
+        const { totalDocs } = await payload.count({
+          collection: 'roller',
+          where: { id: { equals: role.id } },
+          req,
+        })
+        expect(totalDocs, code).toBe(0)
+      } finally {
+        await killTransaction(req)
       }
+
       const { totalDocs } = await payload.count({
         collection: 'roller',
         where: { id: { equals: role.id } },
       })
-      expect(totalDocs).toBe(1)
+      expect(totalDocs, code).toBe(1)
     }
   })
 
-  describe('feedback on shared content (TB-02, TB-03)', () => {
+  describe('feedback (TB-02)', () => {
     let shared: Feedback
     let onTeam: Feedback
 
@@ -342,7 +403,7 @@ describe('Redaktører', () => {
       onTeam = await create({ page: `/organisering/team/${team.id}`, team: team.id })
     })
 
-    it('lets a redaktør read feedback on shared content, but not on a team', async () => {
+    it('lets a redaktør read no feedback, not even on shared content', async () => {
       const { docs } = await payload.find({
         collection: 'tilbakemeldinger',
         where: { text: { like: prefix } },
@@ -350,44 +411,23 @@ describe('Redaktører', () => {
         depth: 0,
         ...as(editor),
       })
-      expect(docs.map((d) => d.id)).toEqual([shared.id])
+      expect(docs).toEqual([])
     })
 
-    it('lets a redaktør set the status of feedback on shared content', async () => {
-      const updated = await payload.update({
-        collection: 'tilbakemeldinger',
-        id: shared.id,
-        data: { status: 'under-arbeid' },
-        depth: 0,
-        ...as(editor),
-      })
-      expect(updated.status).toBe('under-arbeid')
-      await expect(
-        payload.update({
-          collection: 'tilbakemeldinger',
-          id: onTeam.id,
-          data: { status: 'rettet' },
-          ...as(editor),
-        }),
-      ).rejects.toThrow()
-    })
-
-    it('keeps what was reported as it was', async () => {
-      const updated = await payload.update({
-        collection: 'tilbakemeldinger',
-        id: shared.id,
-        data: { text: 'Endret', category: 'annet' },
-        depth: 0,
-        ...as(editor),
-      })
-      expect(updated.text).toBe(`${prefix} /verktoy/verktoykasse`)
-      expect(updated.category).toBe('uklart')
-    })
-
-    it('refuses a redaktør to delete feedback', async () => {
-      await expect(
-        payload.delete({ collection: 'tilbakemeldinger', id: shared.id, ...as(editor) }),
-      ).rejects.toThrow()
+    it('refuses a redaktør to change or delete feedback', async () => {
+      for (const fb of [shared, onTeam]) {
+        await expect(
+          payload.update({
+            collection: 'tilbakemeldinger',
+            id: fb.id,
+            data: { status: 'under-arbeid' },
+            ...as(editor),
+          }),
+        ).rejects.toThrow()
+        await expect(
+          payload.delete({ collection: 'tilbakemeldinger', id: fb.id, ...as(editor) }),
+        ).rejects.toThrow()
+      }
     })
   })
 })
