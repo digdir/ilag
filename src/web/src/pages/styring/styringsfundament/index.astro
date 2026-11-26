@@ -8,12 +8,13 @@ import VisionCard from '../../../components/styringsfundament/VisionCard.astro'
 import Layout from '../../../layouts/Layout.astro'
 import { getGovernanceFoundation } from '../../../lib/cms/governanceFoundation'
 import { formatDate } from '../../../lib/dates'
+import { readableFiles } from '../../../lib/files'
 
 // Digdir's styringsfundament (SF-01), as administrators fill it in (SF-02),
 // in the prototype's layout. A section whose fields are empty is left out.
 const sf = await getGovernanceFoundation(Astro.request.headers.get('cookie'))
 const { intro, vision, mission, documents, goals, plan, values, audiences, roles, footnote } = sf
-const hasPlan = Boolean(plan?.text || plan?.files?.length)
+const hasPlan = Boolean(plan?.text || readableFiles(plan?.files).length)
 const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPlan, values?.length, audiences, roles, footnote].some(Boolean)
 ---
 

@@ -3,6 +3,7 @@ import type { GovernanceFoundation } from '@ilag/shared'
 
 import Markdown from '../Markdown.astro'
 import Prose from '../Prose.astro'
+import { readableFiles } from '../../lib/files'
 import Tag from '../Tag.astro'
 import FileLinks from './FileLinks.astro'
 
@@ -13,7 +14,7 @@ interface Props {
 // An external governing document, such as the allocation letter (SF-01):
 // a summary, and the points and links behind «Les mer».
 const { document } = Astro.props
-const more = Boolean(document.details || document.files?.length)
+const more = Boolean(document.details || readableFiles(document.files).length)
 ---
 
 <article class="ds-card" data-color="neutral">

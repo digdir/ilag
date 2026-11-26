@@ -1,6 +1,8 @@
 ---
 import type { Media } from '@ilag/shared'
 
+import { readableFiles } from '../../lib/files'
+
 interface Props {
   /** Files from Medier; unpopulated when the visitor may not read them. */
   files: (number | Media)[] | null | undefined
@@ -8,7 +10,7 @@ interface Props {
 
 // Links to uploaded documents, such as PDFs, which open in a new tab, with
 // each file's alternative text as the link text.
-const files = (Astro.props.files ?? []).filter((file): file is Media => typeof file === 'object' && Boolean(file.url))
+const files = readableFiles(Astro.props.files)
 ---
 
 {
