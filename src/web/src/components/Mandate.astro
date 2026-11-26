@@ -1,5 +1,6 @@
 ---
 import type { MandateView } from '../types/mandate'
+import Markdown from './Markdown.astro'
 import MandateStatus from './MandateStatus.astro'
 
 interface Props {
@@ -40,8 +41,8 @@ const who = owner === 'team' ? 'Teamet' : 'Enheten'
           <Heading class="ds-heading" data-size="2xs">
             {field.label}
           </Heading>
-          {field.html ? (
-            <div class="markdown" set:html={field.html} />
+          {field.text ? (
+            <Markdown text={field.text} />
           ) : (
             <p class="ds-paragraph empty">Ikke registrert ennå</p>
           )}
@@ -74,12 +75,5 @@ const who = owner === 'team' ? 'Teamet' : 'Enheten'
   .empty {
     margin: 0;
     color: var(--ds-color-text-subtle);
-  }
-
-  /* Room between the paragraphs and lists that markdown makes, which have no margins of their own. */
-  .markdown {
-    display: flex;
-    flex-direction: column;
-    gap: var(--ds-size-3);
   }
 </style>
