@@ -86,9 +86,10 @@ them, nobody's team memberships can be found from their session.
 2. **Editors see only what they may change.**
    - Their dashboard is «Dine team»: one card per team they edit, each opening
      the team's page, which has the team's details and its members with add,
-     edit and remove. Payload's collection cards are only on administrators'
-     dashboards. Both are Payload dashboard widgets, so the default layout is
-     chosen per user, and each user may change their own.
+     edit and remove. Payload's collection cards are only on the dashboards of
+     administrators and redaktører (below). Both are Payload dashboard widgets,
+     so the default layout is chosen per user, and each user may change their
+     own.
    - Collections they can't change are hidden from them in the panel. Lists of
      teams and memberships show only their own teams.
    - Read access through the API is unchanged: everyone signed in still reads
@@ -116,6 +117,17 @@ access, such as produkteier, prosjektleder or enhetsleder, and whether anyone
 besides administrators may create teams (TO-08), will be discussed further.
 Changing the roles is a change to the codes in `TEAM_EDITOR_ROLES`, or a move
 to a flag on the role; the rest of this decision stays the same.
+
+**Redaktører** ([#93](https://github.com/digdir/ilag/pull/93)) are the first
+users besides these to get in. A redaktør is a user role that administrators
+give under Brukere, like `admin`, for people who maintain the content shared
+across Digdir: tools, principles, concepts, team types, the team type wizard
+and roles. They use the admin panel the same way as team editors: they see
+only the collections they maintain, and their dashboard has Payload's
+collection cards, with «Dine team» above when they also edit a team. They
+don't read feedback, can't choose a role's code, and can't delete the roles
+in `TEAM_EDITOR_ROLES`; those stay with administrators. This doesn't settle
+who else gets access.
 
 ## Consequences
 
