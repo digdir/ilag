@@ -37,14 +37,15 @@ Some things shape the choice:
   names in every searched collection with Payload's `like`, as the visitor.
   Access control is exactly right without any work, and nothing is copied.
   But it is one request per collection per search, each with that
-  collection's own fields and shape, and every new collection means another
-  query in the frontend.
+  collection's own fields and shape, the results can't be ranked or limited
+  across types in one place, and every new collection means another query in
+  the frontend.
 - **Payload's search plugin (chosen).** `@payloadcms/plugin-search` keeps a
   document in a search collection for each document in the searched
   collections, through hooks on those collections, and offers a reindex. One
-  collection, with one shape and one set of access rules, holds everything
-  to search. But the index is a copy: it has access rules of its own, and it
-  can fall behind the source when a change doesn't save the indexed
+  query searches everything, in one collection with one shape and one set
+  of access rules. But the index is a copy: it has access rules of its own,
+  and it can fall behind the source when a change doesn't save the indexed
   document.
 - **PostgreSQL full-text search or `pg_trgm` behind an endpoint of our own.**
   Gives ranking and tolerance for typos. But the SQL goes past Payload, so
@@ -90,12 +91,10 @@ We use Payload's search plugin, configured in `src/cms/src/search/`.
   search leaves inactive documents out with a filter in its query. That
   filter decides what is shown, not who may read: inactive teams, units and
   people can still be read, and so can their search documents.
-- **The frontend searches as the visitor.** The header search asks an
-  endpoint in the web app, which queries `sok` with the visitor's session.
-- **A few hits of each type.** The type-ahead shows at most a few hits of
-  each type, such as five, grouped by type in the order of their
-  priorities. One type that matches many documents, such as teams for
-  «drift», can then not crowd out a person or a role that matches.
+- **One query, as the visitor.** The header search asks an endpoint in the
+  web app, which makes one query to `sok` with the visitor's session, sorted
+  by priority so each type's hits stay together, and limited to the first
+  15 hits.
 - **Search terms stay out of analytics.** Analytics (NF-08 to NF-10) must not
   record the search endpoint's requests or their query strings, nor what the
   user types or picks in the search as events (NF-09).
@@ -123,6 +122,11 @@ We use Payload's search plugin, configured in `src/cms/src/search/`.
 - When a searched collection's read access changes, the access of `sok` must
   change with it. The test makes sure we don't forget, but it compares
   documents, not fields.
+- One limit for all types lets the types with the highest priority crowd
+  out the rest: if «drift» matches 15 teams and units, no person or role is
+  shown, even one that matches. We start with the plugin as it is meant to
+  be used and see whether this happens in practice. If it does, the endpoint
+  can ask for a few hits of each type instead.
 - Matching is Payload's `like`: every word of the query must occur in the
   title, with no tolerance for typos. If that is not good enough, `pg_trgm`
   on the plugin's table is the next step, without changing this decision.
