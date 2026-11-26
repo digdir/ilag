@@ -529,6 +529,7 @@ export interface User {
    * Settes ved innlogging fra personen med samme e-post.
    */
   person?: (number | null) | Person;
+  canAccessAdmin?: boolean | null;
   identities?:
     | {
         provider: 'entra';
@@ -1092,6 +1093,7 @@ export interface BrukereSelect<T extends boolean = true> {
   lastName?: T;
   roles?: T;
   person?: T;
+  canAccessAdmin?: T;
   identities?:
     | T
     | {
