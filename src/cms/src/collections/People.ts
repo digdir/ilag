@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
 import { importEndpoints } from '../imports/endpoints'
+import type { SearchSubtitle } from '../search/subtitle'
 import { collectionGroups } from './groups'
 
 // Employees and contractors, imported from Digdir's authoritative source
@@ -33,6 +34,9 @@ export const People: CollectionConfig = {
     hidden: hiddenFromEditors,
     useAsTitle: 'fullName',
     defaultColumns: ['fullName', 'title', 'units', 'location', 'isEmployee', 'active'],
+  },
+  custom: {
+    searchSubtitle: ((doc) => doc.title) satisfies SearchSubtitle,
   },
   endpoints: importEndpoints('people'),
   access: {

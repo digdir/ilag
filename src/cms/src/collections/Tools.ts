@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
 import { isSignedIn } from '../access/isSignedIn'
 import { hiddenFromEditors } from '../access/teamEditor'
+import type { SearchSubtitle } from '../search/subtitle'
 import { validHttpUrl } from '../utils/links'
 import { collectionGroups } from './groups'
 
@@ -36,6 +37,9 @@ export const Tools: CollectionConfig = {
     hidden: hiddenFromEditors,
     useAsTitle: 'name',
     defaultColumns: ['name', 'toolType', 'teamTypes'],
+  },
+  custom: {
+    searchSubtitle: ((doc) => TOOL_TYPES.find((t) => t.value === doc.toolType)?.label) satisfies SearchSubtitle,
   },
   access: {
     read: ({ req }) => isSignedIn(req.user),

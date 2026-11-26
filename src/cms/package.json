@@ -21,6 +21,7 @@
   "dependencies": {
     "@payloadcms/db-postgres": "3.94.1",
     "@payloadcms/next": "3.94.1",
+    "@payloadcms/plugin-search": "3.94.1",
     "@payloadcms/richtext-lexical": "3.94.1",
     "@payloadcms/translations": "3.94.1",
     "@payloadcms/ui": "3.94.1",

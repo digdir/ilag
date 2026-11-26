@@ -1,0 +1,123 @@
+---
+import { MIN_QUERY_LENGTH } from '../lib/cms/search'
+---
+
+<!--
+  The search across ilag in the header (FS-01): type part of the name of a
+  team, unit, person, role or tool, and pick it to go to its page. Built on
+  Designsystemet's Suggestion, which handles the keyboard and the screen
+  reader texts; the script below fills its list from /sok.json, since the CMS
+  does the matching. Without JavaScript the field does nothing.
+-->
+<ds-field class="ds-field site-search" data-size="sm">
+  <label class="ds-label ds-sr-only" for="site-search">Søk i ilag</label>
+  <ds-suggestion class="ds-suggestion" data-site-search data-min={MIN_QUERY_LENGTH}>
+    <input class="ds-input" id="site-search" type="search" placeholder="Søk etter team, enheter, folk …" autocomplete="off" />
+    <u-datalist data-nofilter>
+      <u-option data-empty>Ingen treff</u-option>
+    </u-datalist>
+  </ds-suggestion>
+</ds-field>
+
+<script>
+  import type { SearchHit } from '../types/search'
+
+  // A short pause after the last key, so a fast typist sends one search.
+  const DELAY_MS = 200
+
+  for (const box of document.querySelectorAll<HTMLElement>('[data-site-search]')) {
+    const input = box.querySelector<HTMLInputElement>('input')!
+    const list = box.querySelector<HTMLElement>('u-datalist')!
+    const empty = list.querySelector<HTMLElement>('[data-empty]')!
+    const min = Number(box.dataset.min)
+    let timer: ReturnType<typeof setTimeout> | undefined
+    let pending: AbortController | undefined
+
+    const option = (hit: SearchHit) => {
+      const el = document.createElement('u-option')
+      el.setAttribute('value', hit.url)
+      el.setAttribute('label', hit.title)
+      const title = document.createElement('span')
+      title.className = 'title'
+      title.textContent = hit.title
+      const meta = document.createElement('span')
+      meta.className = 'meta'
+      meta.textContent = [hit.kindLabel, hit.subtitle].filter(Boolean).join(' · ')
+      el.append(title, meta)
+      return el
+    }
+
+    const show = (hits: SearchHit[], emptyText = 'Ingen treff') => {
+      empty.textContent = emptyText
+      list.replaceChildren(...hits.map(option), empty)
+    }
+
+    const run = async (query: string) => {
+      pending?.abort()
+      pending = new AbortController()
+      try {
+        const response = await fetch(`/sok.json?q=${encodeURIComponent(query)}`, { signal: pending.signal })
+        if (!response.ok) throw new Error(String(response.status))
+        show(await response.json())
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') show([], 'Søket virker ikke akkurat nå')
+      }
+    }
+
+    input.addEventListener('input', (event) => {
+      // Picking a hit fills in its name, which needs no new search.
+      if (!(event instanceof InputEvent) || !event.isTrusted) return
+      clearTimeout(timer)
+      const query = input.value.trim()
+      if (query.length < min) {
+        pending?.abort()
+        show([], query ? `Skriv minst ${min} tegn` : 'Ingen treff')
+        return
+      }
+      show([], 'Søker …')
+      timer = setTimeout(() => run(query), DELAY_MS)
+    })
+
+    // A hit's value is its page.
+    box.addEventListener('comboboxafterselect', (event) => {
+      const chosen = (event as CustomEvent<HTMLDataElement>).detail
+      if (chosen?.isConnected && chosen.value.startsWith('/')) window.location.assign(chosen.value)
+    })
+  }
+</script>
+
+<style>
+  .site-search {
+    flex: 1 1 16rem;
+    max-width: 28rem;
+  }
+
+  /*
+   * A quieter focus than Designsystemet's ring around the field: its border
+   * in the accent colour, a little thicker. Still clearly visible (WCAG 2.4.7).
+   */
+  .site-search :global(.ds-input:focus-visible) {
+    box-shadow: none;
+    outline: 2px solid var(--ds-color-accent-border-strong);
+    outline-offset: -1px;
+  }
+
+  /*
+   * Designsystemet makes the list as wide as the field and as tall as the room
+   * below it, the height set on the element itself. Long enough for about six
+   * hits here; the rest scroll.
+   */
+  .site-search :global(u-datalist) {
+    max-height: min(24rem, 60vh) !important;
+  }
+
+  .site-search :global(u-option) {
+    display: grid;
+    gap: var(--ds-size-1);
+  }
+
+  .site-search :global(u-option .meta) {
+    color: var(--ds-color-neutral-text-subtle);
+    font-size: 0.875rem;
+  }
+</style>
