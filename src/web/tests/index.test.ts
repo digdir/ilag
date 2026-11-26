@@ -128,7 +128,7 @@ describe('front page', () => {
       /Endringer i ilag[\s\S]*title="24. november 2026"[^>]*>\s*24. nov.[\s\S]*Prinsippene kan filtreres[\s\S]*20. nov.[\s\S]*18. nov.[\s\S]*16. nov.[\s\S]*6. nov.[\s\S]*Saman har byttet navn/,
     )
     expect(html).not.toContain('Den eldste endringen')
-    expect(html).toMatch(/<a class="ds-link" href="\/styring\/prinsipper"[^>]*>Prinsippene kan filtreres/)
+    expect(html).toMatch(/<a class="ds-link" data-color="neutral" href="\/styring\/prinsipper"[^>]*>Prinsippene kan filtreres/)
     expect(html).toMatch(/<span[^>]*>Saman har byttet navn til ilag.<\/span>/)
   })
 

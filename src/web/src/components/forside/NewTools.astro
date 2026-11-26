@@ -18,7 +18,7 @@ const { tools } = Astro.props
     tools.map((tool) => (
       <li>
         <span class="head">
-          <a class="ds-link" href={toolHref(tool.id)}>
+          <a class="ds-link" data-color="neutral" href={toolHref(tool.id)}>
             {tool.name}
           </a>
           <span class="meta">

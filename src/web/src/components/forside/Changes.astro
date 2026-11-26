@@ -21,7 +21,7 @@ const { changes } = Astro.props
         <time class="date" datetime={change.date.slice(0, 10)} title={formatDate(change.date)}>
           {formatShortDate(change.date)}
         </time>
-        {change.href ? <a class="ds-link" href={change.href}>{change.text}</a> : <span>{change.text}</span>}
+        {change.href ? <a class="ds-link" data-color="neutral" href={change.href}>{change.text}</a> : <span>{change.text}</span>}
       </li>
     ))
   }

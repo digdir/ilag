@@ -8,14 +8,17 @@ interface Props {
 }
 
 // A card on the front page with a heading and a list of rows separated by
-// thin lines, as in the prototype. The rows go in the slot, as <li>.
+// thin lines, as in the prototype. The rows go in the slot, as <li>. Links in a
+// card are black: they set `data-color="neutral"` themselves, since a link
+// that inherits the card's colour is grey. They have no underline until the
+// pointer is over them.
 const { id, heading, more } = Astro.props
 ---
 
 <section class="ds-card" data-color="neutral" aria-labelledby={id}>
   <div class="header">
     <h2 class="ds-heading" data-size="xs" id={id}>{heading}</h2>
-    {more && <a class="ds-link" href={more.href}>{more.label}</a>}
+    {more && <a class="ds-link" data-color="neutral" href={more.href}>{more.label}</a>}
   </div>
   <ul>
     <slot />
@@ -35,6 +38,10 @@ const { id, heading, more } = Astro.props
     justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--ds-size-3);
+  }
+
+  .ds-card :global(.ds-link:not(:hover)) {
+    text-decoration-line: none;
   }
 
   ul {
