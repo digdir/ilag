@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { isSignedIn } from '../access/isSignedIn'
 import { collectionGroups } from './groups'
 
@@ -20,8 +20,8 @@ export const Locations: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.organisation,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // Only administrators see it in the admin panel's menu.
+    hidden: hiddenUnlessAdmin,
     useAsTitle: 'name',
     defaultColumns: ['name', 'code'],
   },

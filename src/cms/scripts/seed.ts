@@ -271,13 +271,20 @@ const seed = async (payload: Payload) => {
     count('mandater')
   }
 
-  // Users for some of the people, to try the admin panel as a team editor or
-  // as someone who may not edit, linked the way an Entra ID login links them.
-  for (const { person, email } of data.users) {
+  // Users for some of the people, to try the admin panel as a team editor, a
+  // redaktør or someone who may not edit, linked the way an Entra ID login
+  // links them.
+  for (const user of data.users) {
+    const { person, email } = user
     if (!(await findId(payload, 'brukere', { email: { equals: email } }))) {
       await payload.create({
         collection: 'brukere',
-        data: { email, password: ADMIN.password, person: personIds.get(person) },
+        data: {
+          email,
+          password: ADMIN.password,
+          person: personIds.get(person),
+          roles: 'roles' in user ? [...user.roles] : undefined,
+        },
       })
       count('brukere')
     }

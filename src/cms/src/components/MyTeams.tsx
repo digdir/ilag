@@ -6,8 +6,9 @@ import { isAdmin } from '@/access/isAdmin'
 import { teamsEditedBy } from '@/access/teamEditor'
 
 // The dashboard widget for teameiere and teamledere (TO-08, RO-06): the teams
-// they edit, each a link to the team's page. It is all they see
-// on the dashboard (see `dashboard` in payload.config.ts).
+// they edit, each a link to the team's page. It is all they see on the
+// dashboard, unless they are also redaktører, who get Payload's collection
+// cards below it (see `dashboard` in payload.config.ts).
 export async function MyTeams({ req, user }: WidgetServerProps) {
   const { i18n, payload } = req
   if (!user || isAdmin(user)) return null

@@ -9,6 +9,9 @@ import { conceptsFor } from './lib/cms/concepts'
 // each user may read.
 const PUBLIC_PATHS = ['/logg-inn', '/logg-inn/']
 
+// Endpoints that answer with data, not a page, and need no concepts to explain.
+const DATA_PATHS = ['/sok.json']
+
 export const onRequest = defineMiddleware(async (context, next) => {
   if (PUBLIC_PATHS.includes(context.url.pathname)) return next()
 
@@ -29,6 +32,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   context.locals.user = user
+  if (DATA_PATHS.includes(context.url.pathname)) return next()
   // Start reading the concepts Prose explains (BG-06) now, alongside the
   // page's own reads, instead of after them. The read never fails.
   void conceptsFor(context.locals, context.request.headers.get('cookie'))

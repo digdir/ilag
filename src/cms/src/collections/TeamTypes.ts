@@ -1,13 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
-import { isSignedIn } from '../access/isSignedIn'
+import { sharedContentAccess } from '../access/isEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
 // The team types in Digdir (TK-01), such as produktteam or fagnettverk, with
 // what characterises each. Every team has one (TO-02). Administrators
-// maintain them.
+// and redaktører maintain them.
 export const TeamTypes: CollectionConfig = {
   slug: 'teamtyper',
   dbName: 'team_types',
@@ -20,17 +19,12 @@ export const TeamTypes: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.team,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // In the admin panel's menu for administrators and redaktører.
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'name',
     defaultColumns: ['name'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {

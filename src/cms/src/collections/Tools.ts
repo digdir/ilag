@@ -1,8 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
-import { isSignedIn } from '../access/isSignedIn'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { sharedContentAccess } from '../access/isEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
+import type { SearchSubtitle } from '../search/subtitle'
 import { validHttpUrl } from '../utils/links'
 import { collectionGroups } from './groups'
 
@@ -17,7 +17,7 @@ export const TOOL_TYPES = [
 ] as const
 
 // The toolbox (VK-01): recommended methods, templates, guides and tools for
-// working in teams and projects. Administrators maintain it; a team's
+// working in teams and projects. Administrators and redaktører maintain it; a team's
 // teameier and teamleder choose the tools the team uses on the team (VK-06).
 export const Tools: CollectionConfig = {
   slug: 'verktoy',
@@ -32,17 +32,15 @@ export const Tools: CollectionConfig = {
   admin: {
     group: collectionGroups.team,
     // Team editors pick tools on their team, which reads them; they don't
-    // need the collection in the menu.
-    hidden: hiddenFromEditors,
+    // need the collection in the menu. Redaktører maintain it.
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'toolType', 'teamTypes'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
+  custom: {
+    searchSubtitle: ((doc) => TOOL_TYPES.find((t) => t.value === doc.toolType)?.label) satisfies SearchSubtitle,
   },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {
