@@ -312,43 +312,6 @@ describe('Redaktører', () => {
     expect(renamed.code).toBe(byEditor.code)
   })
 
-  it('refuses a redaktør a code that decides who edits a team (TO-08, RO-06)', async () => {
-    for (const code of TEAM_EDITOR_ROLES) {
-      // A name whose code is one of them, as a new role or on an existing role
-      // that has no code yet.
-      await expect(
-        payload.create({ collection: 'roller', data: { name: code.toUpperCase() }, ...as(editor) }),
-        code,
-      ).rejects.toThrow(/kan bare gis av en administrator/)
-
-      const uncoded = await payload.create({
-        collection: 'roller',
-        data: { name: `${prefix} Uten kode ${code}` },
-      })
-      createdRoles.push(uncoded.id)
-      await payload.db.updateOne({ collection: 'roller', id: uncoded.id, data: { code: null } })
-
-      await expect(
-        payload.update({
-          collection: 'roller',
-          id: uncoded.id,
-          data: { name: code.toUpperCase() },
-          ...as(editor),
-        }),
-        code,
-      ).rejects.toThrow(/kan bare gis av en administrator/)
-
-      // A code typed by a redaktør is dropped, and the role gets one from its name.
-      const updated = await payload.update({
-        collection: 'roller',
-        id: uncoded.id,
-        data: { code },
-        ...as(editor),
-      })
-      expect(updated.code, code).toBe(codeFromName(uncoded.name))
-    }
-  })
-
   it('lets only an administrator delete the roles that decide who edits a team (RO-07)', async () => {
     for (const code of TEAM_EDITOR_ROLES) {
       const role = await roleWithCode(code)

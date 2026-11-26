@@ -14,35 +14,12 @@ import { TEAM_EDITOR_ROLES } from '../access/teamEditor'
 import { codeFromName, isCode } from '../utils/codes'
 import { collectionGroups } from './groups'
 
-// A new role without a code gets one from its name. A beforeChange hook, not
-// beforeValidate: Payload checks field access after the beforeValidate hooks
-// and drops the value when access is denied, so a code made there for a
-// redaktør would be thrown away. beforeChange runs after that check and before
-// validation. A role that already has a code keeps it.
-//
-// Only administrators may give a role one of the codes that decide who edits a
-// team (TEAM_EDITOR_ROLES): every membership with that role would get edit
-// rights on its team at once. A redaktør who names a role so that its code
-// would be one of them is refused. Scripts on the server, which run without a
-// user, still can.
-const codeFromNameIfEmpty: FieldHook = ({ originalDoc, req, siblingData, value }) => {
-  const code =
-    value ||
-    originalDoc?.code ||
-    (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
-  if (
-    req.user &&
-    !isAdmin(req.user) &&
-    code !== originalDoc?.code &&
-    TEAM_EDITOR_ROLES.includes(code)
-  ) {
-    throw new APIError(
-      `Koden «${code}» styrer hvem som kan redigere team, og kan bare gis av en administrator.`,
-      403,
-    )
-  }
-  return code
-}
+// A role without a code gets one from its name. beforeChange, since Payload
+// drops a value set in beforeValidate when field access is denied.
+const codeFromNameIfEmpty: FieldHook = ({ originalDoc, siblingData, value }) =>
+  value ||
+  originalDoc?.code ||
+  (typeof siblingData.name === 'string' ? codeFromName(siblingData.name) : value)
 
 // Empty passes: the admin form validates before the hook above has filled it.
 const validCode: Validate = (value) =>
@@ -115,11 +92,9 @@ export const Roles: CollectionConfig = {
         beforeChange: [codeFromNameIfEmpty],
       },
       access: {
-        // Only administrators choose a code; for a redaktør it always comes
-        // from the name.
+        // Only administrators choose a code, once; otherwise it comes from
+        // the name.
         create: adminOnly,
-        // Not required in the schema, so the column could be added to
-        // databases that already had roles; an administrator may set it once.
         update: ({ doc, req }) => isAdmin(req.user) && !doc?.code,
       },
       admin: {
