@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import type { GovernanceFoundation, User } from '@/payload-types'
 
-// The styringsfundament (SF-01, SF-02, SF-05): administrators edit it, every
+// The styringsfundament (SF-01, SF-02): administrators edit it, every
 // change is kept as a version, and signed-in readers see only what is published.
 
 let payload: Payload
@@ -36,7 +36,7 @@ describe('Styringsfundament', () => {
     await payload.delete({ collection: 'brukere', where: { email: { like: prefix } } })
   })
 
-  it('SF-01, SF-05: signed-in users read the published version, not a draft', async () => {
+  it('SF-01: signed-in users read the published version, not a draft', async () => {
     await payload.updateGlobal({ slug, data: withVision('Utkast'), draft: true, ...as(admin) })
 
     expect(visionOf(await payload.findGlobal({ slug, ...as(user) }))).toBe('Publisert visjon')
@@ -53,7 +53,7 @@ describe('Styringsfundament', () => {
     await expect(payload.findGlobalVersions({ slug, ...as(user) })).rejects.toThrow()
   })
 
-  it('SF-05: keeps every published change as a version', async () => {
+  it('keeps every published change as a version, for the admin panel', async () => {
     const before = (await payload.findGlobalVersions({ slug, ...as(admin) })).totalDocs
 
     await payload.updateGlobal({ slug, data: { ...withVision('Ny visjon'), _status: 'published' }, ...as(admin) })

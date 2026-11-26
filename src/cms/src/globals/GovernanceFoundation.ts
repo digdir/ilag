@@ -25,8 +25,9 @@ const files: Field = {
 
 // Digdir's styringsfundament (SF-01): vision, mission, goals, values, users
 // and roles on one page, in fixed fields; the page decides the layout.
-// Administrators maintain it (SF-02); every change is kept as a version
-// (SF-05), and readers see only the published one.
+// Administrators maintain it (SF-02); every change is kept as a version,
+// which administrators see in the admin panel, and readers see only the
+// published one. A history for readers (SF-05) is not built yet.
 export const GovernanceFoundation: GlobalConfig = {
   slug: 'styringsfundament',
   dbName: 'governance_foundation',
