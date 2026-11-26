@@ -1,4 +1,5 @@
-# Lint, type checks and tests for every pull request to main.
+# Lint, type checks and tests for every pull request to main. Jobs and steps
+# that the changed files cannot affect are skipped; see the `changes` job.
 name: CI
 
 on:
@@ -14,7 +15,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Decides what the pull request can affect. lint, test and e2e are required
+  # status checks, so they are skipped with `if:` (a skipped job counts as
+  # passed) instead of with a `paths:` filter on the workflow, which would leave
+  # them pending. If this job fails, the others run everything.
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      cms: ${{ steps.filter.outputs.cms }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - id: filter
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          cms=false
+          web=false
+          files=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename')
+          while IFS= read -r f; do
+            case "$f" in
+              '') ;;
+              # Documentation, the prototype and the sandbox agent are not
+              # built or tested.
+              *.md | docs/* | prototype/* | agent/* | .claude/* | .mcp.json) ;;
+              # Not used in CI: Postgres is a service below, and the
+              # prototype deploys from its own workflow.
+              docker-compose.yml | scripts/dev-switch.mjs | renovate.json | .gitignore | .github/workflows/deploy-prototype.yml) ;;
+              # The shared package is used by both.
+              src/shared/*) cms=true web=true ;;
+              src/cms/*) cms=true ;;
+              src/web/*) web=true ;;
+              # Anything else, such as the lockfile, root config, the setup
+              # script or this workflow, can affect both.
+              *) cms=true web=true ;;
+            esac
+          done <<< "$files"
+          echo "cms=$cms" >> "$GITHUB_OUTPUT"
+          echo "web=$web" >> "$GITHUB_OUTPUT"
+          echo "Changed files:"; echo "$files"
+          echo "cms=$cms web=$web"
+
   lint:
+    needs: changes
+    # Runs when the filter failed, so a broken filter never skips a check.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.cms == 'true' || needs.changes.outputs.web == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -27,10 +74,16 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
+        if: ${{ needs.changes.outputs.cms != 'false' }}
       - run: pnpm check:web
+        if: ${{ needs.changes.outputs.web != 'false' }}
       - run: pnpm check:cms
+        if: ${{ needs.changes.outputs.cms != 'false' }}
 
   test:
+    needs: changes
+    # Runs when the filter failed, so a broken filter never skips a check.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.cms == 'true' || needs.changes.outputs.web == 'true') }}
     runs-on: ubuntu-latest
     services:
       # Same image and credentials as docker-compose.yml, which .env.example
@@ -62,9 +115,15 @@ jobs:
       # `run` is needed: some pnpm versions run their own built-in `setup`
       # command, which installs pnpm globally, instead of the script.
       - run: pnpm run setup
-      - run: pnpm test
+      - run: pnpm test:int
+        if: ${{ needs.changes.outputs.cms != 'false' }}
+      - run: pnpm test:web
+        if: ${{ needs.changes.outputs.web != 'false' }}
 
   e2e:
+    needs: changes
+    # Runs when the filter failed, so a broken filter never skips a check.
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.cms == 'true' || needs.changes.outputs.web == 'true') }}
     runs-on: ubuntu-latest
     services:
       postgres:
