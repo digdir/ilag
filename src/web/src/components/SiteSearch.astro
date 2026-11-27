@@ -13,9 +13,7 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
   <label class="ds-label ds-sr-only" for="site-search">Søk i ilag</label>
   <ds-suggestion class="ds-suggestion" data-site-search data-min={MIN_QUERY_LENGTH}>
     <input class="ds-input" id="site-search" type="search" placeholder="Søk etter team, enheter, folk …" autocomplete="off" />
-    <u-datalist data-nofilter>
-      <u-option data-empty>Ingen treff</u-option>
-    </u-datalist>
+    <u-datalist data-nofilter></u-datalist>
   </ds-suggestion>
 </ds-field>
 
@@ -28,7 +26,10 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
   for (const box of document.querySelectorAll<HTMLElement>('[data-site-search]')) {
     const input = box.querySelector<HTMLInputElement>('input')!
     const list = box.querySelector<HTMLElement>('u-datalist')!
-    const empty = list.querySelector<HTMLElement>('[data-empty]')!
+    // Suggestion shows this option when there are no hits. It is only in the
+    // list once something has been typed, so an empty field opens no list.
+    const empty = document.createElement('u-option')
+    empty.toggleAttribute('data-empty', true)
     const min = Number(box.dataset.min)
     let timer: ReturnType<typeof setTimeout> | undefined
     let pending: AbortController | undefined
@@ -71,7 +72,8 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
       const query = input.value.trim()
       if (query.length < min) {
         pending?.abort()
-        show([], query ? `Skriv minst ${min} tegn` : 'Ingen treff')
+        if (query) show([], `Skriv minst ${min} tegn`)
+        else list.replaceChildren()
         return
       }
       show([], 'Søker …')
@@ -109,6 +111,11 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
    */
   .site-search :global(u-datalist) {
     max-height: min(24rem, 60vh) !important;
+  }
+
+  /* Nothing typed yet: no list, not an empty box under the field. */
+  .site-search :global(u-datalist:empty) {
+    display: none !important;
   }
 
   .site-search :global(u-option) {
