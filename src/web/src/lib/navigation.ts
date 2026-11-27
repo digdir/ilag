@@ -3,6 +3,8 @@
 // (`/organisering/...`). A page is `built` once it exists; the others are
 // shown in the submenu without a link, so the structure is visible.
 
+import type { IconName } from './icons'
+
 export interface NavPage {
   label: string
   href: string
@@ -11,6 +13,8 @@ export interface NavPage {
 
 export interface NavGroup {
   label: string
+  /** The icon before the label in the main menu, as in the prototype. */
+  icon?: IconName
   /** The group's folder: the group is current on every page below it. */
   path: string
   pages: NavPage[]
@@ -19,6 +23,7 @@ export interface NavGroup {
 export const NAV: NavGroup[] = [
   {
     label: 'Styring',
+    icon: 'Compass',
     path: '/styring',
     pages: [
       { label: 'Styringsfundament', href: '/styring/styringsfundament', built: true },
@@ -28,11 +33,13 @@ export const NAV: NavGroup[] = [
   },
   {
     label: 'Folk',
+    icon: 'PersonGroup',
     path: '/folk',
     pages: [{ label: 'Folk', href: '/folk', built: true }],
   },
   {
     label: 'Organisering',
+    icon: 'Buildings3',
     path: '/organisering',
     pages: [
       { label: 'Team', href: '/organisering/team', built: true },
@@ -43,6 +50,7 @@ export const NAV: NavGroup[] = [
   },
   {
     label: 'Verktøy',
+    icon: 'Wrench',
     path: '/verktoy',
     pages: [
       { label: 'Verktøykasse', href: '/verktoy/verktoykasse', built: true },

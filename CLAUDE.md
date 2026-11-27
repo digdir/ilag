@@ -170,7 +170,9 @@ change the files, not the collections, and keep them in step with the contracts.
   of answering from memory: the frontend is on Astro 7, and its APIs change between
   majors.
 - The e2e tests write to whatever `DATABASE_URL` points at — they seed and delete
-  a user and a media document. Local databases only.
+  a user and a media document. Local databases only. They find elements by
+  role, label or text before `data-testid`, like the frontend's render tests
+  (see «Finding elements in tests» in `src/web/CLAUDE.md`).
 
 ## Branches
 
