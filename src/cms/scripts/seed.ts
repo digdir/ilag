@@ -3,7 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { isDeepStrictEqual } from 'util'
 
-import { getPayload, type CollectionSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
+import { getPayload, type CollectionSlug, type GlobalSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
 import config from '@payload-config'
 
 import type { ImportError } from '../src/imports/csv'
@@ -314,11 +314,13 @@ const seed = async (payload: Payload) => {
 
   // A global can't be created or deleted, only filled in, and only while
   // nothing is there, not even a draft.
-  const foundation = await foundationState(payload)
-  if (foundation === 'empty') {
-    await payload.updateGlobal({ slug: 'styringsfundament', data: { ...data.governanceFoundation, _status: 'published' } })
-    console.log('Filled in styringsfundament')
-  } else if (foundation === 'edited') console.log('Left styringsfundament as it is: it has been edited')
+  for (const global of SEEDED_GLOBALS) {
+    const state = await globalState(payload, global)
+    if (state === 'empty') {
+      await publishGlobal(payload, global.slug, global.data)
+      console.log(`Filled in ${global.slug}`)
+    } else if (state === 'edited') console.log(`Left ${global.slug} as it is: it has been edited`)
+  }
 
   return created
 }
@@ -341,26 +343,45 @@ const normalize = (value: unknown): unknown => {
   return value === null || value === '' ? undefined : value
 }
 
-// Whether the styringsfundament's latest version, a draft included, is
-// empty, still the seed's, or edited since. Only the fields the seed fills
-// in count, except the plan's title: Payload fills in its default even when
-// nothing is saved, and the seed uses the same title.
-const foundationState = async (payload: Payload): Promise<'empty' | 'seed' | 'edited'> => {
-  const stored = { ...(await payload.findGlobal({ slug: 'styringsfundament', draft: true, depth: 0 })) } as Record<string, unknown>
+// The globals the seed fills in, with what it fills in. `content` picks out
+// what counts when comparing a global with the seed; by default, the fields
+// the seed fills in.
+interface SeededGlobal {
+  slug: GlobalSlug
+  data: Record<string, unknown>
+  content?: (key: string, value: unknown) => unknown
+}
+
+const SEEDED_GLOBALS: SeededGlobal[] = [
+  {
+    slug: 'styringsfundament',
+    data: data.governanceFoundation,
+    // Payload fills in the plan's default title even when nothing is saved,
+    // and the seed uses the same title, so it doesn't count.
+    content: (key, value) => {
+      if (key !== 'plan' || !value || typeof value !== 'object') return value
+      const { title: _title, ...plan } = value as Record<string, unknown>
+      return plan
+    },
+  },
+  { slug: 'forside', data: data.frontPage },
+]
+
+// Publishes new content for a global. Its data type depends on which global
+// it is, which TypeScript can't follow through the list above.
+const publishGlobal = (payload: Payload, slug: GlobalSlug, content: Record<string, unknown>) =>
+  payload.updateGlobal({ slug, data: { ...content, _status: 'published' } as never })
+
+// Whether a global's latest version, a draft included, is empty, still the
+// seed's, or edited since. Only the fields the seed fills in count.
+const globalState = async (payload: Payload, global: SeededGlobal): Promise<'empty' | 'seed' | 'edited'> => {
+  const stored = { ...(await payload.findGlobal({ slug: global.slug, draft: true, depth: 0 })) } as Record<string, unknown>
+  const pick = global.content ?? ((_key: string, value: unknown) => value)
   const content = (source: Record<string, unknown>) =>
-    normalize(
-      Object.fromEntries(
-        Object.keys(data.governanceFoundation).map((key) => {
-          const value = source[key]
-          if (key !== 'plan' || !value || typeof value !== 'object') return [key, value]
-          const { title: _title, ...plan } = value as Record<string, unknown>
-          return [key, plan]
-        }),
-      ),
-    )
+    normalize(Object.fromEntries(Object.keys(global.data).map((key) => [key, pick(key, source[key])])))
   const current = content(stored)
   if (current === undefined) return 'empty'
-  return isDeepStrictEqual(current, content(data.governanceFoundation)) ? 'seed' : 'edited'
+  return isDeepStrictEqual(current, content(global.data)) ? 'seed' : 'edited'
 }
 
 // Deletes what the seed creates, matched on the same keys: the memberships
@@ -396,19 +417,21 @@ const removeSeed = async (payload: Payload) => {
     if (docs.length) console.log(`Deleted ${docs.length} from ${collection}`)
     for (const { message } of errors) console.error(`  ${collection}: ${message}`)
   }
-  // Empties every field while the content is still the seed's, keeping the
-  // versions. Content an administrator has written is left as it is.
-  const foundation = await foundationState(payload)
-  if (foundation === 'edited') console.log('Left styringsfundament as it is: it has been edited')
-  if (foundation !== 'seed') return
-  const empty = Object.fromEntries(
-    Object.entries(data.governanceFoundation).map(([key, value]) => [
-      key,
-      Array.isArray(value) ? [] : typeof value === 'object' ? Object.fromEntries(Object.keys(value).map((k) => [k, null])) : null,
-    ]),
-  )
-  await payload.updateGlobal({ slug: 'styringsfundament', data: { ...empty, _status: 'published' } })
-  console.log('Emptied styringsfundament')
+  // Empties every field of a global while its content is still the seed's,
+  // keeping the versions. Content an administrator has written is left as it is.
+  for (const global of SEEDED_GLOBALS) {
+    const state = await globalState(payload, global)
+    if (state === 'edited') console.log(`Left ${global.slug} as it is: it has been edited`)
+    if (state !== 'seed') continue
+    const empty = Object.fromEntries(
+      Object.entries(global.data).map(([key, value]) => [
+        key,
+        Array.isArray(value) ? [] : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).map((k) => [k, null])) : null,
+      ]),
+    )
+    await publishGlobal(payload, global.slug, empty)
+    console.log(`Emptied ${global.slug}`)
+  }
 }
 
 if (process.env.NODE_ENV === 'production') {

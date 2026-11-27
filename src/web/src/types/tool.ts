@@ -13,3 +13,6 @@ export type ToolWithTypes = Omit<Tool, 'teamTypes' | 'teams'> & {
 
 /** A tool as a team lists it (TO-07). */
 export type ToolSummary = Pick<Tool, 'id' | 'name' | 'toolType'>
+
+/** A tool as the front page lists it among the newest (FS-05). */
+export type NewTool = Pick<Tool, 'id' | 'name' | 'toolType' | 'description' | 'createdAt'>
