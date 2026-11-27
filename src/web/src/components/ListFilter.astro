@@ -1,4 +1,6 @@
 ---
+import SearchField from './SearchField.astro'
+
 interface Chip {
   value: string
   label: string
@@ -58,10 +60,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
 >
   {
     label && (
-      <ds-field class="ds-field">
-        <label class="ds-label" for={`${list}-search`}>{label}</label>
-        <input class="ds-input" id={`${list}-search`} type="search" placeholder={placeholder} />
-      </ds-field>
+      <SearchField class="search" id={`${list}-search`} label={label} placeholder={placeholder} />
     )
   }
   {
@@ -142,7 +141,7 @@ const countLabel = (n: number) => `${n} ${n === 1 ? noun.one : noun.other}`
     gap: var(--ds-size-4);
   }
 
-  ds-field {
+  .list-filter :global(.search) {
     max-width: 28rem;
   }
 

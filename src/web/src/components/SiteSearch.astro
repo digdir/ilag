@@ -1,21 +1,27 @@
 ---
 import { MIN_QUERY_LENGTH } from '../lib/cms/search'
+import SearchField from './SearchField.astro'
 ---
 
 <!--
   The search across ilag in the header (FS-01): type part of the name of a
   team, unit, person, role or tool, and pick it to go to its page. Built on
-  Designsystemet's Suggestion, which handles the keyboard and the screen
-  reader texts; the script below fills its list from /sok.json, since the CMS
+  SearchField, a Designsystemet Suggestion, which handles the keyboard and the
+  screen reader texts; the script below fills its list from /sok.json, since the CMS
   does the matching. Without JavaScript the field does nothing.
 -->
-<ds-field class="ds-field site-search" data-size="sm">
-  <label class="ds-label ds-sr-only" for="site-search">Søk i ilag</label>
-  <ds-suggestion class="ds-suggestion" data-site-search data-min={MIN_QUERY_LENGTH}>
-    <input class="ds-input" id="site-search" type="search" placeholder="Søk etter team, enheter, folk …" autocomplete="off" />
-    <u-datalist data-nofilter></u-datalist>
-  </ds-suggestion>
-</ds-field>
+<SearchField
+  class="site-search"
+  id="site-search"
+  label="Søk i ilag"
+  hideLabel
+  placeholder="Søk etter team, enheter, folk …"
+  size="sm"
+  data-site-search
+  data-min={MIN_QUERY_LENGTH}
+>
+  <u-datalist data-nofilter></u-datalist>
+</SearchField>
 
 <script>
   import type { SearchHit } from '../types/search'
@@ -66,10 +72,11 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
     }
 
     input.addEventListener('input', (event) => {
-      // Picking a hit fills in its name, which needs no new search.
-      if (!(event instanceof InputEvent) || !event.isTrusted) return
       clearTimeout(timer)
       const query = input.value.trim()
+      // Picking a hit fills in its name, which needs no new search. The clear
+      // button empties the field the same way, and that does close the list.
+      if (!(event instanceof InputEvent) || (!event.isTrusted && query)) return
       if (query.length < min) {
         pending?.abort()
         if (query) show([], `Skriv minst ${min} tegn`)
@@ -89,19 +96,9 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
 </script>
 
 <style>
-  .site-search {
+  :global(.site-search) {
     flex: 1 1 16rem;
     max-width: 28rem;
-  }
-
-  /*
-   * A quieter focus than Designsystemet's ring around the field: its border
-   * in the accent colour, a little thicker. Still clearly visible (WCAG 2.4.7).
-   */
-  .site-search :global(.ds-input:focus-visible) {
-    box-shadow: none;
-    outline: 2px solid var(--ds-color-accent-border-strong);
-    outline-offset: -1px;
   }
 
   /*
@@ -109,21 +106,21 @@ import { MIN_QUERY_LENGTH } from '../lib/cms/search'
    * below it, the height set on the element itself. Long enough for about six
    * hits here; the rest scroll.
    */
-  .site-search :global(u-datalist) {
+  :global(.site-search u-datalist) {
     max-height: min(24rem, 60vh) !important;
   }
 
   /* Nothing typed yet: no list, not an empty box under the field. */
-  .site-search :global(u-datalist:empty) {
+  :global(.site-search u-datalist:empty) {
     display: none !important;
   }
 
-  .site-search :global(u-option) {
+  :global(.site-search u-option) {
     display: grid;
     gap: var(--ds-size-1);
   }
 
-  .site-search :global(u-option .meta) {
+  :global(.site-search u-option .meta) {
     color: var(--ds-color-neutral-text-subtle);
     font-size: 0.875rem;
   }
