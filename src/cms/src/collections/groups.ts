@@ -4,6 +4,7 @@
 export const collectionGroups = {
   governance: 'Styring',
   team: 'Team',
+  tools: 'Verktøy',
   organisation: 'Organisasjon',
   system: 'System',
 } as const

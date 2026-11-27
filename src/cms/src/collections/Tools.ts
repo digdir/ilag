@@ -30,7 +30,7 @@ export const Tools: CollectionConfig = {
     interface: 'Tool',
   },
   admin: {
-    group: collectionGroups.team,
+    group: collectionGroups.tools,
     // Team editors pick tools on their team, which reads them; they don't
     // need the collection in the menu. Redaktører maintain it.
     hidden: hiddenUnlessSharedContentEditor,

@@ -68,13 +68,13 @@ export interface Config {
   blocks: {};
   collections: {
     prinsipper: Principle;
+    mandater: Mandate;
     team: Team;
     teammedlemskap: TeamMembership;
-    mandater: Mandate;
     teamtyper: TeamType;
-    'teamtype-veiviser': TeamTypeWizardQuestion;
     verktoy: Tool;
     begreper: Concept;
+    'teamtype-veiviser': TeamTypeWizardQuestion;
     personer: Person;
     enheter: Unit;
     lokasjoner: Location;
@@ -115,13 +115,13 @@ export interface Config {
   };
   collectionsSelect: {
     prinsipper: PrinsipperSelect<false> | PrinsipperSelect<true>;
+    mandater: MandaterSelect<false> | MandaterSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     teammedlemskap: TeammedlemskapSelect<false> | TeammedlemskapSelect<true>;
-    mandater: MandaterSelect<false> | MandaterSelect<true>;
     teamtyper: TeamtyperSelect<false> | TeamtyperSelect<true>;
-    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     verktoy: VerktoySelect<false> | VerktoySelect<true>;
     begreper: BegreperSelect<false> | BegreperSelect<true>;
+    'teamtype-veiviser': TeamtypeVeiviserSelect<false> | TeamtypeVeiviserSelect<true>;
     personer: PersonerSelect<false> | PersonerSelect<true>;
     enheter: EnheterSelect<false> | EnheterSelect<true>;
     lokasjoner: LokasjonerSelect<false> | LokasjonerSelect<true>;
@@ -206,6 +206,42 @@ export interface Principle {
   description: string;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater".
+ */
+export interface Mandate {
+  id: number;
+  title?: string | null;
+  /**
+   * Teamet mandatet hører til. Kan ikke endres etterpå.
+   */
+  team?: (number | null) | Team;
+  /**
+   * Enheten mandatet hører til. Kan ikke endres etterpå.
+   */
+  unit?: (number | null) | Unit;
+  /**
+   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  problem: string;
+  outcomes: string;
+  expectations: string;
+  collaboration: string;
+  /**
+   * Dagens dato hvis tomt når mandatet godkjennes. Kan ikke være frem i tid.
+   */
+  approvedAt?: string | null;
+  approvedBy?: (number | null) | Person;
+  status?: ('draft' | 'current') | null;
+  complete?: boolean | null;
+  missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -408,42 +444,6 @@ export interface Unit {
   createdAt: string;
 }
 /**
- * Lagre som utkast mens dere jobber. Mandatet blir synlig for alle når det godkjennes (publiseres).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mandater".
- */
-export interface Mandate {
-  id: number;
-  title?: string | null;
-  /**
-   * Teamet mandatet hører til. Kan ikke endres etterpå.
-   */
-  team?: (number | null) | Team;
-  /**
-   * Enheten mandatet hører til. Kan ikke endres etterpå.
-   */
-  unit?: (number | null) | Unit;
-  /**
-   * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
-   */
-  problem: string;
-  outcomes: string;
-  expectations: string;
-  collaboration: string;
-  /**
-   * Dagens dato hvis tomt når mandatet godkjennes. Kan ikke være frem i tid.
-   */
-  approvedAt?: string | null;
-  approvedBy?: (number | null) | Person;
-  status?: ('draft' | 'current') | null;
-  complete?: boolean | null;
-  missingFields?: ('problem' | 'outcomes' | 'expectations' | 'collaboration')[] | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "medier".
  */
@@ -461,6 +461,28 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "begreper".
+ */
+export interface Concept {
+  id: number;
+  name: string;
+  /**
+   * Kort og tydelig, i noen få setninger. Vises også når begrepet forklares i teksten.
+   */
+  definition: string;
+  /**
+   * Bøyningsformer og andre skrivemåter som skal forklares som dette begrepet, som «teamet» og «teamene». Navnet er alltid med.
+   */
+  variants?: string[] | null;
+  /**
+   * Slå av for vanlige ord, som «team», som ellers blir markert i nesten hver tekst.
+   */
+  autoLink: boolean;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -495,28 +517,6 @@ export interface TeamTypeWizardQuestion {
         } | null);
     id?: string | null;
   }[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "begreper".
- */
-export interface Concept {
-  id: number;
-  name: string;
-  /**
-   * Kort og tydelig, i noen få setninger. Vises også når begrepet forklares i teksten.
-   */
-  definition: string;
-  /**
-   * Bøyningsformer og andre skrivemåter som skal forklares som dette begrepet, som «teamet» og «teamene». Navnet er alltid med.
-   */
-  variants?: string[] | null;
-  /**
-   * Slå av for vanlige ord, som «team», som ellers blir markert i nesten hver tekst.
-   */
-  autoLink: boolean;
   updatedAt: string;
   createdAt: string;
 }
@@ -786,6 +786,10 @@ export interface PayloadLockedDocument {
         value: number | Principle;
       } | null)
     | ({
+        relationTo: 'mandater';
+        value: number | Mandate;
+      } | null)
+    | ({
         relationTo: 'team';
         value: number | Team;
       } | null)
@@ -794,16 +798,8 @@ export interface PayloadLockedDocument {
         value: number | TeamMembership;
       } | null)
     | ({
-        relationTo: 'mandater';
-        value: number | Mandate;
-      } | null)
-    | ({
         relationTo: 'teamtyper';
         value: number | TeamType;
-      } | null)
-    | ({
-        relationTo: 'teamtype-veiviser';
-        value: number | TeamTypeWizardQuestion;
       } | null)
     | ({
         relationTo: 'verktoy';
@@ -812,6 +808,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'begreper';
         value: number | Concept;
+      } | null)
+    | ({
+        relationTo: 'teamtype-veiviser';
+        value: number | TeamTypeWizardQuestion;
       } | null)
     | ({
         relationTo: 'personer';
@@ -905,6 +905,27 @@ export interface PrinsipperSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mandater_select".
+ */
+export interface MandaterSelect<T extends boolean = true> {
+  title?: T;
+  team?: T;
+  unit?: T;
+  problem?: T;
+  outcomes?: T;
+  expectations?: T;
+  collaboration?: T;
+  approvedAt?: T;
+  approvedBy?: T;
+  status?: T;
+  complete?: T;
+  missingFields?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "team_select".
  */
 export interface TeamSelect<T extends boolean = true> {
@@ -932,27 +953,6 @@ export interface TeammedlemskapSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mandater_select".
- */
-export interface MandaterSelect<T extends boolean = true> {
-  title?: T;
-  team?: T;
-  unit?: T;
-  problem?: T;
-  outcomes?: T;
-  expectations?: T;
-  collaboration?: T;
-  approvedAt?: T;
-  approvedBy?: T;
-  status?: T;
-  complete?: T;
-  missingFields?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "teamtyper_select".
  */
 export interface TeamtyperSelect<T extends boolean = true> {
@@ -960,26 +960,6 @@ export interface TeamtyperSelect<T extends boolean = true> {
   description?: T;
   requirements?: T;
   roles?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "teamtype-veiviser_select".
- */
-export interface TeamtypeVeiviserSelect<T extends boolean = true> {
-  title?: T;
-  isStart?: T;
-  intro?: T;
-  considerations?: T;
-  answers?:
-    | T
-    | {
-        label?: T;
-        hint?: T;
-        leadsTo?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1013,6 +993,26 @@ export interface BegreperSelect<T extends boolean = true> {
   definition?: T;
   variants?: T;
   autoLink?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamtype-veiviser_select".
+ */
+export interface TeamtypeVeiviserSelect<T extends boolean = true> {
+  title?: T;
+  isStart?: T;
+  intro?: T;
+  considerations?: T;
+  answers?:
+    | T
+    | {
+        label?: T;
+        hint?: T;
+        leadsTo?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
