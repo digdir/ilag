@@ -16,7 +16,7 @@ const directorate = await getOrgChart(Astro.request.headers.get('cookie'))
       </p>
     </header>
     <section aria-labelledby="organisasjonskart">
-      <h2 class="ds-heading" data-size="xs" id="organisasjonskart">Organisasjonskart</h2>
+      <h2 class="label" id="organisasjonskart">Organisasjonskart</h2>
       {
         directorate ? (
           <OrgChart directorate={directorate} />
@@ -40,5 +40,15 @@ const directorate = await getOrgChart(Astro.request.headers.get('cookie'))
     display: flex;
     flex-direction: column;
     gap: var(--ds-size-4);
+  }
+
+  /* A small grey label over the chart, as in the prototype. */
+  .label {
+    margin: 0;
+    color: var(--ds-color-neutral-text-subtle);
+    font-size: var(--ds-body-sm-font-size);
+    font-weight: var(--ds-font-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 </style>
