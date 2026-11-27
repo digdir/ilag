@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+interface Props extends Omit<HTMLAttributes<'div'>, 'id'> {
+  id: string
+  label: string
+  /** Visible to screen readers only. */
+  hideLabel?: boolean
+  placeholder?: string
+  size?: 'sm' | 'md' | 'lg'
+}
+
+const { id, label, hideLabel = false, placeholder, size, class: className, ...rest } = Astro.props
+---
+
+<!-- The search field used across ilag. Put a <u-datalist> in the slot for suggestions. -->
+<ds-field class:list={['ds-field', className]} data-size={size}>
+  <label class:list={['ds-label', { 'ds-sr-only': hideLabel }]} for={id}>{label}</label>
+  <ds-suggestion class="ds-suggestion" {...rest}>
+    <input class="ds-input" id={id} type="search" placeholder={placeholder} autocomplete="off" />
+    <button type="reset" hidden></button>
+    <slot />
+  </ds-suggestion>
+</ds-field>
+
+<style>
+  /* Blue border instead of Designsystemet's focus ring. */
+  .ds-input:focus-visible {
+    box-shadow: none;
+    outline: 2px solid var(--ds-color-accent-border-strong);
+    outline-offset: -1px;
+  }
+</style>

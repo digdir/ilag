@@ -1,7 +1,6 @@
 import type { Mandate, Team, Unit } from '@ilag/shared'
 
 import type { MandateField, MandateView } from '../../types/mandate'
-import { renderMarkdown } from '../markdown'
 
 // The mandate that Team and Unit join in (TO-04, LO-02). The join applies the
 // mandate's read access, so readers get the approved version only, and those
@@ -24,12 +23,12 @@ export function mandateFrom(join: Team['mandate'] | Unit['mandate']): MandateVie
 export function toMandate(mandate: Mandate): MandateView {
   const fields = MANDATE_FIELDS.map(({ name, label }) => {
     const text = mandate[name]?.trim()
-    return { name, label, html: text ? renderMarkdown(text) : null }
+    return { name, label, text: text || null }
   })
   return {
     status: mandate.status ?? (mandate._status === 'published' ? 'current' : 'draft'),
     approvedAt: mandate.approvedAt ?? null,
     fields,
-    missing: fields.filter((f) => !f.html).map((f) => f.label),
+    missing: fields.filter((f) => !f.text).map((f) => f.label),
   }
 }

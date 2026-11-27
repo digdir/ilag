@@ -1,0 +1,67 @@
+---
+import { formatDate, formatShortDate } from '../../lib/dates'
+import { toolHref, toolTypeLabel } from '../../lib/tools'
+import type { NewTool } from '../../types/tool'
+import FrontCard from './FrontCard.astro'
+
+interface Props {
+  tools: NewTool[]
+}
+
+// The tools most recently added to the toolbox (FS-05): name, type, the day
+// it was added, and what it is.
+const { tools } = Astro.props
+---
+
+<FrontCard id="nye-verktoy" heading="Nytt i verktøykassen" more={{ label: 'Hele verktøykassen', href: '/verktoy/verktoykasse' }}>
+  {
+    tools.map((tool) => (
+      <li>
+        <span class="head">
+          <a class="ds-link" data-color="neutral" href={toolHref(tool.id)}>
+            {tool.name}
+          </a>
+          <span class="meta">
+            {toolTypeLabel(tool.toolType)} ·{' '}
+            <time datetime={tool.createdAt.slice(0, 10)} title={formatDate(tool.createdAt)}>
+              {formatShortDate(tool.createdAt)}
+            </time>
+          </span>
+        </span>
+        <span class="description">{tool.description}</span>
+      </li>
+    ))
+  }
+</FrontCard>
+
+<style>
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-1);
+  }
+
+  /* The type and day beside the name, or below it when there isn't room. */
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 var(--ds-size-3);
+  }
+
+  .ds-link {
+    font-weight: 600;
+  }
+
+  .meta {
+    font-size: var(--ds-body-xs-font-size);
+    color: var(--ds-color-neutral-text-subtle);
+    white-space: nowrap;
+  }
+
+  .description {
+    font-size: var(--ds-body-sm-font-size);
+    color: var(--ds-color-neutral-text-subtle);
+  }
+</style>

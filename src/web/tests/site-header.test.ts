@@ -95,9 +95,19 @@ describe('site header', () => {
     }
   })
 
+  it('FS-01: has the search across ilag', async () => {
+    const page = await render({ user: kari, pathname: '/' })
+
+    // The field by its label; the suggestion list the script fills is around it.
+    const search = page.getByLabelText('Søk i ilag').closest('[data-site-search]')!
+    expect(search.tagName.toLowerCase()).toBe('ds-suggestion')
+    expect(search.querySelector('u-datalist')!.hasAttribute('data-nofilter')).toBe(true)
+  })
+
   it('shows only the logo when nobody is logged in', async () => {
     const page = await render({ pathname: '/logg-inn' })
 
+    expect(page.queryByLabelText('Søk i ilag')).toBeNull()
     expect(page.getByRole('img', { name: 'Digdir' })).toBeTruthy()
     expect(page.queryByRole('navigation')).toBeNull()
     expect(page.queryByRole('button', { name: 'Logg ut' })).toBeNull()

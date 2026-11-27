@@ -2,7 +2,7 @@ import { APIError, type CollectionConfig } from 'payload'
 
 import { importOnly } from '../access/fields'
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
 // One file from the authoritative source, from the time it arrived until it
@@ -24,8 +24,8 @@ export const ImportRuns: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.system,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // Only administrators see it in the admin panel's menu.
+    hidden: hiddenUnlessAdmin,
     useAsTitle: 'id',
     defaultColumns: ['kind', 'status', 'createdAt', 'rows', 'sender'],
   },

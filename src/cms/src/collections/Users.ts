@@ -8,7 +8,7 @@ import {
 
 import { mayUseAdminPanel } from '../access/adminPanel'
 import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { hiddenUnlessAdmin } from '../access/adminMenu'
 import { isIntegration } from '../access/isIntegration'
 import { isSignedIn } from '../access/isSignedIn'
 import { oidcEndpoints, providersEndpoint } from '../auth/oidc'
@@ -59,8 +59,8 @@ export const Users: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.system,
-    // Team editors only see their teams in the admin panel.
-    hidden: hiddenFromEditors,
+    // Only administrators see it in the admin panel's menu.
+    hidden: hiddenUnlessAdmin,
     useAsTitle: 'email',
     defaultColumns: ['email', 'firstName', 'lastName', 'roles'],
   },
@@ -101,6 +101,8 @@ export const Users: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Administrator', value: 'admin' },
+        // Maintains shared content, such as tools, principles and concepts.
+        { label: 'Redaktør', value: 'editor' },
         // May call the import endpoints and nothing else (ADR-0003).
         { label: 'Integrasjon', value: 'integration' },
       ],

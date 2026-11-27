@@ -16,6 +16,7 @@ import { isSignedIn } from '../access/isSignedIn'
 import { mandateOwners, mayApprove, mayEdit, ownedBy } from '../access/mandateOwners'
 import type { Mandate } from '../payload-types'
 import { idOf } from '../utils/ids'
+import { MARKDOWN_HELP } from '../utils/helptexts'
 import { collectionGroups } from './groups'
 
 // A team's or a unit's mandate: the four core fields of Digdir's mandate
@@ -39,8 +40,6 @@ export const MANDATE_FIELDS = [
 ] as const
 
 type MandateField = (typeof MANDATE_FIELDS)[number]['name']
-
-const MARKDOWN_HELP = 'Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.'
 
 const ownerOf = (doc: Partial<Mandate> | undefined) => ({ team: idOf(doc?.team), unit: idOf(doc?.unit) })
 

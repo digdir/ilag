@@ -65,6 +65,18 @@ describe('middleware', () => {
     expect(await locals.concepts).toMatchObject({ pattern: null })
   })
 
+  it('FS-01: reads no concepts for the search, which answers with data', async () => {
+    const fetchMock = me({ user })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { next, locals } = await run('/sok.json?q=team', 'payload-token=abc')
+
+    expect(next).toHaveBeenCalled()
+    expect(locals.user).toEqual(user)
+    expect(locals.concepts).toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
   it('turns away a session the CMS no longer accepts', async () => {
     vi.stubGlobal('fetch', me({ user: null }))
 

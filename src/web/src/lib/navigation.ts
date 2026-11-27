@@ -26,7 +26,7 @@ export const NAV: NavGroup[] = [
     icon: 'Compass',
     path: '/styring',
     pages: [
-      { label: 'Styringsfundament', href: '/styring/styringsfundament', built: false },
+      { label: 'Styringsfundament', href: '/styring/styringsfundament', built: true },
       { label: 'Prinsipper', href: '/styring/prinsipper', built: true },
       { label: 'Porteføljestyring', href: '/styring/portefolje', built: false },
     ],

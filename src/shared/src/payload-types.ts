@@ -83,6 +83,7 @@ export interface Config {
     tilbakemeldinger: Feedback;
     importkjoringer: ImportRun;
     medier: Media;
+    sok: SearchResult;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -129,6 +130,7 @@ export interface Config {
     tilbakemeldinger: TilbakemeldingerSelect<false> | TilbakemeldingerSelect<true>;
     importkjoringer: ImportkjoringerSelect<false> | ImportkjoringerSelect<true>;
     medier: MedierSelect<false> | MedierSelect<true>;
+    sok: SokSelect<false> | SokSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -140,9 +142,13 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    styringsfundament: GovernanceFoundation;
+    forside: FrontPage;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
+    styringsfundament: StyringsfundamentSelect<false> | StyringsfundamentSelect<true>;
+    forside: ForsideSelect<false> | ForsideSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -522,7 +528,7 @@ export interface User {
   id: number;
   firstName?: string | null;
   lastName?: string | null;
-  roles?: ('admin' | 'integration')[] | null;
+  roles?: ('admin' | 'editor' | 'integration')[] | null;
   /**
    * Settes ved innlogging fra personen med samme e-post.
    */
@@ -603,6 +609,46 @@ export interface ImportRun {
   finishedAt?: string | null;
   file?: string | null;
   fileRemovedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Lages og oppdateres automatisk fra team, teamtyper, enheter, personer, roller og verktøy. Brukes av søket i ilag.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sok".
+ */
+export interface SearchResult {
+  id: number;
+  title?: string | null;
+  priority?: number | null;
+  doc:
+    | {
+        relationTo: 'team';
+        value: number | Team;
+      }
+    | {
+        relationTo: 'teamtyper';
+        value: number | TeamType;
+      }
+    | {
+        relationTo: 'enheter';
+        value: number | Unit;
+      }
+    | {
+        relationTo: 'personer';
+        value: number | Person;
+      }
+    | {
+        relationTo: 'roller';
+        value: number | Role;
+      }
+    | {
+        relationTo: 'verktoy';
+        value: number | Tool;
+      };
+  subtitle?: string | null;
+  active?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -798,6 +844,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'medier';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'sok';
+        value: number | SearchResult;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1134,6 +1184,19 @@ export interface MedierSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sok_select".
+ */
+export interface SokSelect<T extends boolean = true> {
+  title?: T;
+  priority?: T;
+  doc?: T;
+  subtitle?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1207,6 +1270,138 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament".
+ */
+export interface GovernanceFoundation {
+  id: number;
+  intro?: string | null;
+  vision?: string | null;
+  mission?: string | null;
+  /**
+   * Vises under samfunnsoppdraget, bak «Vis eksterne styrende dokumenter».
+   */
+  documents?:
+    | {
+        title: string;
+        /**
+         * For eksempel «Varig» eller «Årlig».
+         */
+        tag?: string | null;
+        summary?: string | null;
+        /**
+         * Vises bak «Les mer». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        /**
+         * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+         */
+        files?: (number | Media)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  goals?:
+    | {
+        title: string;
+        /**
+         * Vises når målbildet åpnes med knappen i midten. Ta med lenken «Les meir om målet». Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+         */
+        details?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  plan?: {
+    title?: string | null;
+    /**
+     * Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+     */
+    text?: string | null;
+    /**
+     * Lenkes til med filens alternative tekst, som «Tildelingsbrev 2026 (PDF)».
+     */
+    files?: (number | Media)[] | null;
+  };
+  values?:
+    | {
+        name: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For eksempel én brukargruppe per punkt, og en tekst under. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  audiences?: string | null;
+  /**
+   * For eksempel én rolle per punkt. Markdown: **fet**, *kursiv*, [lenke](https://…), og lister med - eller 1.
+   */
+  roles?: string | null;
+  /**
+   * Vises nederst på siden.
+   */
+  footnote?: string | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forside".
+ */
+export interface FrontPage {
+  id: number;
+  /**
+   * Vises med små bokstaver over overskriften.
+   */
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  /**
+   * Vises ved siden av overskriften. Uten et bilde vises ilags egen illustrasjon.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Vises nederst på forsiden, side om side, for eksempel for nyansatte og for dem som skal etablere et team.
+   */
+  entries?:
+    | {
+        title: string;
+        text?: string | null;
+        /**
+         * Vises som knapper. Den første er hovedknappen.
+         */
+        links?:
+          | {
+              label: string;
+              /**
+               * En side i ilag, som «/verktoy/veiviser», eller en lenke som starter med https://.
+               */
+              href: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Forsiden viser de fem nyeste etter dato, uansett rekkefølge her.
+   */
+  changes?:
+    | {
+        date: string;
+        text: string;
+        /**
+         * Valgfri. En side i ilag, som «/verktoy/veiviser», eller en lenke som starter med https://.
+         */
+        href?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
 export interface PayloadJobsStat {
@@ -1222,6 +1417,89 @@ export interface PayloadJobsStat {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styringsfundament_select".
+ */
+export interface StyringsfundamentSelect<T extends boolean = true> {
+  intro?: T;
+  vision?: T;
+  mission?: T;
+  documents?:
+    | T
+    | {
+        title?: T;
+        tag?: T;
+        summary?: T;
+        details?: T;
+        files?: T;
+        id?: T;
+      };
+  goals?:
+    | T
+    | {
+        title?: T;
+        details?: T;
+        id?: T;
+      };
+  plan?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        files?: T;
+      };
+  values?:
+    | T
+    | {
+        name?: T;
+        text?: T;
+        id?: T;
+      };
+  audiences?: T;
+  roles?: T;
+  footnote?: T;
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forside_select".
+ */
+export interface ForsideSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  image?: T;
+  entries?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  changes?:
+    | T
+    | {
+        date?: T;
+        text?: T;
+        href?: T;
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

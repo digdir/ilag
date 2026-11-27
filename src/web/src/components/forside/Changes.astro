@@ -1,0 +1,43 @@
+---
+import { formatDate, formatShortDate } from '../../lib/dates'
+import type { Change } from '../../types/frontPage'
+import FrontCard from './FrontCard.astro'
+
+interface Props {
+  /** The changes to show, in order. */
+  changes: Change[]
+}
+
+// The changes in ilag (FS-06): the day in short in a narrow column, as in
+// the prototype, and the change beside it, as a link to where it happened
+// when it has one.
+const { changes } = Astro.props
+---
+
+<FrontCard id="endringer" heading="Endringer i ilag">
+  {
+    changes.map((change) => (
+      <li>
+        <time class="date" datetime={change.date.slice(0, 10)} title={formatDate(change.date)}>
+          {formatShortDate(change.date)}
+        </time>
+        {change.href ? <a class="ds-link" data-color="neutral" href={change.href}>{change.text}</a> : <span>{change.text}</span>}
+      </li>
+    ))
+  }
+</FrontCard>
+
+<style>
+  li {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: var(--ds-size-3);
+    font-size: var(--ds-body-sm-font-size);
+  }
+
+  .date {
+    padding-block-start: 2px;
+    font-size: var(--ds-body-xs-font-size);
+    color: var(--ds-color-neutral-text-subtle);
+  }
+</style>
