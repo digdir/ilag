@@ -2,10 +2,9 @@
 import type { HTMLAttributes } from 'astro/types'
 
 interface Props extends Omit<HTMLAttributes<'div'>, 'id'> {
-  /** The input's id. */
   id: string
   label: string
-  /** Hide the label for sight, as in the header, where the placeholder says what the field is for. */
+  /** Visible to screen readers only. */
   hideLabel?: boolean
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
@@ -14,16 +13,7 @@ interface Props extends Omit<HTMLAttributes<'div'>, 'id'> {
 const { id, label, hideLabel = false, placeholder, size, class: className, ...rest } = Astro.props
 ---
 
-<!--
-  A search field as Designsystemet draws it: a magnifying glass at the start
-  and a button to empty it at the end, with ilag's own focus (below). Every
-  search field in ilag is one of these, so they look and behave the same.
-
-  Designsystemet's Search is deprecated; its replacement is a Suggestion around
-  an input of type search, which also shows, hides and handles the clear
-  button. Emptying the field sends an input event. A list of hits, a
-  <u-datalist>, goes in the default slot; without one it is a plain field.
--->
+<!-- The search field used across ilag. Put a <u-datalist> in the slot for suggestions. -->
 <ds-field class:list={['ds-field', className]} data-size={size}>
   <label class:list={['ds-label', { 'ds-sr-only': hideLabel }]} for={id}>{label}</label>
   <ds-suggestion class="ds-suggestion" {...rest}>
@@ -34,10 +24,7 @@ const { id, label, hideLabel = false, placeholder, size, class: className, ...re
 </ds-field>
 
 <style>
-  /*
-   * A quieter focus than Designsystemet's ring around the field: its border
-   * in the accent colour, a little thicker. Still clearly visible (WCAG 2.4.7).
-   */
+  /* Blue border instead of Designsystemet's focus ring. */
   .ds-input:focus-visible {
     box-shadow: none;
     outline: 2px solid var(--ds-color-accent-border-strong);
