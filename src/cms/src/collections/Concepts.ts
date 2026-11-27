@@ -1,11 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
-import { isSignedIn } from '../access/isSignedIn'
-import { hiddenFromEditors } from '../access/teamEditor'
+import { sharedContentAccess } from '../access/isEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
-// The concept list (BG-01, BG-02). Administrators maintain it. The frontend
+// The concept list (BG-01, BG-02). Administrators and redaktører maintain it. The frontend
 // marks a concept where its name or one of its variants is used in text from
 // the CMS, and explains it in a popover (BG-06, ADR-0009). Two concepts may
 // share a form; the popover then explains both.
@@ -22,16 +21,11 @@ export const Concepts: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.tools,
-    hidden: hiddenFromEditors,
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'variants', 'autoLink'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
-  },
+  access: sharedContentAccess,
   defaultSort: 'name',
   fields: [
     {

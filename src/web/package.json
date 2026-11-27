@@ -18,12 +18,15 @@
     "@digdir/designsystemet-css": "^1.23.0",
     "@digdir/designsystemet-web": "^1.23.0",
     "@ilag/shared": "workspace:*",
+    "@navikt/aksel-icons": "^8.23.1",
     "astro": "^7.4.2",
     "markdown-it": "^15.0.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@testing-library/dom": "^10.4.2",
     "@types/markdown-it": "^14.2.0",
+    "happy-dom": "^21.0.4",
     "typescript": "5.9.3",
     "vitest": "^5.0.5"
   }

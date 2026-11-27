@@ -1,0 +1,22 @@
+---
+import { renderMarkdown } from '../lib/markdown'
+
+interface Props {
+  /** Markdown from the admin panel. */
+  text: string | null | undefined
+}
+
+// Markdown text from the CMS, rendered without raw HTML (ADR-0007).
+const { text } = Astro.props
+---
+
+{text && <div class="markdown" set:html={renderMarkdown(text)} />}
+
+<style>
+  /* Room between the paragraphs and lists that markdown makes, which have no margins of their own. */
+  .markdown {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-3);
+  }
+</style>

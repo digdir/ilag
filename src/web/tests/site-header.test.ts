@@ -2,6 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { describe, expect, it } from 'vitest'
 
 import SiteHeader from '../src/components/SiteHeader.astro'
+import { parse } from './dom'
 
 const kari = {
   email: 'kari@digdir.no',
@@ -11,89 +12,105 @@ const kari = {
 
 const render = async (props: { user?: App.Locals['user']; pathname: string }) => {
   const container = await AstroContainer.create()
-  return container.renderToString(SiteHeader, { props })
+  return parse(await container.renderToString(SiteHeader, { props }))
 }
 
-// The <a> of the menu item with this label.
-const menuLink = (html: string, label: string) =>
-  html.match(new RegExp(`<a [^>]*>\\s*${label}\\s*</a>`))?.[0]
-
+// Main menu items are found by test id: a section with a submenu is a link
+// without JavaScript and a button with it, so its role changes.
 describe('site header', () => {
   it('shows the logged-in user and a way to log out', async () => {
-    const html = await render({ user: kari, pathname: '/' })
+    const page = await render({ user: kari, pathname: '/' })
 
-    expect(html).toContain('Kari Nordmann')
-    expect(html).toMatch(/<form[^>]*method="post"[^>]*action="\/logg-ut"/)
+    expect(page.getByText('Kari Nordmann')).toBeTruthy()
+    expect(page.getByRole('button', { name: 'Logg ut' }).closest('form')!.getAttribute('action')).toBe('/logg-ut')
   })
 
   it('links to the CMS for someone who may use the admin panel', async () => {
-    const html = await render({ user: { ...kari!, canAccessAdmin: true }, pathname: '/' })
+    const page = await render({ user: { ...kari!, canAccessAdmin: true }, pathname: '/' })
 
-    expect(html).toContain('href="http://localhost:3000/admin"')
+    expect(page.getByRole('link', { name: 'CMS' }).getAttribute('href')).toBe('http://localhost:3000/admin')
   })
 
   it('leaves the CMS link out for someone who may not use the admin panel', async () => {
-    const html = await render({ user: { ...kari!, canAccessAdmin: false }, pathname: '/' })
+    const page = await render({ user: { ...kari!, canAccessAdmin: false }, pathname: '/' })
 
-    expect(html).not.toContain('/admin')
-    expect(html).not.toMatch(/>\s*CMS\s*</)
+    expect(page.queryByRole('link', { name: 'CMS' })).toBeNull()
+    expect(page.container.querySelector('a[href$="/admin"]')).toBeNull()
   })
 
   it('links the logo to the front page', async () => {
-    const html = await render({ user: kari, pathname: '/' })
+    const page = await render({ user: kari, pathname: '/' })
 
-    expect(html).toMatch(/<a [^>]*href="\/"[^>]*>\s*<img [^>]*alt="Digdir"/)
+    expect(page.getByRole('link', { name: 'Digdir ilag' }).getAttribute('href')).toBe('/')
   })
 
   it('has a hidden submenu for a section outside it, which the section item points to', async () => {
-    const html = await render({ user: kari, pathname: '/' })
+    const page = await render({ user: kari, pathname: '/' })
 
-    const item = menuLink(html, 'Organisering')
-    expect(item).toContain('href="/organisering/team"')
-    const id = item!.match(/data-submenu="([^"]+)"/)![1]
-    expect(html).toMatch(new RegExp(`<nav [^>]*id="${id}"[^>]*aria-label="Organisering"[^>]*hidden`))
+    const item = page.getByTestId('menu-organisering')
+    expect(item.getAttribute('href')).toBe('/organisering/team')
+    // A hidden element has no accessible name, so follow the item to its submenu.
+    const submenu = page.container.querySelector(`#${item.getAttribute('data-submenu')}`)!
+    expect(submenu.getAttribute('aria-label')).toBe('Organisering')
+    expect(submenu.hasAttribute('hidden')).toBe(true)
   })
 
   it('marks the section of the current page as current and shows its submenu', async () => {
-    const html = await render({ user: kari, pathname: '/organisering/team/42' })
+    const page = await render({ user: kari, pathname: '/organisering/team/42' })
 
-    expect(menuLink(html, 'Organisering')).toContain('data-current')
-    const submenu = html.match(/<nav [^>]*aria-label="Organisering"[^>]*>/)![0]
-    expect(submenu).not.toContain('hidden')
+    expect(page.getByTestId('menu-organisering').hasAttribute('data-current')).toBe(true)
+    expect(page.getByRole('navigation', { name: 'Organisering' }).hasAttribute('hidden')).toBe(false)
   })
 
   it('marks no section or page as current outside the menu', async () => {
-    const html = await render({ user: kari, pathname: '/' })
+    const page = await render({ user: kari, pathname: '/' })
 
-    expect(html).not.toContain('data-current')
-    expect(html).not.toContain('aria-current')
+    expect(page.container.querySelector('[data-current], [aria-current]')).toBeNull()
   })
 
   it('does not take a path that only starts with the same letters as the section', async () => {
-    const html = await render({ user: kari, pathname: '/organiseringer' })
+    const page = await render({ user: kari, pathname: '/organiseringer' })
 
-    expect(html).not.toContain('data-current')
-    expect(html).not.toContain('aria-current')
+    expect(page.container.querySelector('[data-current], [aria-current]')).toBeNull()
   })
 
   it('shows the submenu of the current section, linking only pages that are built', async () => {
-    const html = await render({ user: kari, pathname: '/organisering/team/42' })
+    const page = await render({ user: kari, pathname: '/organisering/team/42' })
 
-    expect(html).toContain('aria-label="Organisering"')
-    expect(menuLink(html, 'Team')).toMatch(/href="\/organisering\/team"[^>]*aria-current="page"/)
-    expect(html).toMatch(
-      /<span [^>]*>\s*Innsatsområde\s*<span class="ds-sr-only"[^>]*> \(kommer snart\)<\/span>/,
+    expect(page.getByRole('link', { name: 'Team', current: 'page' }).getAttribute('href')).toBe('/organisering/team')
+    expect(page.getByRole('link', { name: 'Linjeorganisasjon' }).getAttribute('href')).toBe(
+      '/organisering/linjeorganisasjon',
     )
-    expect(menuLink(html, 'Innsatsområde')).toBeUndefined()
-    expect(menuLink(html, 'Linjeorganisasjon')).toContain('href="/organisering/linjeorganisasjon"')
+    expect(page.getByText('Innsatsområde').textContent).toBe('Innsatsområde (kommer snart)')
+    expect(page.queryByRole('link', { name: /Innsatsområde/ })).toBeNull()
+  })
+
+  it('shows an icon before each main menu item, as in the prototype, hidden from screen readers', async () => {
+    const page = await render({ user: kari, pathname: '/' })
+
+    for (const section of ['styring', 'folk', 'organisering', 'verktoy']) {
+      const icon = page.getByTestId(`menu-${section}`).firstElementChild
+      expect(icon?.tagName, section).toBe('svg')
+      expect(icon?.getAttribute('aria-hidden'), section).toBe('true')
+    }
+  })
+
+  it('FS-01: has the search across ilag', async () => {
+    const page = await render({ user: kari, pathname: '/' })
+
+    // The field by its label; the suggestion list the script fills is around it.
+    const search = page.getByLabelText('Søk i ilag').closest('[data-site-search]')!
+    expect(search.tagName.toLowerCase()).toBe('ds-suggestion')
+    expect(search.querySelector('u-datalist')!.hasAttribute('data-nofilter')).toBe(true)
   })
 
   it('shows only the logo when nobody is logged in', async () => {
-    const html = await render({ pathname: '/logg-inn' })
+    const page = await render({ pathname: '/logg-inn' })
 
-    expect(html).toContain('alt="Digdir"')
-    expect(html).not.toContain('Hovedmeny')
-    expect(html).not.toContain('/logg-ut')
-    expect(html).not.toContain('/admin')
+    expect(page.queryByLabelText('Søk i ilag')).toBeNull()
+    expect(page.getByRole('img', { name: 'Digdir' })).toBeTruthy()
+    expect(page.queryByRole('navigation')).toBeNull()
+    expect(page.queryByRole('button', { name: 'Logg ut' })).toBeNull()
+    expect(page.queryByRole('link', { name: 'CMS' })).toBeNull()
   })
 })

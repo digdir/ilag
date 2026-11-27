@@ -1,5 +1,5 @@
 ---
-import { formatDay } from '../lib/dates'
+import { formatDate } from '../lib/dates'
 import type { MandateView } from '../types/mandate'
 import Tag from './Tag.astro'
 
@@ -18,7 +18,7 @@ const tag = tags[mandate.status]
 const details =
   mandate.status === 'draft'
     ? 'Ikke godkjent ennå. Bare de som kan redigere mandatet, ser det.'
-    : mandate.approvedAt && `Godkjent ${formatDay(mandate.approvedAt)}`
+    : mandate.approvedAt && `Godkjent ${formatDate(mandate.approvedAt)}`
 ---
 
 <!--

@@ -33,3 +33,22 @@
   first. Your own CSS goes in the component's `<style>`, with `--ds-*` tokens.
 - **Tests:** every page gets a render test in `tests/`, through Astro's
   container API with `fetch` stubbed (see `tests/team.test.ts`).
+- **Finding elements in tests:** find elements as a visitor would, which also
+  checks that screen readers get them right. Render tests use the Testing
+  Library queries that `parse` in `tests/dom.ts` returns; the Playwright tests
+  use the matching `page.getBy*` locators. In order of preference:
+  1. By role and accessible name: `getByRole('button', { name: 'Logg ut' })`.
+  2. Form fields by their label: `getByLabelText('E-post')` (Playwright:
+     `getByLabel`).
+  3. Content that isn't interactive by its text: `getByText('Kari Nordmann')`.
+  4. `data-testid` (`getByTestId`), only when none of these finds the element
+     reliably: its role changes (a main menu item is a link without
+     JavaScript and a button with it), it has no unique name (repeated cards
+     or rows), or its wording isn't settled. Name the id after what the
+     element is, in lowercase kebab-case with Norwegian path segments
+     (`menu-organisering`). A script that swaps an element for another, such
+     as `SiteMenu`'s, copies the id.
+
+  Never match rendered HTML with regular expressions; it breaks when the
+  markup changes. Existing tests that do move to these queries when they are
+  next changed.

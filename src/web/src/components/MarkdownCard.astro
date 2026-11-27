@@ -1,0 +1,19 @@
+---
+import Markdown from './Markdown.astro'
+
+interface Props {
+  /** Unique on the page, for aria-labelledby. */
+  id: string
+  label: string
+  text: string
+}
+
+// A short markdown text on a card under a small heading, such as the
+// styringsfundament's user groups or roles.
+const { id, label, text } = Astro.props
+---
+
+<section class="ds-card" aria-labelledby={id}>
+  <h2 class="ds-heading" data-size="2xs" id={id}>{label}</h2>
+  <Markdown text={text} />
+</section>

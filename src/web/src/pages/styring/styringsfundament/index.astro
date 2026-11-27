@@ -1,0 +1,113 @@
+---
+import Prose from '../../../components/Prose.astro'
+import GoalCards from '../../../components/styringsfundament/GoalCards.astro'
+import MarkdownCard from '../../../components/MarkdownCard.astro'
+import MissionCard from '../../../components/styringsfundament/MissionCard.astro'
+import PlanCard from '../../../components/styringsfundament/PlanCard.astro'
+import VisionCard from '../../../components/styringsfundament/VisionCard.astro'
+import Layout from '../../../layouts/Layout.astro'
+import { getGovernanceFoundation } from '../../../lib/cms/governanceFoundation'
+import { formatDate } from '../../../lib/dates'
+import { readableFiles } from '../../../lib/files'
+
+// Digdir's styringsfundament (SF-01), as administrators fill it in (SF-02),
+// in the prototype's layout. A section whose fields are empty is left out.
+const sf = await getGovernanceFoundation(Astro.request.headers.get('cookie'))
+const { intro, vision, mission, documents, goals, plan, values, audiences, roles, footnote } = sf
+const hasPlan = Boolean(plan?.text || readableFiles(plan?.files).length)
+const empty = ![intro, vision, mission, documents?.length, goals?.length, hasPlan, values?.length, audiences, roles, footnote].some(Boolean)
+---
+
+<Layout title="Styringsfundament — ilag" wide>
+  <div class="page">
+    <header>
+      <h1 class="ds-heading" data-size="lg">Styringsfundament</h1>
+      <Prose text={intro} />
+    </header>
+    {empty && <p class="ds-paragraph">Styringsfundamentet er ikke registrert ennå.</p>}
+    {vision && <VisionCard vision={vision} />}
+    {(mission || documents?.length) && <MissionCard mission={mission} documents={documents} />}
+    {
+      (goals?.length || hasPlan) && (
+        <section aria-labelledby="malbilde">
+          <h2 class="ds-heading" data-size="2xs" id="malbilde">Vårt målbilde</h2>
+          {goals?.length ? <GoalCards goals={goals} /> : null}
+          {plan && hasPlan && <PlanCard plan={plan} />}
+        </section>
+      )
+    }
+    {
+      values?.length ? (
+        <section aria-labelledby="verdiar">
+          <h2 class="ds-heading" data-size="2xs" id="verdiar">Våre verdiar</h2>
+          <div class="values">
+            {values.map((value) => (
+              <article class="ds-card" data-color="neutral" data-variant="tinted">
+                <h3 class="ds-heading" data-size="sm">{value.name}</h3>
+                <Prose text={value.text} />
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null
+    }
+    {
+      (audiences || roles) && (
+        <div class="pair">
+          {audiences && <MarkdownCard id="brukarar" label="Våre brukarar" text={audiences} />}
+          {roles && <MarkdownCard id="roller" label="Våre roller" text={roles} />}
+        </div>
+      )
+    }
+    <footer>
+      {footnote && <p class="ds-paragraph" data-size="sm">{footnote}</p>}
+      {sf.updatedAt && <p class="ds-paragraph" data-size="sm">Sist oppdatert {formatDate(sf.updatedAt)}</p>}
+    </footer>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-7);
+    max-width: 56rem;
+  }
+
+  header,
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-4);
+  }
+
+  /* The values three across, all the same size. */
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: var(--ds-size-4);
+  }
+
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ds-size-4);
+  }
+
+  /* In one column, equal heights only add empty space. */
+  @media (width < 40rem) {
+    .values,
+    .pair {
+      grid-template-columns: 1fr;
+    }
+
+    .values {
+      grid-auto-rows: auto;
+    }
+  }
+
+  footer {
+    color: var(--ds-color-neutral-text-subtle);
+  }
+</style>

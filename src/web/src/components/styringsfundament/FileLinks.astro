@@ -1,0 +1,39 @@
+---
+import type { Media } from '@ilag/shared'
+
+import { readableFiles } from '../../lib/files'
+
+interface Props {
+  /** Files from Medier; unpopulated when the visitor may not read them. */
+  files: (number | Media)[] | null | undefined
+}
+
+// Links to uploaded documents, such as PDFs, which open in a new tab, with
+// each file's alternative text as the link text.
+const files = readableFiles(Astro.props.files)
+---
+
+{
+  files.length > 0 && (
+    <ul class="files">
+      {files.map((file) => (
+        <li>
+          <a class="ds-link" href={file.url} target="_blank" rel="noopener">
+            {file.alt}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .files {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-size-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

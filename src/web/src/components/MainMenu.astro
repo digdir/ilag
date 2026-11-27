@@ -1,4 +1,5 @@
 ---
+import { icons } from '../lib/icons'
 import { hasSubMenu, isWithin, mainMenu, subMenuId } from '../lib/navigation'
 
 interface Props {
@@ -21,15 +22,29 @@ const { pathname } = Astro.props
       mainMenu().map((group) => {
         const current = isWithin(pathname, group.path)
         const href = group.pages.find((page) => page.built)!.href
+        const testId = `menu-${group.path.slice(1)}`
+        const Icon = group.icon && icons[group.icon]
+        const label = (
+          <>
+            {Icon && <Icon class="icon" aria-hidden="true" />}
+            {group.label}
+          </>
+        )
         return (
           <li>
             {hasSubMenu(group) ? (
-              <a class="item" href={href} data-submenu={subMenuId(group)} data-current={current || undefined}>
-                {group.label}
+              <a
+                class="item"
+                href={href}
+                data-submenu={subMenuId(group)}
+                data-current={current || undefined}
+                data-testid={testId}
+              >
+                {label}
               </a>
             ) : (
-              <a class="item" href={href} aria-current={current ? 'page' : undefined}>
-                {group.label}
+              <a class="item" href={href} aria-current={current ? 'page' : undefined} data-testid={testId}>
+                {label}
               </a>
             )}
           </li>
@@ -51,7 +66,9 @@ const { pathname } = Astro.props
 
   /* :global, as SiteMenu's script swaps a link for a button it creates itself. */
   ul :global(.item) {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: var(--ds-size-2);
     padding: var(--ds-size-2) var(--ds-size-3);
     border: 0;
     border-radius: var(--ds-border-radius-md);
@@ -61,6 +78,12 @@ const { pathname } = Astro.props
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
+  }
+
+  ul :global(.item .icon) {
+    flex: none;
+    width: 1.25em;
+    height: 1.25em;
   }
 
   ul :global(.item:hover) {

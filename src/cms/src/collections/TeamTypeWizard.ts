@@ -1,14 +1,13 @@
 import type { CollectionConfig } from 'payload'
 
-import { isAdmin } from '../access/isAdmin'
-import { hiddenFromEditors } from '../access/teamEditor'
-import { isSignedIn } from '../access/isSignedIn'
+import { sharedContentAccess } from '../access/isEditor'
+import { hiddenUnlessSharedContentEditor } from '../access/adminMenu'
 import { collectionGroups } from './groups'
 
 // The questions in the team type wizard (TK-03). Each answer leads to another
 // question, to a team type, which is the result, or nowhere, which ends the
 // wizard with the answer itself as advice. VSU owns the content (Vedlegg 1)
-// and administrators edit it; the frontend shows it at /verktoy/veiviser.
+// and administrators and redaktører edit it; the frontend shows it at /verktoy/veiviser.
 export const TeamTypeWizard: CollectionConfig = {
   slug: 'teamtype-veiviser',
   dbName: 'team_type_wizard_questions',
@@ -21,16 +20,11 @@ export const TeamTypeWizard: CollectionConfig = {
   },
   admin: {
     group: collectionGroups.tools,
-    hidden: hiddenFromEditors,
+    hidden: hiddenUnlessSharedContentEditor,
     useAsTitle: 'title',
     defaultColumns: ['title', 'isStart'],
   },
-  access: {
-    read: ({ req }) => isSignedIn(req.user),
-    create: ({ req }) => isAdmin(req.user),
-    update: ({ req }) => isAdmin(req.user),
-    delete: ({ req }) => isAdmin(req.user),
-  },
+  access: sharedContentAccess,
   fields: [
     { name: 'title', label: 'Spørsmål', type: 'text', required: true },
     {

@@ -117,7 +117,7 @@ CMS `:3000`, frontend `:4321`, PostgreSQL `:5432` (Docker).
 | --- | --- |
 | `pnpm setup` | Creates `.env` files. Safe to re-run. |
 | `pnpm db:up` | Starts PostgreSQL. `db:reset` destroys the volume and all data. |
-| `pnpm db:seed` | Test data: units and people from `src/cms/scripts/seed-files/*.csv` through the import, the rest from `seed-data.ts`, and the administrator `admin@example.com` with the password `ilag`. `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
+| `pnpm db:seed` | Test data: units and people from `src/cms/scripts/seed-files/*.csv` through the import, the rest from `seed-data.ts`, and the administrator `admin@example.com` with the password `ilag` (the other users in `seed-data.ts`, such as the redaktør `redaktor@example.com`, have the same password). `db:seed:reset` recreates it, `db:seed:clear` deletes it. Refuses when `NODE_ENV` is production. |
 | `pnpm dev` | Both apps. `pnpm dev:stop` stops leftovers. |
 | `pnpm dev:wt [worktree]` | Moves both dev servers to the worktree you are in (or `[worktree]`) in the background, on :3000 and :4321. A worktree on `ilag_dev` first gets its own empty database, `ilag_<worktree>`, and a worktree database with no users is seeded. `pnpm dev:status`, `pnpm dev:logs`, `pnpm dev:stop`. |
 | `pnpm lint` | ESLint for the CMS. |
@@ -170,7 +170,9 @@ change the files, not the collections, and keep them in step with the contracts.
   of answering from memory: the frontend is on Astro 7, and its APIs change between
   majors.
 - The e2e tests write to whatever `DATABASE_URL` points at — they seed and delete
-  a user and a media document. Local databases only.
+  a user and a media document. Local databases only. They find elements by
+  role, label or text before `data-testid`, like the frontend's render tests
+  (see «Finding elements in tests» in `src/web/CLAUDE.md`).
 
 ## Branches
 

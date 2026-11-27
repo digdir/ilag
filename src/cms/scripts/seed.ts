@@ -1,8 +1,9 @@
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { isDeepStrictEqual } from 'util'
 
-import { getPayload, type CollectionSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
+import { getPayload, type CollectionSlug, type GlobalSlug, type Payload, type RequiredDataFromCollectionSlug, type Where } from 'payload'
 import config from '@payload-config'
 
 import type { ImportError } from '../src/imports/csv'
@@ -271,13 +272,20 @@ const seed = async (payload: Payload) => {
     count('mandater')
   }
 
-  // Users for some of the people, to try the admin panel as a team editor or
-  // as someone who may not edit, linked the way an Entra ID login links them.
-  for (const { person, email } of data.users) {
+  // Users for some of the people, to try the admin panel as a team editor, a
+  // redaktør or someone who may not edit, linked the way an Entra ID login
+  // links them.
+  for (const user of data.users) {
+    const { person, email } = user
     if (!(await findId(payload, 'brukere', { email: { equals: email } }))) {
       await payload.create({
         collection: 'brukere',
-        data: { email, password: ADMIN.password, person: personIds.get(person) },
+        data: {
+          email,
+          password: ADMIN.password,
+          person: personIds.get(person),
+          roles: 'roles' in user ? [...user.roles] : undefined,
+        },
       })
       count('brukere')
     }
@@ -304,7 +312,76 @@ const seed = async (payload: Payload) => {
     count('tilbakemeldinger')
   }
 
+  // A global can't be created or deleted, only filled in, and only while
+  // nothing is there, not even a draft.
+  for (const global of SEEDED_GLOBALS) {
+    const state = await globalState(payload, global)
+    if (state === 'empty') {
+      await publishGlobal(payload, global.slug, global.data)
+      console.log(`Filled in ${global.slug}`)
+    } else if (state === 'edited') console.log(`Left ${global.slug} as it is: it has been edited`)
+  }
+
   return created
+}
+
+// Leaves out what Payload adds and what is empty, so that the global can be
+// compared with the seed: the ids of array rows, and nulls, empty strings,
+// empty arrays and empty groups.
+const normalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    const items = value.map(normalize).filter((item) => item !== undefined)
+    return items.length ? items : undefined
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value)
+      .filter(([key]) => key !== 'id')
+      .map(([key, item]) => [key, normalize(item)] as const)
+      .filter(([, item]) => item !== undefined)
+    return entries.length ? Object.fromEntries(entries) : undefined
+  }
+  return value === null || value === '' ? undefined : value
+}
+
+// The globals the seed fills in, with what it fills in. `content` picks out
+// what counts when comparing a global with the seed; by default, the fields
+// the seed fills in.
+interface SeededGlobal {
+  slug: GlobalSlug
+  data: Record<string, unknown>
+  content?: (key: string, value: unknown) => unknown
+}
+
+const SEEDED_GLOBALS: SeededGlobal[] = [
+  {
+    slug: 'styringsfundament',
+    data: data.governanceFoundation,
+    // Payload fills in the plan's default title even when nothing is saved,
+    // and the seed uses the same title, so it doesn't count.
+    content: (key, value) => {
+      if (key !== 'plan' || !value || typeof value !== 'object') return value
+      const { title: _title, ...plan } = value as Record<string, unknown>
+      return plan
+    },
+  },
+  { slug: 'forside', data: data.frontPage },
+]
+
+// Publishes new content for a global. Its data type depends on which global
+// it is, which TypeScript can't follow through the list above.
+const publishGlobal = (payload: Payload, slug: GlobalSlug, content: Record<string, unknown>) =>
+  payload.updateGlobal({ slug, data: { ...content, _status: 'published' } as never })
+
+// Whether a global's latest version, a draft included, is empty, still the
+// seed's, or edited since. Only the fields the seed fills in count.
+const globalState = async (payload: Payload, global: SeededGlobal): Promise<'empty' | 'seed' | 'edited'> => {
+  const stored = { ...(await payload.findGlobal({ slug: global.slug, draft: true, depth: 0 })) } as Record<string, unknown>
+  const pick = global.content ?? ((_key: string, value: unknown) => value)
+  const content = (source: Record<string, unknown>) =>
+    normalize(Object.fromEntries(Object.keys(global.data).map((key) => [key, pick(key, source[key])])))
+  const current = content(stored)
+  if (current === undefined) return 'empty'
+  return isDeepStrictEqual(current, content(global.data)) ? 'seed' : 'edited'
 }
 
 // Deletes what the seed creates, matched on the same keys: the memberships
@@ -339,6 +416,21 @@ const removeSeed = async (payload: Payload) => {
     const { docs, errors } = await payload.delete({ collection, where })
     if (docs.length) console.log(`Deleted ${docs.length} from ${collection}`)
     for (const { message } of errors) console.error(`  ${collection}: ${message}`)
+  }
+  // Empties every field of a global while its content is still the seed's,
+  // keeping the versions. Content an administrator has written is left as it is.
+  for (const global of SEEDED_GLOBALS) {
+    const state = await globalState(payload, global)
+    if (state === 'edited') console.log(`Left ${global.slug} as it is: it has been edited`)
+    if (state !== 'seed') continue
+    const empty = Object.fromEntries(
+      Object.entries(global.data).map(([key, value]) => [
+        key,
+        Array.isArray(value) ? [] : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).map((k) => [k, null])) : null,
+      ]),
+    )
+    await publishGlobal(payload, global.slug, empty)
+    console.log(`Emptied ${global.slug}`)
   }
 }
 

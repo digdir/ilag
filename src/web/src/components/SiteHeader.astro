@@ -3,6 +3,7 @@ import type { User } from '@ilag/shared'
 
 import Avatar from './Avatar.astro'
 import SiteMenu from './SiteMenu.astro'
+import SiteSearch from './SiteSearch.astro'
 
 interface Props {
   /** Who is logged in. Without one (the login page) only the logo shows. */
@@ -22,6 +23,7 @@ const cmsAdminURL = `${import.meta.env.PUBLIC_CMS_URL}/admin`
         <img src="/digdir-logo.svg" alt="Digdir" width="30" height="30" />
         <span>ilag</span>
       </a>
+      {user && <SiteSearch />}
       {
         user && (
           <div class="actions">
